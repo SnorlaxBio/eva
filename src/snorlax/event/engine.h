@@ -25,6 +25,9 @@ struct event_engine {
     event_object_t * tail;
 
     event_engine_cancel_t cancel;
+
+    event_processor_pool_t * processors;
+    event_generator_set_t * generators;
 };
 
 struct event_engine_func {
