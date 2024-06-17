@@ -11,10 +11,17 @@
 
 #include "../event.h"
 
-static event_queue_t * event_queue_func_rem(event_queue_t * queue, event_callback_t func);
+typedef event_t * (*event_queue_func_push_t)(event_queue_t *, event_t *);
+typedef event_t * (*event_queue_func_pop_t)(event_queue_t *);
+typedef event_t * (*event_queue_func_del_t)(event_queue_t *, event_t *);
+
+static event_queue_t * event_queue_func_rem(event_queue_t * queue);
 
 static event_queue_func_t func = {
-    event_queue_func_rem
+    event_queue_func_rem,
+    (event_queue_func_push_t) queue_func_push,
+    (event_queue_func_pop_t) queue_func_pop,
+    (event_queue_func_del_t) queue_func_del
 };
 
 extern event_queue_t * event_queue_gen(void) {
@@ -25,51 +32,13 @@ extern event_queue_t * event_queue_gen(void) {
     return queue;
 }
 
-extern event_t * event_queue_func_push(event_queue_t * queue, event_t * event) {
+static event_queue_t * event_queue_func_rem(event_queue_t * queue) {
     object_lock(queue);
-
-    if(queue->tail) {
-        queue->tail->next = event;
-        event->prev = queue->tail;
-    } else {
-        queue->head = event;
-    }
-
-    queue->tail = event;
-    queue->size = queue->size + 1;
-
-    object_unlock(queue);
-
-    object_wakeup(queue, false);
-
-    return event;
-}
-
-extern event_t * event_queue_func_pop(event_queue_t * queue) {    
-    event_t * event = queue->head;
-
-    if(event) {
-        queue->head = event->next;
-        if(queue->head == nil) queue->tail = nil;
-        queue->size = queue->size - 1;
-
-        event->next = nil;
-        event->queue = nil;
-    }
-
-    return event;
-}
-
-static event_queue_t * event_queue_func_rem(event_queue_t * queue, event_callback_t func) {
-    object_lock(queue);
-
+    
     event_t * event = queue->head;
     while(event) {
         queue->head = queue->head->next;
-
-        event->next = nil;
-        event->queue = nil;
-        event = event_rem(event, func);
+        event = event_rem(event);
         event = queue->head;
     }
 
@@ -78,6 +47,6 @@ static event_queue_t * event_queue_func_rem(event_queue_t * queue, event_callbac
     queue->sync = sync_rem(queue->sync);
 
     free(queue);
-
+    
     return nil;
 }

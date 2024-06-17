@@ -7,11 +7,14 @@
  * @since       June 17, 2024
  */
 
-#include <stdlib.h>
-
 #include "event.h"
 
-static event_t * event_func_rem(event_t * event, event_callback_t f);
+#include "event/queue.h"
+#include "event/subscription.h"
+#include "event/subscription/event.h"
+#include "event/subscription/event/queue.h"
+
+static event_t * event_func_rem(event_t * event);
 static int32_t event_func_on(event_t * event);
 
 static event_func_t func = {
@@ -19,22 +22,29 @@ static event_func_t func = {
     event_func_on
 };
 
-extern event_t * event_gen(event_subscription_t * subscription, uint32_t type, event_handler_t on, event_t * event) {
-    if(event == nil) {
-        event = (event_t *) calloc(1, sizeof(event_t));
+extern event_t * event_gen(event_subscription_t * subscription, uint32_t type) {
+    event_t * event = (event_t *) calloc(1, sizeof(event_func_t));
 
-        event->func = &func;
-    }
+    event->func = &func;
 
-    event->subscription = subscription;
+    event->subscription =  subscription;
     event->type = type;
-    event->on = on;
+
+    event->node = event_subscription_event_gen(event);
 
     return event;
 }
 
-static event_t * event_func_rem(event_t * event, event_callback_t f) {
-    if(f) f(event);
+static event_t * event_func_rem(event_t * event) {
+    if(event->node) {
+        event_subscription_event_queue_t * queue = event->subscription->queue;
+
+        object_lock(queue);
+        event_subscription_event_queue_del(queue, event->node);
+        object_unlock(queue);
+
+        event->node = event_subscription_event_rem(event->node);
+    }
 
     free(event);
 
@@ -42,6 +52,5 @@ static event_t * event_func_rem(event_t * event, event_callback_t f) {
 }
 
 static int32_t event_func_on(event_t * event) {
-    event->on(event->subscription, event->type, nil);
-    return success;
+    return event->subscription->func->on(event->subscription, event->type, event);
 }

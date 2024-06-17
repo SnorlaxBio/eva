@@ -14,23 +14,27 @@
 
 struct event {
     event_func_t * func;
+    sync_t * sync;
+
     event_queue_t * queue;
     event_t * prev;
     event_t * next;
 
+    event_subscription_event_t * node;
+
     event_subscription_t * subscription;
     uint32_t type;
-    event_handler_t on;
 };
 
 struct event_func {
-    event_t * (*rem)(event_t *, event_callback_t);
+    event_t * (*rem)(event_t *);
+    
     int32_t (*on)(event_t *);
 };
 
-extern event_t * event_gen(event_subscription_t * subscription, uint32_t type, event_handler_t on, event_t * event);
+extern event_t * event_gen(event_subscription_t * subscription, uint32_t type);
 
-#define event_rem(event, func)      (event ? event->func->rem(event, func) : nil)
-#define event_on(event)             (event ? event->func->on(event) : fail)
+#define event_rem(event)        (event ? event->func->rem(event) : nil)
+#define event_on(event)         (event ? event->func->on(event) : fail)
 
 #endif // __SNORLAX__EVENT__H__
