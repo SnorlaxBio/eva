@@ -22,10 +22,12 @@ static event_func_t func = {
     event_func_on
 };
 
-extern event_t * event_gen(event_subscription_t * subscription, uint32_t type) {
-    event_t * event = (event_t *) calloc(1, sizeof(event_func_t));
+extern event_t * event_gen(event_t * event, event_subscription_t * subscription, uint32_t type) {
+    if(event == nil) {
+        event = (event_t *) calloc(1, sizeof(event_func_t));
 
-    event->func = &func;
+        event->func = &func;
+    }
 
     event->subscription =  subscription;
     event->type = type;

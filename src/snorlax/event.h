@@ -28,11 +28,11 @@ struct event {
 
 struct event_func {
     event_t * (*rem)(event_t *);
-    
+
     int32_t (*on)(event_t *);
 };
 
-extern event_t * event_gen(event_subscription_t * subscription, uint32_t type);
+extern event_t * event_gen(event_t * event, event_subscription_t * subscription, uint32_t type);
 
 #define event_rem(event)        (event ? event->func->rem(event) : nil)
 #define event_on(event)         (event ? event->func->on(event) : fail)

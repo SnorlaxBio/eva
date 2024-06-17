@@ -16,6 +16,10 @@ struct event_subscription {
     event_subscription_func_t * func;
     sync_t * sync;
 
+    event_generator_t * generator;
+    event_subscription_t * prev;
+    event_subscription_t * next;
+
     event_subscription_event_queue_t * queue;
 };
 
