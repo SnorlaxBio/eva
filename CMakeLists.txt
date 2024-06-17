@@ -33,11 +33,13 @@ link_directories(${PROJECT_SOURCE_DIR}/lib ${PROJECT_SOURCE_DIR}/build)
 
 set(SNORLAX_EVA_SOURCE      src/snorlax/event.c
                             src/snorlax/event/queue.c
+                            src/snorlax/event/processor.c
                             src/snorlax/event/generator.c
                             src/snorlax/event/engine.c
                             src/snorlax/event/subscription/event.c
                             src/snorlax/event/subscription/event/queue.c
                             src/snorlax/event/generator/set.c
+                            src/snorlax/event/processor/pool.c
                             src/snorlax/command.c
                             src/snorlax/command/event.c
                             src/snorlax/command/event/subscription.c

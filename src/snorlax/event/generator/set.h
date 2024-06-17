@@ -27,6 +27,8 @@ struct event_generator_set_func {
     event_generator_set_t * (*rem)(event_generator_set_t *);
 };
 
+extern event_generator_set_t * event_generator_set_gen(void);
+
 extern int32_t event_generator_set_func_pub(event_generator_set_t * set, event_queue_t * queue);
 extern int32_t event_generator_set_func_on(event_generator_set_t * set);
 extern int32_t event_generator_set_func_off(event_generator_set_t * set);

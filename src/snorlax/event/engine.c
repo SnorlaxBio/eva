@@ -21,6 +21,12 @@
 
 static event_engine_t * engine = nil;
 
+static event_engine_t * event_engine_func_rem(event_engine_t * engine);
+
+static event_engine_func_t func = {
+    event_engine_func_rem
+};
+
 extern uint32_t event_engine_pool_size(void) {
     if(engine) {
         object_lock(engine->pool);
@@ -45,7 +51,23 @@ extern void event_engine_push(event_t * event) {
     }
 }
 
+extern int32_t event_engine_on(event_engine_conf_t * conf) {
+    if(engine == nil) {
+        engine = (event_engine_t *) calloc(1, sizeof(event_engine_t));
+
+        engine->func = &func;
+
+        engine->queue = event_queue_gen();
+        engine->pool = event_processor_pool_gen(engine, 0);
+        engine->set = event_generator_set_gen();
+    }
+
+    return success;
+}
+
 extern int32_t event_engine_run(void) {
+    if(engine == nil) event_engine_on(nil);
+
     object_lock(engine);
 
     while(engine->cancel == nil) {
@@ -95,4 +117,16 @@ extern command_event_subscription_t * event_engine_command_add(command_t * comma
     object_unlock(engine->set->command);
 
     return subscription;
+}
+
+static event_engine_t * event_engine_func_rem(event_engine_t * engine) {
+    object_lock(engine);
+    engine->pool = event_processor_pool_rem(engine->pool);
+    engine->set = event_generator_set_rem(engine->set);
+    engine->queue = event_queue_rem(engine->queue);
+    object_unlock(engine);
+
+    engine->sync = sync_rem(engine->sync);
+    free(engine);
+    return nil;
 }
