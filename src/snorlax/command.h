@@ -53,9 +53,17 @@ struct command_func {
     command_t * (*rem)(command_t *);
 };
 
+extern command_t * command_gen(command_executor_t exec);
+
+#define command_init(exec)          ((command_t) { command_func_rem, nil, exec })
+
 #define command_rem(command)        (command ? command->func->rem(command) : nil)
 #define command_exec(command)       (command ? command->exec(command) : fail)
 
 extern command_t * command_func_rem(command_t * command);
+
+extern command_event_subscription_t * command_event_subscription_rem(command_event_subscription_t * subscription);
+extern command_t * command_event_subscription_command_get(command_event_subscription_t * subscription);
+
 
 #endif // __SNORLAX__COMMAND__H__

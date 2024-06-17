@@ -10,6 +10,8 @@
 #ifndef   __SNORLAX__COMMAND_EVENT_SUBSCRIPTION__H__
 #define   __SNORLAX__COMMAND_EVENT_SUBSCRIPTION__H__
 
+#include <snorlax/eva.h>
+
 #include <snorlax/command.h>
 
 struct command_event_subscription {
@@ -30,5 +32,7 @@ struct command_event_subscription {
 struct command_event_subscription_func {
     command_event_subscription_t * (*rem)(command_event_subscription_t *);
 };
+
+extern command_event_subscription_t * command_event_subscription_gen(command_t * command, uint32_t status);
 
 #endif // __SNORLAX__COMMAND_EVENT_SUBSCRIPTION__H__

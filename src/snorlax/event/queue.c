@@ -7,6 +7,8 @@
  * @since       June 17, 2024
  */
 
+#include <stdlib.h>
+
 #include "queue.h"
 
 #include "../event.h"
@@ -34,7 +36,7 @@ extern event_queue_t * event_queue_gen(void) {
 
 static event_queue_t * event_queue_func_rem(event_queue_t * queue) {
     object_lock(queue);
-    
+
     event_t * event = queue->head;
     while(event) {
         queue->head = queue->head->next;

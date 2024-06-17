@@ -7,8 +7,12 @@
  * @since       June 18, 2024
  */
 
+#include <stdlib.h>
+
 #include "generator.h"
 #include "subscription.h"
+
+#include "../event.h"
 
 #include "../../event/engine.h"
 #include "../../event/generator.h"
@@ -75,7 +79,7 @@ static int32_t command_event_generator_func_pub(command_event_generator_t * gene
                 object_unlock(generator);
             }
         } else {
-            event_engine_push(command_event_gen(subscription, command_event_type_exec));
+            event_engine_push((event_t *) command_event_gen(subscription, command_event_type_exec));
         }
         object_unlock(subscription);
 

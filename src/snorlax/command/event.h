@@ -32,7 +32,7 @@ struct command_event_func {
     int32_t (*on)(command_event_t *);
 };
 
-extern command_event_t * command_event_gen(command_event_t * event, command_event_subscription_t * subscription, uint32_t type);
+extern command_event_t * command_event_gen(command_event_subscription_t * subscription, uint32_t type);
 
 #define command_event_rem(event)        (event ? event->func->rem(event) : nil)
 

@@ -7,6 +7,8 @@
  * @since       June 17, 2024
  */
 
+#include <stdlib.h>
+
 #include "event.h"
 
 #include "event/queue.h"

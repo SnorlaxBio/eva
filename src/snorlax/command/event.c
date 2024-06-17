@@ -7,11 +7,14 @@
  * @since       June 18, 2024
  */
 
+#include <stdlib.h>
+
 #include "event.h"
 
 #include "../event.h"
 
 #include "event/subscription.h"
+#include "event/generator.h"
 
 static command_event_t * commad_event_func_rem(command_event_t * event);
 static int32_t command_event_func_on(command_event_t * event);
@@ -21,12 +24,10 @@ static command_event_func_t func = {
     command_event_func_on
 };
 
-extern command_event_t * command_event_gen(command_event_t * event, command_event_subscription_t * subscription, uint32_t type) {
-    if(event == nil) {
-        event = (command_event_t *) calloc(1, sizeof(command_event_t));
+extern command_event_t * command_event_gen(command_event_subscription_t * subscription, uint32_t type) {
+    command_event_t * event = (command_event_t *) calloc(1, sizeof(command_event_t));
 
-        event->func = &func;
-    }
+    event->func = &func;
 
     return (command_event_t *) event_gen((event_t *) event, (event_subscription_t *) subscription, type);
 }
@@ -46,7 +47,7 @@ static int32_t command_event_func_on(command_event_t * event) {
                 command_event_generator_t * generator = event->subscription->generator;
 
                 object_lock(generator);
-                command_event_generator_func_del(generator, event->subscription);
+                command_event_generator_del(generator, event->subscription);
                 object_unlock(generator);
             }
         } else {

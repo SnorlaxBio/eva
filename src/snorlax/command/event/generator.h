@@ -33,5 +33,11 @@ struct command_event_generator_func {
 
 extern command_event_generator_t * command_event_generator_gen(void);
 
+#define command_event_generator_rem(generator)                  (generator ? generator->func->rem(generator) : nil)
+#define command_event_generator_on(generator)                   (generator ? generator->func->on(generator) : fail)
+#define command_event_generator_off(generator)                  (generator ? generator->func->off(generator) : fail)
+#define command_event_generator_pub(generator, queue)           (generator ? generator->func->pub(generator, queue) : fail)
+#define command_event_generator_add(generator, subscription)    (generator ? generator->func->add(generator, subscription) : fail)
+#define command_event_generator_del(generator, subscription)    (generator ? generator->func->del(generator, subscription) : fail)
 
 #endif // __SNORLAX__COMMAND_EVENT_GENERATOR__H__

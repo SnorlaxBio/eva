@@ -10,10 +10,14 @@
 #include "engine.h"
 
 #include "processor/pool.h"
+#include "generator.h"
 #include "generator/set.h"
 #include "queue.h"
 
 #include "../event.h"
+
+#include "../command/event/generator.h"
+#include "../command/event/subscription.h"
 
 static event_engine_t * engine = nil;
 
@@ -79,4 +83,16 @@ extern int32_t event_engine_run(void) {
     engine = event_engine_rem(engine);
 
     return success;
+}
+
+extern command_event_subscription_t * event_engine_command_add(command_t * command, uint32_t status) {
+    command_event_subscription_t * subscription = command_event_subscription_gen(command, status);
+
+    if(event_engine_pool_size() > 0) subscription->sync = sync_gen();
+
+    object_lock(engine->set->command);
+    command_event_generator_add(((command_event_generator_t *) engine->set->command), subscription);
+    object_unlock(engine->set->command);
+
+    return subscription;
 }
