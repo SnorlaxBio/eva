@@ -40,12 +40,12 @@ extern event_t * event_queue_func_push(event_queue_t * queue, event_t * event) {
 
     object_unlock(queue);
 
+    object_wakeup(queue, false);
+
     return event;
 }
 
-extern event_t * event_queue_func_pop(event_queue_t * queue) {
-    object_lock(queue);
-    
+extern event_t * event_queue_func_pop(event_queue_t * queue) {    
     event_t * event = queue->head;
 
     if(event) {
@@ -56,8 +56,6 @@ extern event_t * event_queue_func_pop(event_queue_t * queue) {
         event->next = nil;
         event->queue = nil;
     }
-
-    object_unlock(queue);
 
     return event;
 }

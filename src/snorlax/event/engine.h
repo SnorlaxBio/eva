@@ -17,7 +17,7 @@ struct event_engine {
     sync_t * sync;
 
     event_queue_t * queue;
-    event_processor_pool_t * processors;
+    event_processor_pool_t * pool;
 
     event_engine_cancel_t cancel;
 };
@@ -27,5 +27,7 @@ struct event_engine_func {
 };
 
 #define event_engine_rem(engine)        (engine ? engine->func->rem(engine) : nil)
+
+extern void event_engine_queue_push(event_engine_t * engine, event_t * event);
 
 #endif // __SNORLAX__EVENT_ENGINE__H__

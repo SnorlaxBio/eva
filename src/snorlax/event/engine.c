@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "engine.h"
+#include "processor/pool.h"
 
 static event_engine_t * event_engine_func_rem(event_engine_t * o);
 
@@ -80,4 +81,8 @@ static event_engine_t * event_engine_func_rem(event_engine_t * o) {
         free(o);
     }
     return nil;
+}
+
+extern void event_engine_queue_push(event_engine_t * engine, event_t * event) {
+    event_processor_pool_queue_push(engine->pool, event);
 }

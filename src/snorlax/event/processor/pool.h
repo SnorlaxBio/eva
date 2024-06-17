@@ -32,4 +32,6 @@ struct event_processor_pool_func {
 
 extern event_processor_pool_t * event_processor_pool_gen(event_engine_t * engine, uint32_t n);
 
+extern void event_processor_pool_queue_push(event_processor_pool_t * pool, event_t * event);
+
 #endif // __SNORLAX__EVENT_PROCESSOR_POOL__H__

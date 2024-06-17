@@ -10,6 +10,7 @@
 #include "pool.h"
 
 #include "../processor.h"
+#include "../queue.h"
 
 static event_processor_pool_t * event_processor_pool_func_rem(event_processor_pool_t * pool);
 static int32_t event_processor_pool_func_on(event_processor_pool_t * pool);
@@ -25,7 +26,6 @@ extern event_processor_pool_t * event_processor_pool_gen(event_engine_t * engine
     event_processor_pool_t * pool = (event_processor_pool_t *) calloc(1, sizeof(event_processor_pool_t));
 
     pool->func = &func;
-    pool->engine = engine;
     pool->sync = sync_gen();
     
     for(uint32_t i = 0; i < n; i++) {
@@ -64,9 +64,28 @@ static int32_t event_processor_pool_func_off(event_processor_pool_t * pool) {
     object_lock(pool);
     event_processor_t * processor = pool->head;
     while(processor) {
-        event_processor_off(processor, event_processor_func_cancel);
+        processor->thread->cancel = (thread_cancel_t) event_processor_func_cancel;
         processor = processor->next;
+    }
+
+    processor = pool->head;
+    while(processor) {
+        event_processor_off(processor, event_processor_func_cancel);
     }
     object_unlock(pool);
     return success;
+}
+
+extern void event_processor_pool_queue_push(event_processor_pool_t * pool, event_t * event) {
+    if(event) {
+        event_queue_t * queue = pool->queue;
+        
+        object_lock(queue);
+
+        event_queue_push(queue, event);
+
+        object_unlock(queue);
+
+        object_wakeup(queue, false);
+    }
 }

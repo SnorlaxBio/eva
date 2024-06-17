@@ -22,10 +22,7 @@ struct event_processor {
     event_processor_t * prev;
     event_processor_t * next;
 
-    event_queue_t ** queue;
-
     thread_t * thread;
-
 };
 
 struct event_processor_func {
@@ -34,10 +31,10 @@ struct event_processor_func {
 
 extern event_processor_t * event_processor_gen(event_processor_pool_t * pool);
 
+extern void event_processor_func_cancel(event_processor_t * processor);
+
 #define event_processor_rem(processor, cancel)      (processor ? processor->func->rem(processor, cancel) : nil)
 #define event_processor_on(processor)               (processor ? thread_on(processor->thread) : fail)
 #define event_processor_off(processor, cancel)      (processor ? thread_off(processor->thread, (thread_cancel_t) cancel) : success)
-
-extern void event_processor_func_cancel(event_processor_t * processor);
 
 #endif // __SNORLAX__EVENT_PROCESSOR__H__
