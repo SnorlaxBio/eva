@@ -4,77 +4,80 @@
  * @details
  * 
  * @author      snorlax <ceo@snorlax.bio>
- * @since       June 14, 2024
+ * @since       June 17, 2024
  */
 
-#include "engine.h"
-#include "object.h"
+#include <stdlib.h>
 
-static event_engine_t * singleton = nil;
+#include "engine.h"
+
+static event_engine_t * event_engine_func_rem(event_engine_t * o);
+
+static event_engine_func_t func = {
+    event_engine_func_rem
+};
+
+static event_engine_t * engine = nil;
 
 static event_engine_t * event_engine_gen(void);
 
-extern int event_engine_run(void) {
-    if(singleton == nil) singleton = event_engine_gen();
+extern int32_t event_engine_on(void) {
+    if(engine == nil) {
+        engine = event_engine_gen();
+    }
 
-    return singleton->func->run(singleton);
+    return success;
 }
 
-extern void event_engine_cancel(event_engine_cancel_t cancel) {
-    // TODO: ASSERT
-    singleton->cancel = cancel;
+extern int32_t event_engine_off(event_engine_cancel_t cancel) {
+    if(engine) {
+        object_lock(engine);
+        if(engine->cancel) {
+            // TODO: DEBUG ALREADY CANCELLED ...
+            object_unlock(engine);
+            return success;
+        }
+
+        engine->cancel = cancel;
+        object_unlock(engine);
+    }
+
+    return success;
 }
 
-extern event_object_t * event_engine_object_add(event_object_t * o) {
-    // TODO: ASSERT
-    return singleton->func->add(singleton, o);
-}
-
-extern event_object_t * event_engine_object_del(event_object_t * o) {
-    // TODO: ASSERT
-    return singleton->func->del(singleton, o);
+extern int32_t event_engine_run(void) {
+    if(engine) {
+        object_lock(engine);
+        while(engine->cancel == nil) {
+            object_unlock(engine);
+            // TODO: IMPLEMENT
+            object_lock(engine);
+        }
+        engine->cancel(engine);
+        object_unlock(engine);
+        engine = event_engine_rem(engine);
+        return success;
+    }
+    return fail;
 }
 
 static event_engine_t * event_engine_gen(void) {
-    event_engine_t * o = (event_engine_t *) event_engine_epoll_gen();
+    if(engine == nil) {
+        engine = (event_engine_t *) calloc(1, sizeof(event_engine_t));
 
-    return o;
-}
-
-extern event_object_t * event_engine_func_add(event_engine_t * engine, event_object_t * o) {
-    if(engine->tail) {
-        engine->tail->next = o;
-        o->prev = engine->tail;
-    } else {
-        engine->head = o;
+        engine->func = &func;
     }
-    engine->tail = o;
-    engine->size = engine->size + 1;
-    return o;
+    return engine;
 }
 
-extern event_object_t * event_engine_func_del(event_engine_t * engine, event_object_t * o) {
-    if(o->engine) {
-        event_object_t * prev = o->prev;
-        event_object_t * next = o->next;
+static event_engine_t * event_engine_func_rem(event_engine_t * o) {
+    if(o) {
+        object_lock(o);
+        // TODO: IMPLEMENT THIS
+        object_unlock(o);
 
-        if(prev) {
-            prev->next = next;
-        } else {
-            engine->head = next;
-        }
-
-        if(next) {
-            next->prev = prev;
-        } else {
-            engine->tail = prev;
-        }
-
-        engine->size = engine->size - 1;
-
-        o->engine = nil;
+        o->sync = sync_rem(o->sync);
+        free(o);
     }
-    
-    return o;
+    return nil;
 }
-
