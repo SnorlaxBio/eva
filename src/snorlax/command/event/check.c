@@ -16,6 +16,8 @@
 static int32_t exec(command_t * command);
 
 int main(int argc, char ** argv) {
+    event_engine_on(nil);
+
     command_event_subscription_t * subscription = event_engine_command_add(command_gen(exec), command_event_subscription_state_once);
 
     int32_t ret = event_engine_run();
@@ -28,6 +30,8 @@ int main(int argc, char ** argv) {
 
 static int32_t exec(command_t * command) {
     printf("hello world\n");
+
+    event_engine_off(nil);
 
     return success;
 }

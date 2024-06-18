@@ -11,6 +11,8 @@
 
 #include "engine.h"
 
+#include "engine/conf.h"
+
 #include "processor/pool.h"
 #include "generator.h"
 #include "generator/set.h"
@@ -22,6 +24,8 @@
 #include "../command/event/subscription.h"
 
 static event_engine_t * engine = nil;
+
+static void event_engine_func_cancel(event_engine_t * engine);
 
 static event_engine_t * event_engine_func_rem(event_engine_t * engine);
 
@@ -62,9 +66,29 @@ extern int32_t event_engine_on(event_engine_conf_t * conf) {
         engine->queue = event_queue_gen();
         engine->pool = event_processor_pool_gen(engine, 0);
         engine->set = event_generator_set_gen();
+
+        conf = conf ? conf : event_engine_conf_default_get();
+
+        if(conf->command.on) {
+            engine->set->command = (event_generator_t *) command_event_generator_gen();
+        }
+
+        // TODO: IMPLEMENT THIS
     }
 
     return success;
+}
+
+extern int32_t event_engine_off(event_engine_cancel_t cancel) {
+    if(engine){
+        object_lock(engine);
+        engine->cancel = (cancel ? cancel : event_engine_func_cancel);
+        object_unlock(engine);
+    }
+}
+
+extern void event_engine_cancel_set(event_engine_cancel_t cancel) {
+    if(engine) engine->cancel = (cancel ? cancel : event_engine_func_cancel);
 }
 
 extern int32_t event_engine_run(void) {
@@ -131,4 +155,8 @@ static event_engine_t * event_engine_func_rem(event_engine_t * engine) {
     engine->sync = sync_rem(engine->sync);
     free(engine);
     return nil;
+}
+
+static void event_engine_func_cancel(event_engine_t * engine) {
+
 }

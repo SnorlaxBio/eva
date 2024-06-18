@@ -29,6 +29,8 @@ struct event_engine_func {
 
 extern uint32_t event_engine_pool_size(void);
 
+extern void event_engine_cancel_set(event_engine_cancel_t cancel);
+
 extern void event_engine_push(event_t * event);
 
 #define event_engine_rem(engine)        (engine ? engine->func->rem(engine) : nil)

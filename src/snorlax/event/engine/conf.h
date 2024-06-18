@@ -12,10 +12,6 @@
 
 #include <snorlax/eva.h>
 
-struct event_engine_conf {
-    int32_t timeout;
-};
-
-
+extern event_engine_conf_t * event_engine_conf_default_get(void);
 
 #endif // __SNORLAX__EVENT_ENGINE_CONF__H__

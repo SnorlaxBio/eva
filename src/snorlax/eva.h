@@ -77,9 +77,28 @@ typedef struct command_event_subscription command_event_subscription_t;
 typedef void (*event_engine_cancel_t)(event_engine_t *);
 typedef void (*event_processor_cancel_t)(event_processor_t *);
 
+struct event_engine_conf {
+    struct {
+        int32_t on;
+    } command;
+    struct {
+        int32_t on;
+    } descriptor;
+    struct {
+        int32_t on;
+    } time;
+    struct {
+        int32_t on;
+    } signal;
+    struct {
+        int32_t on;
+    } user;
+};
+
 extern command_event_subscription_t * event_engine_command_add(command_t * command, uint32_t status);
 
 extern int32_t event_engine_on(event_engine_conf_t * conf);
+extern int32_t event_engine_off(event_engine_cancel_t cancel);
 extern int32_t event_engine_run(void);
 
 #endif // __SNORLAX__EVA__H__

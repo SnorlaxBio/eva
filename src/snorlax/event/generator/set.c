@@ -51,5 +51,7 @@ static event_generator_set_t * event_generator_set_func_rem(event_generator_set_
 
     set->sync = sync_rem(set->sync);
 
+    free(set);
+
     return nil;
 }
