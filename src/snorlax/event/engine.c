@@ -7,6 +7,8 @@
  * @since       June 18, 2024
  */
 
+#include <stdlib.h>
+
 #include "engine.h"
 
 #include "processor/pool.h"

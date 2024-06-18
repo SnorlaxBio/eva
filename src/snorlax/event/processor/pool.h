@@ -25,10 +25,17 @@ struct event_processor_pool {
 
 struct event_processor_pool_func {
     event_processor_pool_t * (*rem)(event_processor_pool_t *);
+    int32_t (*on)(event_processor_pool_t *);
+    int32_t (*off)(event_processor_pool_t *, event_processor_cancel_t);
 };
 
 extern event_processor_pool_t * event_processor_pool_gen(event_engine_t * engine, uint32_t size);
 
-#define event_processor_pool_rem(pool)      (pool ? pool->func->rem(pool) : nil)
+extern void event_processor_pool_add(event_processor_pool_t * pool, event_processor_t * processor);
+extern void event_processor_pool_del(event_processor_pool_t * pool, event_processor_t * processor);
+
+#define event_processor_pool_rem(pool)              ((pool) ? (pool)->func->rem(pool) : nil)
+#define event_processor_pool_on(pool)               ((pool) ? (pool)->func->on(pool) : nil)
+#define event_processor_pool_off(pool, cancel)      ((pool) ? (pool)->func->off(pool, cancel) : nil)
 
 #endif // __SNORLAX__EVENT_PROCESSOR_POOL__H__
