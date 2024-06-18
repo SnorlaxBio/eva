@@ -86,7 +86,7 @@ static int32_t event_processor_func_routine(event_processor_t * processor) {
 
 static event_processor_t * event_processor_func_rem(event_processor_t * processor) {
     // PROCESSOR OFF
-    processor->thread = thread_rem(processor->thread, nil);
+    processor->thread = thread_rem(processor->thread);
 
     event_processor_pool_del(processor->pool, processor);
 
