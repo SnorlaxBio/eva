@@ -28,13 +28,14 @@ struct event {
 
 struct event_func {
     event_t * (*rem)(event_t *);
-
     int32_t (*on)(event_t *);
 };
 
-extern event_t * event_gen(event_t * event, event_subscription_t * subscription, uint32_t type);
+// TODO: UPGRADE PARAM event: event_t * 를 없애야 한다.
+//       공통적으로 표준적이지 않다. 지금 바꾸자.
+extern event_t * event_gen(event_subscription_t * subscription, uint32_t type);
 
-#define event_rem(event)        (event ? event->func->rem(event) : nil)
-#define event_on(event)         (event ? event->func->on(event) : fail)
+#define event_rem(event)        ((event)->func->rem(event))
+#define event_on(event)         ((event)->func->on(event))
 
 #endif // __SNORLAX__EVENT__H__

@@ -29,7 +29,10 @@ extern command_event_t * command_event_gen(command_event_subscription_t * subscr
 
     event->func = &func;
 
-    return (command_event_t *) event_gen((event_t *) event, (event_subscription_t *) subscription, type);
+    event->subscription = subscription;
+    event->type = type;
+
+    return event;
 }
 
 static command_event_t * commad_event_func_rem(command_event_t * event) {
