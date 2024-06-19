@@ -20,6 +20,7 @@
 #include "../../../event/generator.h"
 
 static descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_func_rem(descriptor_event_generator_epoll_t * generator);
+
 static int32_t descriptor_event_generator_epoll_func_on(descriptor_event_generator_epoll_t * generator);
 static int32_t descriptor_event_generator_epoll_func_off(descriptor_event_generator_epoll_t * generator);
 static int32_t descriptor_event_generator_epoll_func_pub(descriptor_event_generator_epoll_t * generator, event_queue_t * queue);
@@ -39,6 +40,9 @@ static descriptor_event_generator_epoll_func_t func = {
     descriptor_event_generator_epoll_func_del
 };
 
+/**
+ * @fn          extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen(void)
+ */
 extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen(void) {
     descriptor_event_generator_epoll_t * generator = (descriptor_event_generator_epoll_t *) calloc(1, sizeof(descriptor_event_generator_epoll_t));
 
@@ -53,33 +57,38 @@ extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen
     return generator;
 }
 
+/**
+ * @fn          static int32_t descriptor_event_generator_epoll_func_on(descriptor_event_generator_epoll_t * generator)
+ */
 static int32_t descriptor_event_generator_epoll_func_on(descriptor_event_generator_epoll_t * generator) {
+    int32_t ret = success;
     object_lock(generator);
     if(generator->fd <= invalid) {
         generator->fd = epoll_create(generator->max);
-        // TODO: CHECK fd is invalid
+        if(generator->fd > invalid) {
+            descriptor_event_subscription_t * subscription = generator->head;
+            while(subscription) {
+                object_lock(subscription);
 
-        descriptor_event_subscription_t * subscription = generator->head;
-        while(subscription) {
-            object_lock(subscription);
+                descriptor_event_generator_epoll_func_add(generator, subscription);
 
-            if(subscription->descriptor->value > invalid) {
-                descriptor_event_generator_epoll_func_system_add(generator, subscription);
-            } else {
-                // TODO: OPEN DESCRIPTOR LOGIC
+                descriptor_event_subscription_t * next = subscription->next;
+                object_unlock(subscription);
+
+                subscription = next;
             }
-
-            descriptor_event_subscription_t * next = subscription->next;
-            object_unlock(subscription);
-
-            subscription = next;
+        } else {
+            ret = fail;
         }
     }
     object_unlock(generator);
 
-    return success;
+    return ret;
 }
 
+/**
+ * @fn          static int32_t descriptor_event_generator_epoll_func_off(descriptor_event_generator_epoll_t * generator)
+ */
 static int32_t descriptor_event_generator_epoll_func_off(descriptor_event_generator_epoll_t * generator) {
     object_lock(generator);
     if(generator->fd > invalid) {
