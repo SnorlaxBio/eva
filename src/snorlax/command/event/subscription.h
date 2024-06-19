@@ -31,8 +31,15 @@ struct command_event_subscription {
 
 struct command_event_subscription_func {
     command_event_subscription_t * (*rem)(command_event_subscription_t *);
+    void (*on)(command_event_subscription_t *, uint32_t, uint64_t);
 };
 
 extern command_event_subscription_t * command_event_subscription_gen(command_t * command, uint32_t status);
+
+extern command_event_subscription_t * command_event_subscription_func_rem(command_event_subscription_t * subscription);
+extern void command_event_subscription_func_on(command_event_subscription_t * subscription, uint32_t type, uint64_t ret);
+
+#define command_event_subscription_rem(subscription)            ((subscription)->func->rem(subscription))
+#define command_event_subscription_on(subscription, type, ret)  ((subscription)->func->on(subscription, type, ret))
 
 #endif // __SNORLAX__COMMAND_EVENT_SUBSCRIPTION__H__

@@ -31,9 +31,7 @@ struct event_func {
     int32_t (*on)(event_t *);
 };
 
-// TODO: UPGRADE PARAM event: event_t * 를 없애야 한다.
-//       공통적으로 표준적이지 않다. 지금 바꾸자.
-extern event_t * event_gen(event_subscription_t * subscription, uint32_t type);
+extern event_t * event_func_rem(event_t * event);
 
 #define event_rem(event)        ((event)->func->rem(event))
 #define event_on(event)         ((event)->func->on(event))

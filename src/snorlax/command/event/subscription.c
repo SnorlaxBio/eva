@@ -14,7 +14,8 @@
 #include "../../event/subscription/event/queue.h"
 
 command_event_subscription_func_t func = {
-    command_event_subscription_rem
+    command_event_subscription_func_rem,
+    command_event_subscription_func_on
 };
 
 extern command_event_subscription_t * command_event_subscription_gen(command_t * command, uint32_t status) {
@@ -30,7 +31,7 @@ extern command_event_subscription_t * command_event_subscription_gen(command_t *
     return subscription;
 }
 
-extern command_event_subscription_t * command_event_subscription_rem(command_event_subscription_t * subscription) {
+extern command_event_subscription_t * command_event_subscription_func_rem(command_event_subscription_t * subscription) {
     if(subscription) {
         object_lock(subscription);
         subscription->queue = event_subscription_event_queue_rem(subscription->queue);
@@ -42,6 +43,10 @@ extern command_event_subscription_t * command_event_subscription_rem(command_eve
     }
     
     return nil;
+}
+
+extern void command_event_subscription_func_on(command_event_subscription_t * subscription, uint32_t type, uint64_t ret) {
+    // TODO: IMPLEMENT THIS
 }
 
 extern command_t * command_event_subscription_command_get(command_event_subscription_t * subscription) {

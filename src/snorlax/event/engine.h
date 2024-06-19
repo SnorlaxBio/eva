@@ -33,6 +33,8 @@ extern void event_engine_cancel_set(event_engine_cancel_t cancel);
 
 extern void event_engine_push(event_t * event);
 
+extern int32_t event_engine_subscription_dispatch(event_subscription_t * subscription, uint32_t type, uint64_t param, event_generator_t * generator);
+
 #define event_engine_rem(engine)        (engine ? engine->func->rem(engine) : nil)
 
 #endif // __SNORLAX__EVENT_ENGINE__H__

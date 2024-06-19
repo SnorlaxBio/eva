@@ -9,7 +9,11 @@
 
 #include "../descriptor.h"
 
-extern void descriptor_exception_func_set(___notnull descriptor_exception_t * exception, uint32_t action, uint32_t type) {
-    exception->action = action;
+extern void descriptor_exception_func_set(___notnull descriptor_exception_t * exception, uint32_t type, void * func, uint32_t no) {
+#ifndef   RELEASE
+    snorlaxdbg(exception == nil, "critical", "");
+#endif // RELEASE
     exception->type = type;
+    exception->func = func;
+    exception->no = no;
 }

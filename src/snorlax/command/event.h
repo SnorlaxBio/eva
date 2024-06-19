@@ -32,8 +32,10 @@ struct command_event_func {
     int32_t (*on)(command_event_t *);
 };
 
+// TODO: EVENT 객체와 동일하기에 매크로로 변경할 수 있다. 필요시에 재정의하면
+//       라이브러리의 크기가 작아진다.
 extern command_event_t * command_event_gen(command_event_subscription_t * subscription, uint32_t type);
 
-#define command_event_rem(event)        (event ? event->func->rem(event) : nil)
+#define command_event_rem(event)        ((event)->func->rem(event))
 
 #endif // __SNORLAX__COMMAND_EVENT__H__
