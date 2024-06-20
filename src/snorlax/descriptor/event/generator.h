@@ -22,6 +22,8 @@ struct descriptor_event_generator {
     uint64_t size;
     descriptor_event_subscription_t * head;
     descriptor_event_subscription_t * tail;
+
+    int32_t retry;
 };
 
 struct descriptor_event_generator_func {
@@ -32,6 +34,8 @@ struct descriptor_event_generator_func {
     int32_t (*add)(descriptor_event_generator_t *, descriptor_event_subscription_t *);
     int32_t (*del)(descriptor_event_generator_t *, descriptor_event_subscription_t *);
 };
+
+extern descriptor_event_generator_t * descriptor_event_generator_gen(void);
 
 #define descriptor_event_generator_rem(generator)                       ((generator)->func->rem(generator))
 #define descriptor_event_generator_on(generator)                        ((generator)->func->on(generator))

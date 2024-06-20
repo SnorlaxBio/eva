@@ -30,6 +30,8 @@ extern descriptor_t * descriptor_gen(int32_t value) {
     descriptor->buffer.out = buffer_gen(0);
     descriptor->value = value;
 
+    descriptor->status = descriptor_state_gen;
+
     return descriptor;
 }
 
@@ -49,10 +51,9 @@ extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor) {
 }
 
 /**
+ * @fn          extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor)
  * 
- * @todo        read 를 수행한 후에 버퍼의 사이즈를 줄일 수 있을까?
- *              차후를 위해서 지금 줄이면 안되고 이것을 호출하는 곳에서
- *              줄여야 한다.
+ * 
  */
 extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
     int32_t fd = descriptor->value;
@@ -66,7 +67,7 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
         if(n > 0) {
             buffer_size_set(buffer, buffer_size_get(buffer) + n);
         } else if(n == 0) {
-            descriptor_exception_set(address_of(descriptor->exception), descriptor_action_read, descriptor_exception_type_eof);
+            descriptor_exception_set(address_of(descriptor->exception), descriptor_action_type_lib, descriptor_func_read, descriptor_exception_no_eof);
 
             n = fail;
         } else {
@@ -74,16 +75,23 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
                 descriptor->status = (descriptor->status | (~descriptor_state_in));
                 n = 0;
             } else {
-                descriptor_exception_set(address_of(descriptor->exception), descriptor_action_system_read, errno);
+                descriptor_exception_set(address_of(descriptor->exception), descriptor_action_type_system, read, errno);
             }
         }
 
         return n;
     }
-    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_read, descriptor_exception_type_closed);
+
+    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_type_lib, descriptor_func_read, descriptor_exception_no_dead);
+
     return fail;
 }
 
+/**
+ * @fn          extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor)
+ * @brief
+ * @details     쓰기 후에 포지션 위치만 변경하기 때문에, 이벤트를 핸들일 할 때, 외부에서 쓰여진 버퍼에 기록된 정보를 추출할 수 있다.
+ */
 extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
     int32_t value = descriptor->value;
 
@@ -94,6 +102,7 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
 
             if(n > 0) {
                 buffer_position_set(buffer, buffer_position_get(buffer) + n);
+
                 if(buffer_length(buffer) == 0) buffer_reset(buffer, 0);
             } else if(n == 0) {
                 // TODO: CHECK THIS
@@ -101,28 +110,35 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
                 if(errno == EAGAIN) {
                     n == 0;
                 } else {
-                    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_system_write, errno);
+                    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_type_system, write, errno);
                 }
             }
         }
         return success;
     }
-    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_write, descriptor_exception_type_closed);
+
+    descriptor_exception_set(address_of(descriptor->exception), descriptor_action_type_lib, descriptor_func_write, descriptor_exception_no_dead);
+
     return fail;
 }
 
 /**
  * @fn          int32_t descriptor_func_close(descriptor_t * descriptor)
- * @brief       디스크립터를 닫는다.
+ * @brief       close open file descriptor.
  * @details     
  */
 extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor) {
     if(descriptor->value > invalid) {
         int ret = close(descriptor->value);
 
-        if(ret < 0) descriptor_exception_set(address_of(descriptor->exception), descriptor_action_system_close, errno);
+        if(ret == fail) {
+            snorlaxdbg(false, "caution", "fail to close => %d", errno);
+        }
+
+        descriptor->status = descriptor_state_gen;
 
         descriptor->value = invalid;
     }
+
     return success;
 }

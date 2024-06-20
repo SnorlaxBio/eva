@@ -96,6 +96,7 @@ struct event_engine_conf {
 };
 
 extern command_event_subscription_t * event_engine_command_add(command_t * command, uint32_t status);
+extern descriptor_event_subscription_t * event_engine_descriptor_add(descriptor_t * descriptor, uint32_t interest);
 
 extern int32_t event_engine_on(event_engine_conf_t * conf);
 extern int32_t event_engine_off(event_engine_cancel_t cancel);

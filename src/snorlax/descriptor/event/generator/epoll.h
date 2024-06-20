@@ -28,6 +28,8 @@ struct descriptor_event_generator_epoll {
     descriptor_event_subscription_t * head;
     descriptor_event_subscription_t * tail;
 
+    uint32_t retry;
+
     int32_t fd;
     void * events;
     int32_t max;

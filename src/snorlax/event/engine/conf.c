@@ -11,6 +11,7 @@
 
 static event_engine_conf_t conf = {
     { true },
+    { true },
     0,
 };
 

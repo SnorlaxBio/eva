@@ -29,9 +29,9 @@ struct event_generator_set_func {
 
 extern event_generator_set_t * event_generator_set_gen(void);
 
-extern int32_t event_generator_set_func_pub(event_generator_set_t * set, event_queue_t * queue);
-extern int32_t event_generator_set_func_on(event_generator_set_t * set);
-extern int32_t event_generator_set_func_off(event_generator_set_t * set);
+extern int32_t event_generator_set_func_pub(___notnull event_generator_set_t * set, event_queue_t * queue);
+extern int32_t event_generator_set_func_on(___notnull event_generator_set_t * set);
+extern int32_t event_generator_set_func_off(___notnull event_generator_set_t * set);
 
 #define event_generator_set_rem(set)            (set ? set->func->rem(set) : nil)
 #define event_generator_set_pub(set, queue)     event_generator_set_func_pub(set, queue);

@@ -16,6 +16,7 @@
 
 #include "../../event.h"
 #include "../subscription.h"
+#include "../subscription/action.h"
 
 #include "../../../event/generator.h"
 
@@ -54,6 +55,8 @@ extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen
 
     generator->fd = epoll_create(generator->max);
 
+    generator->retry = 4;
+
     return generator;
 }
 
@@ -70,7 +73,7 @@ static int32_t descriptor_event_generator_epoll_func_on(descriptor_event_generat
             while(subscription) {
                 object_lock(subscription);
 
-                descriptor_event_generator_epoll_func_add(generator, subscription);
+                descriptor_event_generator_epoll_func_system_add(generator, subscription);
 
                 descriptor_event_subscription_t * next = subscription->next;
                 object_unlock(subscription);
@@ -99,7 +102,8 @@ static int32_t descriptor_event_generator_epoll_func_off(descriptor_event_genera
     descriptor_event_subscription_t * subscription = generator->head;
     while(subscription) {
         object_lock(subscription);
-        subscription->status = subscription->status & (~descriptor_event_subscription_state_wait);
+
+        subscription->descriptor->status = subscription->descriptor->status & (~(descriptor_state_subscription_reg | descriptor_state_subscription_wait));
         descriptor_event_subscription_t * next = subscription->next;
         object_unlock(subscription);
 
@@ -110,9 +114,7 @@ static int32_t descriptor_event_generator_epoll_func_off(descriptor_event_genera
     return success;
 }
 
-/**
- * 
- */
+// TODO: QUEUE 를 사용하는 구조로 변경하자...
 static int32_t descriptor_event_generator_epoll_func_pub(descriptor_event_generator_epoll_t * generator, event_queue_t * queue) {
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, "critical", "");
@@ -120,37 +122,41 @@ static int32_t descriptor_event_generator_epoll_func_pub(descriptor_event_genera
 
     snorlaxdbg(queue == nil, "critical", "");
 #endif // RELEASE
+    // 큐가 사용되지 않는다....
+
     struct epoll_event * events = (struct epoll_event *) generator->events;
 
     int32_t n = epoll_wait(generator->fd, events, generator->max, generator->timeout);
 
     if(n >= 0) {
         descriptor_event_subscription_t * subscription = nil;
+        descriptor_t * descriptor = nil;
         for(int32_t i = 0; i < n; i++) {
             subscription = events[i].data.ptr;
             object_lock(subscription);
+            descriptor = subscription->descriptor;
             int32_t flags = events[i].events;
             if(flags & (EPOLLERR | EPOLLPRI | EPOLLRDHUP | EPOLLHUP)) {
-                // TODO: SUBSCRIPTION STATUS & DESCRIPTOR STATUS
-                uint64_t param = uint64_from_uint32x2(descriptor_action_system_engine ,(flags & (EPOLLERR | EPOLLPRI | EPOLLRDHUP | EPOLLHUP)));
-                event_engine_subscription_dispatch(subscription, descriptor_event_type_exception, param, generator);
+                descriptor->status = descriptor->status | descriptor_state_exception;
+                descriptor_exception_t * exception = descriptor_exception_set(address_of(subscription->descriptor->exception), descriptor_exception_type_system, epoll_wait, (flags & (EPOLLERR | EPOLLPRI | EPOLLRDHUP | EPOLLHUP)));
+                descriptor_event_subscription_dispatch(subscription, descriptor_action_exception, exception, queue);
                 object_unlock(subscription);
                 continue;
             }
             if(flags & EPOLLOUT) {
-                subscription->status = subscription->status & (~descriptor_event_subscription_state_wait_out);
-                subscription->descriptor->status = subscription->descriptor->status | descriptor_state_out;
+                descriptor->status = descriptor->status | descriptor_state_out;
+                descriptor->status = descriptor->status & (~descriptor_state_subscription_wait_out);
                 if(buffer_length(subscription->descriptor->buffer.out) > 0) {
-                    if(event_engine_subscription_dispatch(subscription, descriptor_event_type_out, 0, generator) == fail) {
+                    if(descriptor_event_subscription_dispatch(subscription, descriptor_action_out, 0, queue) == fail) {
                         object_unlock(subscription);
                         continue;
                     }
                 }
             }
             if(flags & EPOLLIN) {
-                subscription->status = subscription->status & (~descriptor_event_subscription_state_wait_in);
-                subscription->descriptor->status = subscription->descriptor->status | descriptor_state_in;
-                if(event_engine_subscription_dispatch(subscription, descriptor_event_type_in, 0, generator) == fail) {
+                descriptor->status = descriptor->status | descriptor_state_in;
+                descriptor->status = descriptor->status & (~descriptor_state_subscription_wait_in);
+                if(descriptor_event_subscription_dispatch(subscription, descriptor_action_in, 0, queue) == fail) {
                     object_unlock(subscription);
                     continue;
                 }
@@ -183,15 +189,17 @@ static int32_t descriptor_event_generator_epoll_func_add(descriptor_event_genera
     snorlaxdbg(subscription->descriptor == nil, "critical", "");
     snorlaxdbg(subscription->generator != nil, "critical", "");
 #endif // RELEASE
+    descriptor_t * descriptor = subscription->descriptor;
     int32_t ret = event_generator_func_add((event_generator_t *) generator, (event_subscription_t *) subscription);
 
     if(ret == success) {
+        descriptor->status = descriptor->status | descriptor_event_subscription_state_subscribed;
+
         if(generator->fd > invalid) {
             if(subscription->descriptor->value <= invalid) {
-                ret = descriptor_open(subscription->descriptor);
-                if(ret == success && (subscription->descriptor->status & descriptor_state_open) == 0) {
-                    descriptor_event_subscription_on(subscription, descriptor_event_type_open, success);
-                }
+                ret = descriptor_event_subscription_action_func_open(subscription, 0);
+            } else {
+                ret = descriptor_event_generator_epoll_func_system_add(generator, subscription);
             }
 
             if(ret == success) {
@@ -200,10 +208,14 @@ static int32_t descriptor_event_generator_epoll_func_add(descriptor_event_genera
             
             if(ret == fail) {
                 event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
+
+                subscription->status = subscription->status & (~descriptor_event_subscription_state_subscribed);
             }
         } else {
             event_engine_push((event_t *) descriptor_event_gen(subscription, descriptor_event_type_open, 0));
         }
+    } else {
+        subscription->status = subscription->status & (~descriptor_event_subscription_state_subscribed);
     }
 
     return ret;
@@ -226,6 +238,8 @@ static int32_t descriptor_event_generator_epoll_func_del(descriptor_event_genera
     }
     
     event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
+
+    subscription->status = subscription->status & (~descriptor_event_subscription_state_subscribed);
 
     return success;
 }
@@ -279,6 +293,8 @@ static int32_t descriptor_event_generator_epoll_func_system_add(descriptor_event
     }
 
     if(ret == success) {
+        subscription->status = subscription->status | descriptor_event_subscription_state_registered;
+
         if(subscription->interest & descriptor_event_subscription_interest_in) {
             subscription->status = subscription->status | descriptor_event_subscription_state_wait_in;
         }
@@ -339,6 +355,8 @@ static int32_t descriptor_event_generator_epoll_func_system_mod(descriptor_event
     }
 
     if(ret == success) {
+        subscription->status = subscription->status | descriptor_event_subscription_state_registered;
+
         if(subscription->interest & descriptor_event_subscription_interest_in) {
             subscription->status = subscription->status | descriptor_event_subscription_state_wait_in;
         }
@@ -394,7 +412,7 @@ static int32_t descriptor_event_generator_epoll_func_system_del(___notnull descr
     }
 
     if(ret == success) {
-        subscription->status = subscription->status & (~descriptor_event_subscription_state_wait);
+        subscription->status = subscription->status & (~(descriptor_event_subscription_state_wait | descriptor_event_subscription_state_registered));
     }
 
     return ret;

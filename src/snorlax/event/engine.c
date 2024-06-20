@@ -23,6 +23,9 @@
 #include "../command/event/generator.h"
 #include "../command/event/subscription.h"
 
+#include "../descriptor/event/generator.h"
+#include "../descriptor/event/subscription.h"
+
 static event_engine_t * engine = nil;
 
 static void event_engine_func_cancel(event_engine_t * engine);
@@ -69,9 +72,9 @@ extern int32_t event_engine_on(event_engine_conf_t * conf) {
 
         conf = conf ? conf : event_engine_conf_default_get();
 
-        if(conf->command.on) {
-            engine->set->command = (event_generator_t *) command_event_generator_gen();
-        }
+        if(conf->command.on) engine->set->command = (event_generator_t *) command_event_generator_gen();
+        if(conf->descriptor.on) engine->set->descriptor = (event_generator_t *) descriptor_event_generator_gen();
+
 
         // TODO: IMPLEMENT THIS
     }
@@ -100,7 +103,7 @@ extern int32_t event_engine_run(void) {
         object_unlock(engine);
 
         if(event_engine_pool_size() == 0) {
-            event_generator_set_pub(engine->set, engine->queue);
+            event_generator_set_pub(engine->set, nil);
 
             object_lock(engine->queue);
             uint64_t limit = engine->queue->size;
@@ -131,6 +134,19 @@ extern int32_t event_engine_run(void) {
     engine = event_engine_rem(engine);
 
     return success;
+}
+
+
+extern descriptor_event_subscription_t * event_engine_descriptor_add(descriptor_t * descriptor, uint32_t interest) {
+    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, interest);
+
+    if(event_engine_pool_size() > 0) subscription->sync = sync_gen();
+
+    object_lock(engine->set->descriptor);
+    descriptor_event_generator_add(((descriptor_event_generator_t *) engine->set->descriptor), subscription);
+    object_unlock(engine->set->descriptor);
+
+    return subscription;
 }
 
 extern command_event_subscription_t * event_engine_command_add(command_t * command, uint32_t status) {
