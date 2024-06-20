@@ -42,6 +42,9 @@ struct event_generator_set_func;
 struct command;
 struct command_event_subscription;
 
+struct descriptor;
+struct descriptor_func;
+
 typedef struct event event_t;
 typedef struct event_func event_func_t;
 typedef struct event_queue event_queue_t;
@@ -74,6 +77,13 @@ typedef struct event_generator_set_func event_generator_set_func_t;
 typedef struct command command_t;
 typedef struct command_event_subscription command_event_subscription_t;
 
+typedef struct descriptor_buffer descriptor_buffer_t;
+typedef struct descriptor_exception descriptor_exception_t;
+
+typedef struct descriptor descriptor_t;
+
+typedef struct descriptor_func descriptor_func_t;
+
 typedef void (*event_engine_cancel_t)(event_engine_t *);
 typedef void (*event_processor_cancel_t)(event_processor_t *);
 
@@ -96,7 +106,7 @@ struct event_engine_conf {
 };
 
 extern command_event_subscription_t * event_engine_command_add(command_t * command, uint32_t status);
-extern descriptor_event_subscription_t * event_engine_descriptor_add(descriptor_t * descriptor, uint32_t interest);
+// extern descriptor_event_subscription_t * event_engine_descriptor_add(descriptor_t * descriptor, uint32_t interest);
 
 extern int32_t event_engine_on(event_engine_conf_t * conf);
 extern int32_t event_engine_off(event_engine_cancel_t cancel);
