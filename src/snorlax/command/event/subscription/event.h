@@ -12,6 +12,7 @@
 
 #include <snorlax/command/event.h>
 
-extern command_event_subscription_event_t * command_event_subscription_event_gen(___notnull command_event_subscription_t * subscription);
+#define command_event_subscription_event_gen    event_subscription_event_gen
+#define command_event_subscription_event_rem    event_subscription_event_rem
 
 #endif // __SNORLAX__COMMAND_EVENT_SUBSCRIPTION_EVENT__H__

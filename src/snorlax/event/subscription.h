@@ -23,10 +23,10 @@ struct event_subscription {
 
 struct event_subscription_func {
     event_subscription_t * (*rem)(___notnull event_subscription_t *);
-    void (*on)(___notnull event_subscription_t *, uint32_t, ___notnull event_subscription_event_t *);
+    void (*on)(___notnull event_subscription_t *, uint32_t, uint64_t);
     event_subscription_event_t * (*event_gen)(___notnull event_subscription_t *);
 };
 
-#define event_subscription_on(subscription, type, node)     ((subscription)->func->on(subscription, type, node))
+#define event_subscription_on(subscription, type, ret)      ((subscription)->func->on(subscription, type, ret))
 
 #endif // __SNORLAX__EVENT_SUBSCRIPTION__H__

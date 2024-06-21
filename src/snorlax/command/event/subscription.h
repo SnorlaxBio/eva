@@ -21,6 +21,7 @@ struct command_event_subscription {
     command_event_subscription_event_queue_t * queue;
 
     int32_t retry;
+    int32_t count;
     command_t * command;
 };
 
