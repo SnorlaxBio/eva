@@ -133,3 +133,7 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
 
     return success;
 }
+
+static void event_engine_func_default_cancel(event_engine_t * engine) {
+    
+}

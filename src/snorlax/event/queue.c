@@ -12,7 +12,7 @@
 
 static ___sync event_queue_t * event_queue_func_rem(___notnull event_queue_t * queue);
 static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___notnull event_t * event);
-static event_t * event_queue_func_pop(___notnull event_queue_t * queue);
+static ___notsync event_t * event_queue_func_pop(___notnull event_queue_t * queue);
 static ___sync void event_queue_func_del(___notnull event_queue_t * queue, ___notnull event_t * event);
 
 static event_queue_func_t func = {
@@ -72,7 +72,7 @@ static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___n
     object_wakeup(queue, false);
 }
 
-static event_t * event_queue_func_pop(___notnull event_queue_t * queue) {
+static ___notsync event_t * event_queue_func_pop(___notnull event_queue_t * queue) {
 #ifndef   RELEASE
     snorlaxdbg(queue == nil, "critical", "");
 #endif // RELEASE

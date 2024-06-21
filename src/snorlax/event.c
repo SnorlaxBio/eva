@@ -17,7 +17,8 @@
 static event_t * event_func_rem(___notnull event_t * event);
 
 static event_func_t func = {
-    event_func_rem
+    event_func_rem,
+    event_func_on
 };
 
 extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node) {
@@ -37,18 +38,6 @@ extern event_t * event_gen(___notnull event_subscription_t * subscription, uint3
     node->origin = event;
 
     return event;
-}
-
-extern void event_func_on(___notnull event_t * event) {
-#ifndef   RELEASE
-    snorlaxdbg(event == nil, "critical", "");
-    snorlaxdbg(event->subscription == nil, "critical", "");
-    snorlaxdbg(event->node == nil, "critical", "");
-#endif // RELEASE
-
-    event_subscription_on(event->subscription, event->type, event->node);
-
-    event_rem(event);
 }
 
 static event_t * event_func_rem(___notnull event_t * event) {
@@ -71,4 +60,14 @@ static event_t * event_func_rem(___notnull event_t * event) {
     return nil;
 }
 
+extern void event_func_on(___notnull event_t * event) {
+#ifndef   RELEASE
+    snorlaxdbg(event == nil, "critical", "");
+    snorlaxdbg(event->subscription == nil, "critical", "");
+    snorlaxdbg(event->node == nil, "critical", "");
+#endif // RELEASE
 
+    event_subscription_on(event->subscription, event->type, (uint64_t) event->node);
+
+    event_rem(event);
+}

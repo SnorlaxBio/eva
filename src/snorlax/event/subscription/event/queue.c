@@ -13,6 +13,10 @@
 #include "queue.h"
 #include "../event.h"
 
+static event_subscription_event_queue_t * event_subscription_event_queue_func_rem(___notnull event_subscription_event_queue_t * queue);
+static event_subscription_event_t * event_subscription_event_queue_func_add(___notnull event_subscription_event_queue_t * queue, ___notnull event_subscription_event_t * event);
+static event_subscription_event_t * event_subscription_event_queue_func_del(___notnull event_subscription_event_queue_t * queue, ___notnull event_subscription_event_t * event);
+
 static event_subscription_event_queue_func_t func = {
     event_subscription_event_queue_func_rem,
     event_subscription_event_queue_func_add,

@@ -24,7 +24,7 @@ struct event_queue {
 struct event_queue_func {
     ___sync event_queue_t * (*rem)(___notnull event_queue_t *);
     ___sync void (*push)(___notnull event_queue_t *, ___notnull event_t *);
-    event_t * (*pop)(___notnull event_queue_t *);
+    ___notsync event_t * (*pop)(___notnull event_queue_t *);
     ___sync void (*del)(___notnull event_queue_t *, ___notnull event_t *);
 };
 

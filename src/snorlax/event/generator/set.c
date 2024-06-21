@@ -12,6 +12,7 @@
 #include "set.h"
 
 #include "../engine.h"
+#include "../generator.h"
 #include "../processor/pool.h"
 
 static ___sync event_generator_set_t * event_generator_set_func_rem(___notnull event_generator_set_t * set);

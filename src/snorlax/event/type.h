@@ -1,6 +1,6 @@
 /**
  * @file        snorlax/event/type.h
- * @brief       
+ * @brief
  * @details
  * 
  * @author      snorlax <ceo@snorlax.bio>
@@ -10,7 +10,6 @@
 #ifndef   __SNORLAX__EVENT_TYPE__H__
 #define   __SNORLAX__EVENT_TYPE__H__
 
-#define event_type_subscribe            0
-#define event_type_unsubscribe          1
+#define event_type_subscription             0
 
 #endif // __SNORLAX__EVENT_TYPE__H__
