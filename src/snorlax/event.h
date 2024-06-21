@@ -5,6 +5,7 @@
  * 
  * @author      snorlax <ceo@snorlax.bio>
  * @since       June 21, 2024
+ * @version     0.0.1
  */
 
 #ifndef   __SNORLAX__EVENT__H__
@@ -57,9 +58,6 @@ typedef struct event_processor_pool_func event_processor_pool_func_t;
 typedef void (*event_processor_cancel_t)(___notnull event_processor_t *);
 typedef void (*event_engine_cancel_t)(___notnull event_engine_t *);
 
-/**
- * @version     0.0.1
- */
 struct event {
     event_func_t * func;
     sync_t * sync;
@@ -71,9 +69,6 @@ struct event {
     uint32_t type;
 };
 
-/**
- * @version     0.0.1
- */
 struct event_func {
     event_t * (*rem)(___notnull event_t *);
 };
@@ -81,14 +76,7 @@ struct event_func {
 extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node);
 extern void event_func_on(___notnull event_t * event);
 
-/**
- * @version     0.0.1
- */
 #define event_rem(event)        ((event)->func->rem(event))
-
-/**
- * @version     0.0.1
- */
 #define event_on(event)         (event_func_on(event))
 
 #endif // __SNORLAX__EVENT__H__

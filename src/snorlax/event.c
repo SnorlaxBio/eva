@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "event.h"
+#include "event/queue.h"
 #include "event/subscription.h"
 #include "event/subscription/event.h"
 
@@ -19,9 +20,6 @@ static event_func_t func = {
     event_func_rem
 };
 
-/**
- * @version     0.0.1
- */
 extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, "critical", "");
@@ -36,34 +34,36 @@ extern event_t * event_gen(___notnull event_subscription_t * subscription, uint3
     event->type = type;
     event->node = node;
 
+    node->origin = event;
+
     return event;
 }
 
-/**
- * @version     0.0.1
- */
 extern void event_func_on(___notnull event_t * event) {
 #ifndef   RELEASE
     snorlaxdbg(event == nil, "critical", "");
     snorlaxdbg(event->subscription == nil, "critical", "");
-    snorlaxdbg(event->type == nil, "critical", "");
     snorlaxdbg(event->node == nil, "critical", "");
 #endif // RELEASE
 
     event_subscription_on(event->subscription, event->type, event->node);
+
     event_rem(event);
 }
 
-/**
- * @version     0.0.1
- */
 static event_t * event_func_rem(___notnull event_t * event) {
 #ifndef   RELEASE
     snorlaxdbg(event == nil, "critical", "");
-    snorlaxdbg(event->queue, "critical", "");
 #endif // RELEASE
 
-    event->node = event_subscription_event_rem(event->node);
+    if(event->queue) event_queue_del(event->queue, event);
+
+    if(event->node){
+        event->node->origin = nil;
+
+        event->node = event_subscription_event_rem(event->node);
+    }
+    
     event->sync = sync_rem(event->sync);
 
     free(event);

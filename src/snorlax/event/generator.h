@@ -34,4 +34,12 @@ struct event_generator_func {
 extern int32_t event_generator_func_add(___notnull event_generator_t * generator, ___notnull event_subscription_t * subscription);
 extern int32_t event_generator_func_del(___notnull event_generator_t * generator, ___notnull event_subscription_t * subscription);
 
+#define event_generator_rem(generator)                  ((generator)->func->rem(generator))
+#define event_generator_on(generator)                   ((generator)->func->on(generator))
+#define event_generator_off(generator)                  ((generator)->func->off(generator))
+#define event_generator_pub(generator, queue)           ((generator)->func->pub(generator, queue))
+#define event_generator_add(generator, subscription)    ((generator)->func->add(generator, subscription))
+#define event_generator_del(generator, subscription)    ((generator)->func->del(generator, subscription))
+
+
 #endif // __SNORLAX__EVENT_GENERATOR__H__

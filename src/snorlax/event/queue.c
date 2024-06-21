@@ -13,11 +13,13 @@
 static ___sync event_queue_t * event_queue_func_rem(___notnull event_queue_t * queue);
 static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___notnull event_t * event);
 static event_t * event_queue_func_pop(___notnull event_queue_t * queue);
+static ___sync void event_queue_func_del(___notnull event_queue_t * queue, ___notnull event_t * event);
 
 static event_queue_func_t func = {
     event_queue_func_rem,
     event_queue_func_push,
-    event_queue_func_pop
+    event_queue_func_pop,
+    event_queue_func_del
 };
 
 extern event_queue_t * event_queue_gen(sync_t * sync) {
@@ -71,6 +73,10 @@ static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___n
 }
 
 static event_t * event_queue_func_pop(___notnull event_queue_t * queue) {
+#ifndef   RELEASE
+    snorlaxdbg(queue == nil, "critical", "");
+#endif // RELEASE
+
     event_t * event = queue->head;
 
     if(event) {
@@ -87,4 +93,36 @@ static event_t * event_queue_func_pop(___notnull event_queue_t * queue) {
     }
 
     return event;
+}
+
+static ___sync void event_queue_func_del(___notnull event_queue_t * queue, ___notnull event_t * event) {
+#ifndef   RELEASE
+    snorlaxdbg(queue == nil, "critical", "");
+    snorlaxdbg(event == nil, "critical", "");
+    snorlaxdbg(event->queue != queue, "critical", "");
+#endif // RELEASE
+
+    object_lock(queue);
+
+    event_t * prev = event->prev;
+    event_t * next = event->next;
+
+    if(prev) {
+        prev->next = next;
+        event->prev = nil;
+    } else {
+        queue->head = next;
+    }
+
+    if(next) {
+        next->prev = prev;
+        event->next = nil;
+    } else {
+        queue->tail = nil;
+    }
+
+    queue->size = queue->size - 1;
+    event->queue = nil;
+
+    object_unlock(queue);
 }

@@ -19,11 +19,15 @@ struct event_subscription_event {
     event_subscription_event_queue_t * queue;
     event_subscription_event_t * prev;
     event_subscription_event_t * next;
+
+    event_t * origin;
 };
 
 struct event_subscription_event_func {
     event_subscription_event_t * (*rem)(___notnull event_subscription_event_t *);
 };
+
+extern event_subscription_event_t * event_subscription_event_gen(event_subscription_t * subscription);
 
 extern event_subscription_event_t * event_subscription_event_func_rem(___notnull event_subscription_event_t * event);
 
