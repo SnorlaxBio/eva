@@ -25,6 +25,7 @@ struct event_subscription_event_queue_func {
     event_subscription_event_queue_t * (*rem)(___notnull event_subscription_event_queue_t *);
     event_subscription_event_t * (*add)(___notnull event_subscription_event_queue_t *, ___notnull event_subscription_event_t *);
     event_subscription_event_t * (*del)(___notnull event_subscription_event_queue_t *, ___notnull event_subscription_event_t *);
+    void (*clear)(___notnull event_subscription_event_queue_t *);
 };
 
 extern event_subscription_event_queue_t * event_subscription_event_queue_gen(void);
@@ -32,5 +33,6 @@ extern event_subscription_event_queue_t * event_subscription_event_queue_gen(voi
 #define event_subscription_event_queue_rem(queue)           ((queue)->func->rem(queue))
 #define event_subscription_event_queue_add(queue, event)    ((queue)->func->add(queue, event))
 #define event_subscription_event_queue_del(queue, event)    ((queue)->func->del(queue, event))
+#define event_subscription_event_queue_clear(queue)         ((queue)->func->clear(queue))
 
 #endif // __SNORLAX__EVENT_SUBSCRIPTION_EVENT_QUEUE__H__

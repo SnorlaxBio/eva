@@ -28,6 +28,6 @@ struct event_subscription_func {
 };
 
 #define event_subscription_rem(subscription)                ((subscription)->func->rem(subscription))
-#define event_subscription_on(subscription, type, ret)      ((subscription)->func->on(subscription, type, ret))
+#define event_subscription_on(subscription, type, param)    ((subscription)->func->on(subscription, type, param))
 
 #endif // __SNORLAX__EVENT_SUBSCRIPTION__H__

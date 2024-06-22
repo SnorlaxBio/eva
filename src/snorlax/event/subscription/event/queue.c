@@ -16,11 +16,13 @@
 static event_subscription_event_queue_t * event_subscription_event_queue_func_rem(___notnull event_subscription_event_queue_t * queue);
 static event_subscription_event_t * event_subscription_event_queue_func_add(___notnull event_subscription_event_queue_t * queue, ___notnull event_subscription_event_t * event);
 static event_subscription_event_t * event_subscription_event_queue_func_del(___notnull event_subscription_event_queue_t * queue, ___notnull event_subscription_event_t * event);
+static void event_subscription_event_queue_func_clear(___notnull event_subscription_event_queue_t * queue);
 
 static event_subscription_event_queue_func_t func = {
     event_subscription_event_queue_func_rem,
     event_subscription_event_queue_func_add,
-    event_subscription_event_queue_func_del
+    event_subscription_event_queue_func_del,
+    event_subscription_event_queue_func_clear
 };
 
 extern event_subscription_event_queue_t * event_subscription_event_queue_gen(void) {
@@ -97,4 +99,15 @@ static event_subscription_event_t * event_subscription_event_queue_func_del(___n
     event->queue = nil;
 
     return event;
+}
+
+static void event_subscription_event_queue_func_clear(___notnull event_subscription_event_queue_t * queue) {
+#ifndef   RELEASE
+    snorlaxdbg(queue == nil, "critical", "");
+#endif // RELEASE
+
+    while(queue->head) {
+        event_subscription_event_t * event = event_subscription_event_queue_func_del(queue, queue->head);
+        event_subscription_event_rem(event);
+    }
 }

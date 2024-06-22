@@ -67,7 +67,9 @@ extern void event_func_on(___notnull event_t * event) {
     snorlaxdbg(event->node == nil, "critical", "");
 #endif // RELEASE
 
+    object_lock(event->subscription);
     event_subscription_on(event->subscription, event->type, (uint64_t) event->node);
+    object_unlock(event->subscription);
 
     event_rem(event);
 }

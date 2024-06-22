@@ -15,6 +15,8 @@
 #include "../generator.h"
 #include "../processor/pool.h"
 
+#include "../../command/event/generator.h"
+
 static ___sync event_generator_set_t * event_generator_set_func_rem(___notnull event_generator_set_t * set);
 static ___sync int32_t event_generator_set_func_on(___notnull event_generator_set_t * set);
 static ___sync int32_t event_generator_set_func_off(___notnull event_generator_set_t * set);
@@ -38,6 +40,8 @@ extern event_generator_set_t * event_generator_set_gen(___notnull event_engine_t
     set->engine = engine;
 
     if(engine->pool->size > 0) set->sync = sync_gen();
+
+    set->command = (event_generator_t *) command_event_genrator_gen(set);
 
     return set;
 }
