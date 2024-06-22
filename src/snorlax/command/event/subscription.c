@@ -49,6 +49,7 @@ extern command_event_subscription_t * command_event_subscription_gen(___notnull 
     subscription->func = address_of(func);
     subscription->command = command;
     subscription->retry = retry;
+    subscription->queue = event_subscription_event_queue_gen();
     subscription->handler = (command_event_subscription_handler_t *) calloc(command_event_type_max, sizeof(command_event_subscription_handler_t));
 
     if(handler) {
@@ -72,6 +73,9 @@ static command_event_subscription_t * command_event_subscription_func_rem(___not
     event_subscription_event_queue_clear(subscription->queue);
 
     command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_rem);
+
+    subscription->queue = event_subscription_event_queue_rem(subscription->queue);
+
     object_unlock(subscription);
 
     subscription->sync = sync_rem(subscription->sync);

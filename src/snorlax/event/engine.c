@@ -13,7 +13,7 @@
 #include "processor/pool.h"
 #include "generator/set.h"
 
-static void event_engine_func_default_cancel(event_engine_t * engine);
+static void event_engine_func_default_cancel(const event_engine_t * engine);
 
 static event_engine_t * event_engine_func_rem(___notnull event_engine_t * engine);
 static int32_t event_engine_func_on(___notnull event_engine_t * engine);
@@ -61,6 +61,8 @@ static int32_t event_engine_func_on(___notnull event_engine_t * engine) {
 #endif // RELEASE
 
     if((engine->status & event_engine_state_on) == 0) {
+        engine->status = engine->status | event_engine_state_on;
+
         event_processor_pool_on(engine->pool);
         event_generator_set_on(engine->set);
     } else {
@@ -131,10 +133,12 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
     engine->cancel(engine);
     engine->cancel = nil;
 
+    engine = event_engine_rem(engine);
+
     return success;
 }
 
-static void event_engine_func_default_cancel(event_engine_t * engine) {
+static void event_engine_func_default_cancel(const event_engine_t * engine) {
     
 }
 

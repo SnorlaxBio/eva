@@ -56,7 +56,7 @@ typedef struct event_processor_pool event_processor_pool_t;
 typedef struct event_processor_pool_func event_processor_pool_func_t;
 
 typedef void (*event_processor_cancel_t)(___notnull event_processor_t *);
-typedef void (*event_engine_cancel_t)(___notnull event_engine_t *);
+typedef void (*event_engine_cancel_t)(___notnull const event_engine_t *);
 typedef void (*event_subscription_handler_t)(___notnull event_subscription_t *, int32_t, uint64_t);
 
 struct event {
