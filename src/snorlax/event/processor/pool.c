@@ -32,7 +32,7 @@ static event_processor_pool_func_t func = {
 
 extern ___sync event_processor_pool_t * event_processor_pool_gen(uint64_t n, ___notnull event_engine_t * engine) {
 #ifndef   RELEASE
-    snorlaxdbg(engine == nil, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
 #endif // RELEASE
 
     event_processor_pool_t * pool = (event_processor_pool_t *) calloc(1, sizeof(event_processor_pool_t));
@@ -58,7 +58,7 @@ extern ___sync event_processor_pool_t * event_processor_pool_gen(uint64_t n, ___
 
 static ___sync event_processor_pool_t * event_processor_pool_func_rem(___notnull event_processor_pool_t * pool) {
 #ifndef   RELEASE
-    snorlaxdbg(pool == nil, "critical", "");
+    snorlaxdbg(pool == nil, false, "critical", "");
 #endif // RELEASE
     object_lock(pool);
     while(pool->head) event_processor_rem(pool->head);
@@ -73,7 +73,7 @@ static ___sync event_processor_pool_t * event_processor_pool_func_rem(___notnull
 
 static ___sync int32_t event_processor_pool_func_on(___notnull event_processor_pool_t * pool) {
 #ifndef   RELEASE
-    snorlaxdbg(pool == nil, "critical", "");
+    snorlaxdbg(pool == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(pool);
@@ -88,7 +88,7 @@ static ___sync int32_t event_processor_pool_func_on(___notnull event_processor_p
 
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "event processor pool is already on");
+        snorlaxdbg(false, true, "notice", "event processor pool is already on");
 #endif // RELEASE
     }
     object_unlock(pool);
@@ -98,7 +98,7 @@ static ___sync int32_t event_processor_pool_func_on(___notnull event_processor_p
 
 static ___sync int32_t event_processor_pool_func_off(___notnull event_processor_pool_t * pool) {
 #ifndef   RELEASE
-    snorlaxdbg(pool == nil, "critical", "");
+    snorlaxdbg(pool == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(pool);
@@ -111,7 +111,7 @@ static ___sync int32_t event_processor_pool_func_off(___notnull event_processor_
         pool->status = pool->status & (~event_processor_pool_state_on);
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "event processor pool is already off");
+        snorlaxdbg(false, true, "notice", "event processor pool is already off");
 #endif // RELEASE
     }
     object_unlock(pool);
@@ -121,8 +121,8 @@ static ___sync int32_t event_processor_pool_func_off(___notnull event_processor_
 
 static ___notsync int32_t event_processor_pool_func_add(___notnull event_processor_pool_t * pool, ___notnull event_processor_t * processor) {
 #ifndef   RELEASE
-    snorlaxdbg(pool == nil, "critical", "");
-    snorlaxdbg(processor == nil, "critical", "");
+    snorlaxdbg(pool == nil, false, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
 #endif // RELEASE
 
     if(pool->tail) {
@@ -146,8 +146,8 @@ static ___notsync int32_t event_processor_pool_func_add(___notnull event_process
 
 static ___notsync int32_t event_processor_pool_func_del(___notnull event_processor_pool_t * pool, ___notnull event_processor_t * processor) {
 #ifndef   RELEASE
-    snorlaxdbg(pool == nil, "critical", "");
-    snorlaxdbg(processor == nil, "critical", "");
+    snorlaxdbg(pool == nil, false, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
 #endif // RELEASE
 
     event_processor_off(processor, nil);

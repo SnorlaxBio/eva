@@ -11,11 +11,15 @@
 #define   __SNORLAX__EVA__H__
 
 #include <snorlax.h>
+#include <snorlax/command.h>
 
-___private struct event;
-___private struct event_func;
+struct event_subscription;
 
-___private typedef struct event event_t;
-___private typedef struct event_func event_func_t;
+typedef struct event_subscription event_subscription_t;
+
+extern int32_t snorlax_eva_on(void);
+extern int32_t snorlax_eva_run(void);
+
+extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
 
 #endif // __SNORLAX__EVA__H__

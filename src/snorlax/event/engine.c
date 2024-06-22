@@ -41,7 +41,7 @@ extern event_engine_t * event_engine_gen(void) {
 
 static event_engine_t * event_engine_func_rem(___notnull event_engine_t * engine) {
 #ifndef   RELEASE
-    snorlaxdbg(engine == nil, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
 #endif // RELEASE
 
     engine->set = event_generator_set_rem(engine->set);
@@ -57,7 +57,7 @@ static event_engine_t * event_engine_func_rem(___notnull event_engine_t * engine
 
 static int32_t event_engine_func_on(___notnull event_engine_t * engine) {
 #ifndef   RELEASE
-    snorlaxdbg(engine == nil, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
 #endif // RELEASE
 
     if((engine->status & event_engine_state_on) == 0) {
@@ -65,7 +65,7 @@ static int32_t event_engine_func_on(___notnull event_engine_t * engine) {
         event_generator_set_on(engine->set);
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "event engine already on");
+        snorlaxdbg(false, true, "notice", "event engine already on");
 #endif // RELEASE
     }
 
@@ -74,7 +74,7 @@ static int32_t event_engine_func_on(___notnull event_engine_t * engine) {
 
 static int32_t event_engine_func_off(___notnull event_engine_t * engine, event_engine_cancel_t cancel) {
 #ifndef   RELEASE
-    snorlaxdbg(engine == nil, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
 #endif // RELEASE
 
     if(engine->status & event_engine_state_on) {
@@ -83,12 +83,12 @@ static int32_t event_engine_func_off(___notnull event_engine_t * engine, event_e
             engine->cancel = cancel ? cancel : event_engine_func_default_cancel;
         } else {
 #ifndef   RELEASE
-            snorlaxdbg(false, "notice", "event engine cancel already set");
+            snorlaxdbg(false, true, "notice", "event engine cancel already set");
 #endif // RELEASE
         }
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "event engine already off");
+        snorlaxdbg(false, true, "notice", "event engine already off");
 #endif // RELEASE
     }
 
@@ -97,7 +97,7 @@ static int32_t event_engine_func_off(___notnull event_engine_t * engine, event_e
 
 static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
 #ifndef   RELEASE
-    snorlaxdbg(engine == nil, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
 #endif // RELEASE
     event_processor_pool_t * pool = engine->pool;
 
@@ -126,7 +126,7 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
         }
     }
 #ifndef   RELEASE
-    snorlaxdbg(engine->status & event_engine_state_on, "critical", "");
+    snorlaxdbg(engine->status & event_engine_state_on, false, "critical", "");
 #endif // RELEASE
     engine->cancel(engine);
     engine->cancel = nil;
@@ -137,3 +137,4 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
 static void event_engine_func_default_cancel(event_engine_t * engine) {
     
 }
+

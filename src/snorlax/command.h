@@ -14,11 +14,15 @@
 
 struct command;
 struct command_func;
+struct command_event_subscription;
 
 typedef struct command command_t;
 typedef struct command_func command_func_t;
+typedef struct command_event_subscription command_event_subscription_t;
 
 typedef int32_t (*command_execute_t)(___notnull command_t *);
+
+typedef void (*command_event_subscription_handler_t)(___notnull command_event_subscription_t *, uint32_t, uint64_t);
 
 struct command {
     command_func_t * func;

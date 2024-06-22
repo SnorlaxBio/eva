@@ -24,7 +24,7 @@ static event_subscription_event_func_t func = {
 
 extern event_subscription_event_t * event_subscription_event_gen(event_subscription_t * subscription, uint64_t param) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
     event_subscription_event_t * event = (event_subscription_event_t *) calloc(1, sizeof(event_subscription_event_t));
@@ -39,7 +39,7 @@ extern event_subscription_event_t * event_subscription_event_gen(event_subscript
 
 extern event_subscription_event_t * event_subscription_event_func_rem(___notnull event_subscription_event_t * event) {
 #ifndef   RELEASE
-    snorlaxdbg(event == nil, "critical", "");
+    snorlaxdbg(event == nil, false, "critical", "");
 #endif // RELEASE
 
     if(event->queue) event_subscription_event_queue_del(event->queue, event);

@@ -12,9 +12,9 @@
 
 extern int32_t event_generator_func_add(___notnull event_generator_t * generator, ___notnull event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
-    snorlaxdbg(subscription == nil, "critical", "");
-    snorlaxdbg(subscription->generator, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->generator, false, "critical", "");
 #endif // RELEASE
 
     if(generator->tail) {
@@ -33,9 +33,9 @@ extern int32_t event_generator_func_add(___notnull event_generator_t * generator
 
 extern int32_t event_generator_func_del(___notnull event_generator_t * generator, ___notnull event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
-    snorlaxdbg(subscription == nil, "critical", "");
-    snorlaxdbg(subscription->generator != generator, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->generator != generator, false, "critical", "");
 #endif // RELEASE
 
     event_subscription_t * prev = subscription->prev;

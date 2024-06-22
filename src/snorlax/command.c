@@ -19,7 +19,7 @@ static command_func_t func = {
 
 extern command_t * command_gen(command_execute_t execute) {
 #ifndef   RELEASE
-    snorlaxdbg(execute == nil, "critical", "");
+    snorlaxdbg(execute == nil, false, "critical", "");
 #endif // RELEASE
 
     command_t * command = (command_t *) calloc(1, sizeof(command_t));
@@ -33,7 +33,7 @@ extern command_t * command_gen(command_execute_t execute) {
 
 static command_t * command_func_rem(___notnull command_t * command) {
 #ifndef   RELEASE
-    snorlaxdbg(command == nil, "critical", "");
+    snorlaxdbg(command == nil, false, "critical", "");
 #endif // RELEASE
 
     free(command);

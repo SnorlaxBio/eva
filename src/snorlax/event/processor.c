@@ -39,14 +39,14 @@ extern event_processor_t * event_processor_gen(void) {
 
 static event_processor_t * event_processor_func_rem(___notnull event_processor_t * processor) {
 #ifndef   RELEASE
-    snorlaxdbg(processor == nil, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
 #endif // RELEASE
 
     event_processor_pool_t * pool = processor->pool;
 
     if(pool) {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "processor is in pool");
+        snorlaxdbg(false, true, "notice", "processor is in pool");
 #endif // RELEASE
 
         object_lock(pool);
@@ -66,9 +66,9 @@ static event_processor_t * event_processor_func_rem(___notnull event_processor_t
 
 static int32_t event_processor_func_on(___notnull event_processor_t * processor) {
 #ifndef   RELEASE
-    snorlaxdbg(processor == nil, "critical", "");
-    snorlaxdbg(processor->thread == nil, "critical", "");
-    snorlaxdbg(processor->pool == nil, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
+    snorlaxdbg(processor->thread == nil, false, "critical", "");
+    snorlaxdbg(processor->pool == nil, false, "critical", "");
 #endif // RELEASE
     
     thread_t * thread = processor->thread;
@@ -82,12 +82,12 @@ static int32_t event_processor_func_on(___notnull event_processor_t * processor)
 
 static int32_t event_processor_func_off(___notnull event_processor_t * processor, event_processor_cancel_t cancel) {
 #ifndef   RELEASE
-    snorlaxdbg(processor == nil, "critical", "");
-    snorlaxdbg(processor->thread == nil, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
+    snorlaxdbg(processor->thread == nil, false, "critical", "");
 
-    snorlaxdbg(processor->pool == nil, "critical", "");
-    snorlaxdbg(processor->pool->engine == nil, "critical", "");
-    snorlaxdbg(processor->pool->engine->queue == nil, "critical", "");
+    snorlaxdbg(processor->pool == nil, false, "critical", "");
+    snorlaxdbg(processor->pool->engine == nil, false, "critical", "");
+    snorlaxdbg(processor->pool->engine->queue == nil, false, "critical", "");
 #endif // RELEASE
 
     thread_t * thread = processor->thread;
@@ -103,11 +103,11 @@ static int32_t event_processor_func_off(___notnull event_processor_t * processor
 
 static int32_t event_processor_func_thread_routine(___notnull event_processor_t * processor) {
 #ifndef   RELEASE
-    snorlaxdbg(processor == nil, "critical", "");
-    snorlaxdbg(processor->pool == nil, "critical", "");
-    snorlaxdbg(processor->pool->engine == nil, "critical", "");
-    snorlaxdbg(processor->pool->engine->queue == nil, "critical", "");
-    snorlaxdbg(processor->thread == nil, "critical", "");
+    snorlaxdbg(processor == nil, false, "critical", "");
+    snorlaxdbg(processor->pool == nil, false, "critical", "");
+    snorlaxdbg(processor->pool->engine == nil, false, "critical", "");
+    snorlaxdbg(processor->pool->engine->queue == nil, false, "critical", "");
+    snorlaxdbg(processor->thread == nil, false, "critical", "");
 #endif // RELEASE
 
     event_queue_t * queue = processor->pool->engine->queue;

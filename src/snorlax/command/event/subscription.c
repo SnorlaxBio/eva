@@ -41,7 +41,7 @@ static command_event_subscription_func_t func = {
 
 extern command_event_subscription_t * command_event_subscription_gen(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler) {
 #ifndef   RELEASE
-    snorlaxdbg(command == nil, "critical", "");
+    snorlaxdbg(command == nil, false, "critical", "");
 #endif // RELEASE
 
     command_event_subscription_t * subscription = (command_event_subscription_t *) calloc(1, sizeof(command_event_subscription_t));
@@ -62,10 +62,10 @@ extern command_event_subscription_t * command_event_subscription_gen(___notnull 
 
 static command_event_subscription_t * command_event_subscription_func_rem(___notnull command_event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
     command_event_generator_t * generator = subscription->generator;
-    if(generator) command_event_generator_func_del(generator, subscription);
+    if(generator) command_event_generator_del(generator, subscription);
 
     object_lock(subscription);
 
@@ -83,8 +83,8 @@ static command_event_subscription_t * command_event_subscription_func_rem(___not
 
 static void command_event_subscription_func_on(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
-    snorlaxdbg(command_event_type_max <= type, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(command_event_type_max <= type, false, "critical", "");
 #endif // RELEASE
 
     command_event_subscription_process_t process = processor[type];
@@ -95,8 +95,11 @@ static void command_event_subscription_func_on(___notnull command_event_subscrip
 
     on(subscription, type, ret);
 
-    if(subscription->retry > 0) {
-        subscription->retry = subscription->retry - 1;
+    if(type == command_event_type_execute) {
+        if(subscription->retry > 0) {
+            subscription->retry = subscription->retry - 1;
+        }
+        
         if(subscription->retry == 0) {
             command_event_generator_t * generator = subscription->generator;
 
@@ -111,7 +114,7 @@ static void command_event_subscription_func_on(___notnull command_event_subscrip
 
 static uint64_t command_event_subscription_processor_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
     return param;
@@ -119,8 +122,8 @@ static uint64_t command_event_subscription_processor_func_subscription(___notnul
 
 static uint64_t command_event_subscription_processor_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
-    snorlaxdbg(subscription->command == nil, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->command == nil, false, "critical", "");
 #endif // RELEASE
 
     return command_execute(subscription->command);

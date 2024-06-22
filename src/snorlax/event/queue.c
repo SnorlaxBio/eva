@@ -33,10 +33,10 @@ extern event_queue_t * event_queue_gen(sync_t * sync) {
 
 static ___sync event_queue_t * event_queue_func_rem(___notnull event_queue_t * queue) {
 #ifndef   RELEASE
-    snorlaxdbg(queue == nil, "critical", "");
-    snorlaxdbg(queue->size > 0, "critical", "");
-    snorlaxdbg(queue->head, "critical", "");
-    snorlaxdbg(queue->tail, "critical", "");
+    snorlaxdbg(queue == nil, false, "critical", "");
+    snorlaxdbg(queue->size > 0, false, "critical", "");
+    snorlaxdbg(queue->head, false, "critical", "");
+    snorlaxdbg(queue->tail, false, "critical", "");
 #endif // RELEASE
 
     queue->sync = sync_rem(queue->sync);
@@ -48,9 +48,9 @@ static ___sync event_queue_t * event_queue_func_rem(___notnull event_queue_t * q
 
 static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___notnull event_t * event) {
 #ifndef   RELEASE
-    snorlaxdbg(queue == nil, "critical", "");
-    snorlaxdbg(event == nil, "critical", "");
-    snorlaxdbg(event->queue, "critical", "");
+    snorlaxdbg(queue == nil, false, "critical", "");
+    snorlaxdbg(event == nil, false, "critical", "");
+    snorlaxdbg(event->queue, false, "critical", "");
 #endif // RELEASE
 
     object_lock(queue);
@@ -74,7 +74,7 @@ static ___sync void event_queue_func_push(___notnull event_queue_t * queue, ___n
 
 static ___notsync event_t * event_queue_func_pop(___notnull event_queue_t * queue) {
 #ifndef   RELEASE
-    snorlaxdbg(queue == nil, "critical", "");
+    snorlaxdbg(queue == nil, false, "critical", "");
 #endif // RELEASE
 
     event_t * event = queue->head;
@@ -97,9 +97,9 @@ static ___notsync event_t * event_queue_func_pop(___notnull event_queue_t * queu
 
 static ___sync void event_queue_func_del(___notnull event_queue_t * queue, ___notnull event_t * event) {
 #ifndef   RELEASE
-    snorlaxdbg(queue == nil, "critical", "");
-    snorlaxdbg(event == nil, "critical", "");
-    snorlaxdbg(event->queue != queue, "critical", "");
+    snorlaxdbg(queue == nil, false, "critical", "");
+    snorlaxdbg(event == nil, false, "critical", "");
+    snorlaxdbg(event->queue != queue, false, "critical", "");
 #endif // RELEASE
 
     object_lock(queue);

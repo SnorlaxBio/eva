@@ -23,8 +23,8 @@ static event_func_t func = {
 
 extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node) {
 #ifndef   RELEASE
-    snorlaxdbg(subscription == nil, "critical", "");
-    snorlaxdbg(node == nil, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(node == nil, false, "critical", "");
 #endif // RELEASE
 
     event_t * event = (event_t *) calloc(1, sizeof(event_t));
@@ -42,7 +42,7 @@ extern event_t * event_gen(___notnull event_subscription_t * subscription, uint3
 
 static event_t * event_func_rem(___notnull event_t * event) {
 #ifndef   RELEASE
-    snorlaxdbg(event == nil, "critical", "");
+    snorlaxdbg(event == nil, false, "critical", "");
 #endif // RELEASE
 
     if(event->queue) event_queue_del(event->queue, event);
@@ -62,9 +62,9 @@ static event_t * event_func_rem(___notnull event_t * event) {
 
 extern void event_func_on(___notnull event_t * event) {
 #ifndef   RELEASE
-    snorlaxdbg(event == nil, "critical", "");
-    snorlaxdbg(event->subscription == nil, "critical", "");
-    snorlaxdbg(event->node == nil, "critical", "");
+    snorlaxdbg(event == nil, false, "critical", "");
+    snorlaxdbg(event->subscription == nil, false, "critical", "");
+    snorlaxdbg(event->node == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(event->subscription);

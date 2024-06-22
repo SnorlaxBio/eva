@@ -31,7 +31,8 @@ ExternalProject_Add(snorlax-std
 
 link_directories(${PROJECT_SOURCE_DIR}/lib ${PROJECT_SOURCE_DIR}/build)
 
-set(SNORLAX_EVA_SOURCE      src/snorlax/event.c
+set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
+                            src/snorlax/event.c
                             src/snorlax/event/queue.c
                             src/snorlax/event/processor.c
                             src/snorlax/event/generator.c
@@ -39,7 +40,10 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/event.c
                             src/snorlax/event/subscription/event.c
                             src/snorlax/event/subscription/event/queue.c
                             src/snorlax/event/processor/pool.c
-                            src/snorlax/event/generator/set.c)
+                            src/snorlax/event/generator/set.c
+                            src/snorlax/command.c
+                            src/snorlax/command/event/subscription.c
+                            src/snorlax/command/event/generator.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -53,12 +57,16 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event/processor/pool.h
                             src/snorlax/event/processor/pool/state.h
                             src/snorlax/event/generator/set.h
-                            src/snorlax/event/engine/state.h)
+                            src/snorlax/event/engine/state.h
+                            src/snorlax/command/event.h
+                            src/snorlax/command/event/type.h
+                            src/snorlax/command/event/subscription.h
+                            src/snorlax/command/event/generator.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})
 
 target_compile_options(snorlax-eva PUBLIC "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
 
-# add_executable(snorlax-eva-command-check src/snorlax/command/event/check.c)
-# target_link_libraries(snorlax-eva-command-check snorlax-eva libsnorlax-std.a)
+add_executable(snorlax-eva-command-event-check src/snorlax/command/event/main.c)
+target_link_libraries(snorlax-eva-command-event-check snorlax-eva libsnorlax-std.a)

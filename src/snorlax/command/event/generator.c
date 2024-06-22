@@ -12,13 +12,13 @@
 #include "subscription.h"
 #include "type.h"
 
-#include "../../../event/queue.h"
-#include "../../../event/engine.h"
-#include "../../../event/generator.h"
-#include "../../../event/generator/set.h"
-#include "../../../event/generator/state.h"
-#include "../../../event/processor/pool.h"
-#include "../../../event/subscription/event.h"
+#include "../../event/queue.h"
+#include "../../event/engine.h"
+#include "../../event/generator.h"
+#include "../../event/generator/set.h"
+#include "../../event/generator/state.h"
+#include "../../event/processor/pool.h"
+#include "../../event/subscription/event.h"
 
 static command_event_generator_t * command_event_generator_func_rem(___notnull command_event_generator_t * generator);
 static ___sync int32_t command_event_generator_func_on(___notnull command_event_generator_t * generator);
@@ -40,9 +40,9 @@ static command_event_generator_func_t func = {
 
 extern command_event_generator_t * command_event_generator_gen(___notnull event_generator_set_t * set) {
 #ifndef   RELEASE
-    snorlaxdbg(set == nil, "critical", "");
-    snorlaxdbg(set->engine == nil, "critical", "");
-    snorlaxdbg(set->engine->pool == nil, "critical", "");
+    snorlaxdbg(set == nil, false, "critical", "");
+    snorlaxdbg(set->engine == nil, false, "critical", "");
+    snorlaxdbg(set->engine->pool == nil, false, "critical", "");
 #endif // RELEASE
 
     command_event_generator_t * generator = (command_event_generator_t *) calloc(1, sizeof(command_event_generator_t));
@@ -57,7 +57,7 @@ extern command_event_generator_t * command_event_generator_gen(___notnull event_
 
 static command_event_generator_t * command_event_generator_func_rem(___notnull command_event_generator_t * generator) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
     command_event_generator_off(generator);
@@ -72,7 +72,7 @@ static command_event_generator_t * command_event_generator_func_rem(___notnull c
 
 static ___sync int32_t command_event_generator_func_on(___notnull command_event_generator_t * generator) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(generator);
@@ -81,7 +81,7 @@ static ___sync int32_t command_event_generator_func_on(___notnull command_event_
         generator->status = generator->status | event_generator_state_on;
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "command event generator already on");
+        snorlaxdbg(false, true, "notice", "command event generator already on");
 #endif // RELEASE
     }
 
@@ -92,7 +92,7 @@ static ___sync int32_t command_event_generator_func_on(___notnull command_event_
 
 static ___sync int32_t command_event_generator_func_off(___notnull command_event_generator_t * generator) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
 #endif // REELASE
 
     object_lock(generator);
@@ -100,7 +100,7 @@ static ___sync int32_t command_event_generator_func_off(___notnull command_event
         generator->status = generator->status & (~event_generator_state_on);
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, "notice", "command event generator already off");
+        snorlaxdbg(false, true, "notice", "command event generator already off");
 #endif // RELEASE
     }
     object_unlock(generator);
@@ -110,7 +110,7 @@ static ___sync int32_t command_event_generator_func_off(___notnull command_event
 
 static ___sync int32_t command_event_generator_func_pub(___notnull command_event_generator_t * generator, event_queue_t * queue) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
     int32_t n = 0;
@@ -125,7 +125,7 @@ static ___sync int32_t command_event_generator_func_pub(___notnull command_event
         command_event_subscription_t * next = subscription->next;
         if(queue) {
             event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription, 0);
-            event_t * event = event_gen(subscription, command_event_type_execute, node);
+            event_t * event = event_gen((event_subscription_t *) subscription, command_event_type_execute, node);
             event_queue_push(queue, event);
         } else {
             command_event_subscription_on(subscription, command_event_type_execute, 0);
@@ -144,8 +144,8 @@ static ___sync int32_t command_event_generator_func_pub(___notnull command_event
 
 static ___sync int32_t command_event_generator_func_add(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
-    snorlaxdbg(subscription == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(generator);
@@ -159,8 +159,8 @@ static ___sync int32_t command_event_generator_func_add(___notnull command_event
 
 static ___sync int32_t command_event_generator_func_del(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
-    snorlaxdbg(subscription == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(generator);
@@ -174,7 +174,7 @@ static ___sync int32_t command_event_generator_func_del(___notnull command_event
 
 static ___sync void command_event_generator_func_clear(___notnull command_event_generator_t * generator) {
 #ifndef   RELEASE
-    snorlaxdbg(generator == nil, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(generator);
