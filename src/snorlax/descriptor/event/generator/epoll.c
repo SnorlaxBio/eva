@@ -18,13 +18,14 @@
 
 #include "../subscription.h"
 
+#include "../../event/queue.h"
 #include "../../event/subscription/event.h"
 
 static descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_func_rem(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_on(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_off(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull descriptor_event_generator_epoll_t * generator, event_queue_t * queue);
-    // ___sync int32_t (*add)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
+static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * genereator, ___notnull descriptor_event_subscription_t * subscription);
     // ___sync int32_t (*del)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
     // ___sync void (*clear)(___notnull descriptor_event_generator_epoll_t *);
     // ___notsync int32_t (*reg)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
@@ -35,7 +36,8 @@ static descriptor_event_generator_epoll_func_t func = {
     descriptor_event_generator_epoll_func_rem,
     descriptor_event_generator_epoll_func_on,
     descriptor_event_generator_epoll_func_off,
-    descriptor_event_generator_epoll_func_pub
+    descriptor_event_generator_epoll_func_pub,
+    descriptor_event_generator_epoll_func_add
 };
 
 extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen(___notnull event_generator_set_t * set) {
@@ -213,4 +215,14 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_pub(___notnull d
     }
 
     return n;
+}
+
+static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * genereator, ___notnull descriptor_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(genereator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+
+    object_lock(genereator);
+    object_unlock(genereator);
 }

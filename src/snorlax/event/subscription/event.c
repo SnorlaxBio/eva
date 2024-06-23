@@ -22,7 +22,7 @@ static event_subscription_event_func_t func = {
     event_subscription_event_func_rem
 };
 
-extern event_subscription_event_t * event_subscription_event_gen(event_subscription_t * subscription, uint64_t param) {
+extern event_subscription_event_t * event_subscription_event_gen(event_subscription_t * subscription) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
@@ -30,7 +30,6 @@ extern event_subscription_event_t * event_subscription_event_gen(event_subscript
     event_subscription_event_t * event = (event_subscription_event_t *) calloc(1, sizeof(event_subscription_event_t));
 
     event->func = address_of(func);
-    event->param = param;
 
     event_subscription_event_queue_add(subscription->queue, event);
     

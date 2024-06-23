@@ -57,8 +57,27 @@ typedef struct event_processor_pool_func event_processor_pool_func_t;
 
 typedef void (*event_processor_cancel_t)(___notnull event_processor_t *);
 typedef void (*event_engine_cancel_t)(___notnull const event_engine_t *);
-typedef void (*event_subscription_handler_t)(___notnull event_subscription_t *, int32_t, uint64_t);
+typedef void (*event_subscription_handler_t)(___notnull event_subscription_t *, uint32_t, event_subscription_event_t *);
 
+/**
+ * @struct      struct event
+ * @brief       event object
+ * @details     이벤트 라이브러리에서 이벤트가 발생했을 때, 이벤트와 관련한 내용과 상태를 관리하는 이벤트 객체입니다.
+ *              O(1) 의 삽입과 삭제가 일어나야 하기 때문에, EVENT 객체에 QUEUE, PREV, NEXT 등과 같은 리스트 노드와
+ *              유사한 멤버 변수를 정의하였습니다. 이벤트 서브스크립션이란 객체에서는 발생한 이벤트를 관리합니다.
+ *              처리 중일 수도 있고, 그렇지 않을 수도 있습니다. 처리 중이라면 큰 상관이 없지만, 처리를 기다리고 있는
+ *              이벤트의 경우 서브스크립션 객체가 메모리 상에서 해제가 되면, 프로그램 상에서 예외를 발생시킬 수 있습니다.
+ *              그래서 미처리 이벤트가 있는 서브스크립션의 경우 삭제 시에 모든 이벤트들을 정상적으로 메모리 상에서
+ *              해제하거나 처리해주어야 합니다. 즉, 이벤트 큐에 존재하는 이벤트 들을 삭제하는 매커니즘이 필요하고
+ *              그런 삭제 로직이 O(1) 로 이루어져야 하기 때문에, 리스트 노드처럼 참조를 통하여 큐 상에서의 이전 이벤트
+ *              그리고 다음 이벤트를 멤버로 가지고 있는 것 입니다.
+ * 
+ *              그 외에 이벤트가 발생한 서브스크립션 객체와 서브스크립션 큐에서 관리하는 노드 그리고 발생한 이벤트 타입을
+ *              멤버 변수로 가지고 있어서, 이벤트 큐에서 추출하면 서브스크립션의 이벤트 타입과 관련한 액션을 수행할
+ *              것입니다. 이벤트의 파라미터가 필요한 경우 node 의 생성 시에 파라미터 정보를 가지고 있도록 할 수 있습니다.
+ * 
+ * @version     0.0.1
+ */
 struct event {
     event_func_t * func;
     sync_t * sync;

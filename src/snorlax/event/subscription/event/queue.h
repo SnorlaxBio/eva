@@ -13,6 +13,14 @@
 
 #include <snorlax/event.h>
 
+/**
+ * @struct          struct event_subscription_event_queue
+ * @brief           event subscription event queue object
+ * @details         이벤트 서브스크립션에서 이벤트를 관리하는 큐 객체다.
+ * 
+ * @version         0.0.1
+ * @todo            클리어 함수의 필요 유무를 체크하자.
+ */
 struct event_subscription_event_queue {
     event_subscription_event_queue_func_t * func;
     sync_t * sync;

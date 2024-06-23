@@ -14,6 +14,17 @@
 
 #include <snorlax/event/engine/state.h>
 
+/**
+ * @struct          struct event_engine
+ * @brief           event engine object
+ * @details         이벤트 엔진 객체는 이벤트 처리 및 관리를 위한 멤버 변수들을 가진다. 이벤트 생성기들을 관리하는
+ *                  이벤트 제네레이터 셋과 멀티 스레드 환경에서 여러 스레드에서 등록된 이벤트를 처리할 수 있는 프로세서들을
+ *                  관리하는 프로세스 풀, 그리고 이벤트 큐, 기타 상태를 관리하는 상태 변수와 이벤트 엔진 수행 상태를 관리하며
+ *                  종료 후에 콜백으로 사용되어지는 CANCEL 등이 정의되어 있다.
+ * @version         0.0.1
+ * 
+ * @todo            refactor function.
+ */
 struct event_engine {
     event_engine_func_t * func;
     sync_t * sync;
