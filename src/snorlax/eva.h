@@ -15,9 +15,11 @@
 
 struct event_subscription;
 struct event_engine;
+struct event_subscription_event;
 
 typedef struct event_subscription event_subscription_t;
 typedef struct event_engine event_engine_t;
+typedef struct event_subscription_event event_subscription_event_t;
 typedef void (*event_engine_cancel_t)(const event_engine_t *);
 
 extern int32_t snorlax_eva_on(void);

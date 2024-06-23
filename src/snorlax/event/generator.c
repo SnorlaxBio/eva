@@ -43,29 +43,31 @@ extern int32_t event_generator_func_del(___notnull event_generator_t * generator
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, false, "critical", "");
     snorlaxdbg(subscription == nil, false, "critical", "");
-    snorlaxdbg(subscription->generator != generator, false, "critical", "");
 #endif // RELEASE
 
-    event_subscription_t * prev = subscription->prev;
-    event_subscription_t * next = subscription->next;
+    if(subscription->generator) {
+        event_subscription_t * prev = subscription->prev;
+        event_subscription_t * next = subscription->next;
 
-    if(prev) {
-        prev->next = next;
-        subscription->prev = nil;
-    } else {
-        generator->head = next;
+        if(prev) {
+            prev->next = next;
+            subscription->prev = nil;
+        } else {
+            generator->head = next;
+        }
+
+        if(next) {
+            next->prev = prev;
+            subscription->next = nil;
+        } else {
+            generator->tail = prev;
+        }
+
+        subscription->generator = nil;
+        
+        generator->size = generator->size - 1;
     }
 
-    if(next) {
-        next->prev = prev;
-        subscription->next = nil;
-    } else {
-        generator->tail = prev;
-    }
-
-    subscription->generator = nil;
-    
-    generator->size = generator->size - 1;
 
     return success;
 }

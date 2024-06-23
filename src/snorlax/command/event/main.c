@@ -13,7 +13,7 @@
 
 static int32_t execute(___notnull command_t * command);
 static void cancel(const event_engine_t * engine);
-static void on(command_event_subscription_t * subscription, uint32_t type, uint64_t ret);
+static void on(command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * ret);
 
 command_t * command = nil;
 event_subscription_t * subscription = nil;
@@ -43,9 +43,9 @@ static void cancel(const event_engine_t * engine) {
     command = command_rem(command);
 }
 
-static void on(command_event_subscription_t * subscription, uint32_t type, uint64_t ret) {
-    if(type == 0 && ret == 2) {
+static void on(command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * ret) {
+    if(type == 0 && ret == (event_subscription_event_t *) 2) {
         snorlax_eva_off(cancel);
     }
-    printf("type => %u, ret => %lu\n", type, ret);
+    printf("type => %u, ret => %p\n", type, ret);
 }

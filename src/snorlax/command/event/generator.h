@@ -27,6 +27,7 @@ struct command_event_generator_func {
     ___sync int32_t (*on)(___notnull command_event_generator_t *);
     ___sync int32_t (*off)(___notnull command_event_generator_t *);
     ___sync int32_t (*pub)(___notnull command_event_generator_t *, event_queue_t *);
+    int32_t (*control)(___notnull command_event_generator_t *, ___notnull command_event_subscription_t *, uint32_t, event_subscription_event_t *);
     ___sync int32_t (*add)(___notnull command_event_generator_t *, ___notnull command_event_subscription_t *);
     ___sync int32_t (*del)(___notnull command_event_generator_t *, ___notnull command_event_subscription_t *);
     ___sync void (*clear)(___notnull command_event_generator_t *);
@@ -34,12 +35,13 @@ struct command_event_generator_func {
 
 extern command_event_generator_t * command_event_generator_gen(___notnull event_generator_set_t * set);
 
-#define command_event_generator_rem(generator)                  ((generator)->func->rem(generator))
-#define command_event_generator_on(generator)                   ((generator)->func->on(generator))
-#define command_event_generator_off(generator)                  ((generator)->func->off(generator))
-#define command_event_generator_pub(generator, queue)           ((generator)->func->pub(generator, queue))
-#define command_event_generator_add(generator, subscription)    ((generator)->func->add(generator, subscription))
-#define command_event_generator_del(generator, subscription)    ((generator)->func->del(generator, subscription))
-#define command_event_generator_clear(generator)                ((generator)->func->clear(generator))
+#define command_event_generator_rem(generator)                                  ((generator)->func->rem(generator))
+#define command_event_generator_on(generator)                                   ((generator)->func->on(generator))
+#define command_event_generator_off(generator)                                  ((generator)->func->off(generator))
+#define command_event_generator_pub(generator, queue)                           ((generator)->func->pub(generator, queue))
+#define command_event_generator_control(generator, subscription, type, event)   ((generator)->func->add(generator, subscription, type, event))
+#define command_event_generator_add(generator, subscription)                    ((generator)->func->add(generator, subscription))
+#define command_event_generator_del(generator, subscription)                    ((generator)->func->del(generator, subscription))
+#define command_event_generator_clear(generator)                                ((generator)->func->clear(generator))
 
 #endif // __SNORLAX__COMMAND_EVENT_GENERATOR__H__

@@ -9,6 +9,8 @@
 
 #include "subscription.h"
 
+#include "subscription/type.h"
+
 #include "generator.h"
 #include "type.h"
 
@@ -16,13 +18,13 @@
 #include "../../event/subscription/event/queue.h"
 
 static command_event_subscription_t * command_event_subscription_func_rem(___notnull command_event_subscription_t * subscription);
-static void command_event_subscription_func_on(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param);
+static void command_event_subscription_func_on(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
 
-static uint64_t command_event_subscription_processor_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param);
-static uint64_t command_event_subscription_processor_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param);
+static event_subscription_event_t * command_event_subscription_processor_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
+static event_subscription_event_t * command_event_subscription_processor_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
 
-static void command_event_subscription_subscriber_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param);
-static void command_event_subscription_subscriber_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param);
+static void command_event_subscription_subscriber_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
+static void command_event_subscription_subscriber_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
 
 static command_event_subscription_process_t processor[command_event_type_max] = {
     command_event_subscription_processor_func_subscription,
@@ -72,7 +74,7 @@ static command_event_subscription_t * command_event_subscription_func_rem(___not
 
     event_subscription_event_queue_clear(subscription->queue);
 
-    command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_rem);
+    command_event_subscription_on(subscription, command_event_type_subscription, (event_subscription_event_t *) command_event_subscription_type_rem);
 
     subscription->queue = event_subscription_event_queue_rem(subscription->queue);
 
@@ -85,14 +87,14 @@ static command_event_subscription_t * command_event_subscription_func_rem(___not
     return nil;
 }
 
-static void command_event_subscription_func_on(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
+static void command_event_subscription_func_on(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(command_event_type_max <= type, false, "critical", "");
 #endif // RELEASE
 
     command_event_subscription_process_t process = processor[type];
-    uint64_t ret = process(subscription, type, param);
+    event_subscription_event_t * ret = process(subscription, type, event);
 
     command_event_subscription_handler_t on = subscription->handler[type];
     on = on ? on : subscriber[type];
@@ -111,32 +113,34 @@ static void command_event_subscription_func_on(___notnull command_event_subscrip
             event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
             object_unlock(generator);
 
-            command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_del);
+            command_event_subscription_on(subscription, command_event_type_subscription, (event_subscription_event_t *) command_event_subscription_type_del);
         }
     }
 }
 
-static uint64_t command_event_subscription_processor_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
+static event_subscription_event_t * command_event_subscription_processor_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
-    return param;
+    return event;
 }
 
-static uint64_t command_event_subscription_processor_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
+static event_subscription_event_t * command_event_subscription_processor_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->command == nil, false, "critical", "");
 #endif // RELEASE
 
-    return command_execute(subscription->command);
+    command_execute(subscription->command);
+
+    return event;
 }
 
-static void command_event_subscription_subscriber_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
+static void command_event_subscription_subscriber_func_subscription(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
 
 }
 
-static void command_event_subscription_subscriber_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, uint64_t param) {
+static void command_event_subscription_subscriber_func_execute(___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
 
 }

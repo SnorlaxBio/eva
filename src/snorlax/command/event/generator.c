@@ -10,6 +10,7 @@
 #include "generator.h"
 
 #include "subscription.h"
+#include "subscription/type.h"
 #include "type.h"
 
 #include "../../event/queue.h"
@@ -24,6 +25,7 @@ static command_event_generator_t * command_event_generator_func_rem(___notnull c
 static ___sync int32_t command_event_generator_func_on(___notnull command_event_generator_t * generator);
 static ___sync int32_t command_event_generator_func_off(___notnull command_event_generator_t * generator);
 static ___sync int32_t command_event_generator_func_pub(___notnull command_event_generator_t * generator, event_queue_t * queue);
+static int32_t command_event_generator_func_control(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event);
 static ___sync int32_t command_event_generator_func_add(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription);
 static ___sync int32_t command_event_generator_func_del(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription);
 static ___sync void command_event_generator_func_clear(___notnull command_event_generator_t * generator);
@@ -33,6 +35,7 @@ static command_event_generator_func_t func = {
     command_event_generator_func_on,
     command_event_generator_func_off,
     command_event_generator_func_pub,
+    command_event_generator_func_control,
     command_event_generator_func_add,
     command_event_generator_func_del,
     command_event_generator_func_clear
@@ -124,7 +127,7 @@ static ___sync int32_t command_event_generator_func_pub(___notnull command_event
         object_lock(subscription);
         command_event_subscription_t * next = subscription->next;
         if(queue) {
-            event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription, 0);
+            event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription);
             event_t * event = event_gen((event_subscription_t *) subscription, command_event_type_execute, node);
             event_queue_push(queue, event);
         } else {
@@ -142,6 +145,10 @@ static ___sync int32_t command_event_generator_func_pub(___notnull command_event
     return n;
 }
 
+static int32_t command_event_generator_func_control(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * event) {
+    return success;
+}
+
 static ___sync int32_t command_event_generator_func_add(___notnull command_event_generator_t * generator, ___notnull command_event_subscription_t * subscription) {
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, false, "critical", "");
@@ -153,7 +160,7 @@ static ___sync int32_t command_event_generator_func_add(___notnull command_event
     object_unlock(generator);
 
     object_lock(subscription);
-    command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_add);
+    command_event_subscription_on(subscription, command_event_type_subscription, (event_subscription_event_t *) command_event_subscription_type_add);
     object_unlock(subscription);
 }
 
@@ -168,7 +175,7 @@ static ___sync int32_t command_event_generator_func_del(___notnull command_event
     object_unlock(generator);
 
     object_lock(subscription);
-    command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_del);
+    command_event_subscription_on(subscription, command_event_type_subscription, (event_subscription_event_t *) command_event_subscription_type_del);
     object_unlock(subscription);
 }
 
@@ -184,7 +191,7 @@ static ___sync void command_event_generator_func_clear(___notnull command_event_
         object_unlock(generator);
 
         object_lock(subscription);
-        command_event_subscription_on(subscription, command_event_type_subscription, (uint64_t) command_event_type_subscription_del);
+        command_event_subscription_on(subscription, command_event_type_subscription, (event_subscription_event_t *) command_event_subscription_type_del);
         object_unlock(subscription);
 
         object_lock(generator);
