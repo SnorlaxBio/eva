@@ -19,7 +19,8 @@
 #include "../queue.h"
 
 static event_subscription_event_func_t func = {
-    event_subscription_event_func_rem
+    event_subscription_event_func_rem,
+    event_subscription_event_func_parameter_set
 };
 
 extern event_subscription_event_t * event_subscription_event_gen(event_subscription_t * subscription) {
@@ -54,4 +55,14 @@ extern event_subscription_event_t * event_subscription_event_func_rem(___notnull
     free(event);
 
     return nil;
+}
+
+extern event_subscription_event_t * event_subscription_event_func_parameter_set(___notnull event_subscription_event_t * event, int64_t parameter) {
+#ifndef   RELEASE
+    snorlaxdbg(event == nil, false, "critical", "");
+#endif // RELEASE
+
+    event->parameter = parameter;
+
+    return event;
 }

@@ -55,6 +55,9 @@ typedef struct event_processor_func event_processor_func_t;
 typedef struct event_processor_pool event_processor_pool_t;
 typedef struct event_processor_pool_func event_processor_pool_func_t;
 
+typedef event_subscription_event_t event_subscription_node_t;
+
+typedef void (*event_subscription_process_t)(___notnull event_subscription_t *, uint32_t, event_subscription_node_t *);
 typedef void (*event_processor_cancel_t)(___notnull event_processor_t *);
 typedef void (*event_engine_cancel_t)(___notnull const event_engine_t *);
 typedef void (*event_subscription_handler_t)(___notnull event_subscription_t *, uint32_t, event_subscription_event_t *);
@@ -86,6 +89,7 @@ struct event {
     event_t * next;
     event_subscription_event_t * node;
     event_subscription_t * subscription;
+    event_subscription_process_t process;
     uint32_t type;
 };
 
@@ -94,7 +98,7 @@ struct event_func {
     void (*on)(___notnull event_t *);
 };
 
-extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node);
+extern event_t * event_gen(___notnull event_subscription_t * subscription, event_subscription_process_t process, uint32_t type, ___notnull event_subscription_event_t * node);
 
 extern void event_func_on(___notnull event_t * event);
 

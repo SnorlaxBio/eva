@@ -34,6 +34,8 @@ int main(int argc, char ** argv) {
 
 static int32_t execute(___notnull command_t * command) {
     printf("hello world\n");
+
+    return success;
 }
 
 static void cancel(const event_engine_t * engine) {

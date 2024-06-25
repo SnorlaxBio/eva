@@ -10,7 +10,7 @@
 #ifndef   __SNORLAX__DESCRIPTOR_EVENT_TYPE__H__
 #define   __SNORLAX__DESCRIPTOR_EVENT_TYPE__H__
 
-#define command_event_type_subscription         0
+#define descriptor_event_type_subscription      0
 #define descriptor_event_type_open              1
 #define descriptor_event_type_in                2
 #define descriptor_event_type_out               3

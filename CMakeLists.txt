@@ -43,7 +43,8 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/event/generator/set.c
                             src/snorlax/command.c
                             src/snorlax/command/event/subscription.c
-                            src/snorlax/command/event/generator.c)
+                            src/snorlax/command/event/generator.c
+                            src/snorlax/command/event/subscription/process.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -61,7 +62,8 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/command/event.h
                             src/snorlax/command/event/type.h
                             src/snorlax/command/event/subscription.h
-                            src/snorlax/command/event/generator.h)
+                            src/snorlax/command/event/subscription/type.h
+                            src/snorlax/command/event/subscription/process.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})

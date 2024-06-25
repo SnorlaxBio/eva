@@ -21,7 +21,7 @@ static event_func_t func = {
     event_func_on
 };
 
-extern event_t * event_gen(___notnull event_subscription_t * subscription, uint32_t type, ___notnull event_subscription_event_t * node) {
+extern event_t * event_gen(___notnull event_subscription_t * subscription, event_subscription_process_t process, uint32_t type,___notnull event_subscription_event_t * node) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(node == nil, false, "critical", "");
@@ -32,8 +32,9 @@ extern event_t * event_gen(___notnull event_subscription_t * subscription, uint3
     event->func = address_of(func);
 
     event->subscription = subscription;
-    event->type = type;
+    event->process = process;
     event->node = node;
+    event->type = type;
 
     node->origin = event;
 
@@ -65,10 +66,13 @@ extern void event_func_on(___notnull event_t * event) {
     snorlaxdbg(event == nil, false, "critical", "");
     snorlaxdbg(event->subscription == nil, false, "critical", "");
     snorlaxdbg(event->node == nil, false, "critical", "");
+    snorlaxdbg(event->process == nil, false, "critical", "");
 #endif // RELEASE
 
     object_lock(event->subscription);
-    event_subscription_on(event->subscription, event->type, event->node);
+
+    event->process(event->subscription, event->type, event->node);
+
     object_unlock(event->subscription);
 
     event_rem(event);

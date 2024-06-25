@@ -36,7 +36,6 @@ struct event_generator_func {
     int32_t (*on)(___notnull event_generator_t *);
     int32_t (*off)(___notnull event_generator_t *);
     int32_t (*pub)(___notnull event_generator_t *, event_queue_t *);
-    int32_t (*control)(___notnull event_generator_t *, ___notnull event_subscription_t *, uint32_t, event_subscription_event_t *);
     int32_t (*add)(___notnull event_generator_t *, ___notnull event_subscription_t *);
     int32_t (*del)(___notnull event_generator_t *, ___notnull event_subscription_t *);
     ___sync void (*clear)(___notnull event_generator_t *);
@@ -50,7 +49,6 @@ extern ___sync void event_generator_func_clear(___notnull event_generator_t * ge
 #define event_generator_on(generator)                                   ((generator)->func->on(generator))
 #define event_generator_off(generator)                                  ((generator)->func->off(generator))
 #define event_generator_pub(generator, queue)                           ((generator)->func->pub(generator, queue))
-#define event_generator_control(generator, subscription, type, node)    ((generator)->func->control(generator, subscription, type, node))
 #define event_generator_add(generator, subscription)                    ((generator)->func->add(generator, subscription))
 #define event_generator_del(generator, subscription)                    ((generator)->func->del(generator, subscription))
 #define event_generator_clear(generator)                                ((generator)->func->clear(generator))

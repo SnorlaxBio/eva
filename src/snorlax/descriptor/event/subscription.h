@@ -25,7 +25,13 @@ struct descriptor_event_subscription {
 };
 
 struct descriptor_event_subscription_func {
-
+    descriptor_event_subscription_t * (*rem)(___notnull descriptor_event_subscription_t *);
+    void (*on)(___notnull descriptor_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
+
+extern descriptor_event_subscription_t * descriptor_event_subscription_gen(descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
+
+#define descriptor_event_subscription_rem(subscription)                 ((subscription)->func->rem(subscription))
+#define descriptor_event_subscription_on(subscription, type, event)     ((subscription)->func->on(subscription, type, event))
 
 #endif // __SNORLAX__DESCRIPTOR_EVENT_SUBSCRIPTION__H__

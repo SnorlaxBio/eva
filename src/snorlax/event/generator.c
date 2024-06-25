@@ -36,6 +36,8 @@ extern int32_t event_generator_func_add(___notnull event_generator_t * generator
 
     generator->size = generator->size + 1;
 
+    // event_subscription_notify(subscription, event_type_subscription, (event_subscription_event_t *) event_subscription_type_add);
+
     return success;
 }
 
@@ -68,6 +70,7 @@ extern int32_t event_generator_func_del(___notnull event_generator_t * generator
         generator->size = generator->size - 1;
     }
 
+    // event_subscription_notify(subscription, event_type_subscription, (event_subscription_event_t *) event_subscription_type_del);
 
     return success;
 }
@@ -81,25 +84,12 @@ extern void event_generator_func_clear(___notnull event_generator_t * generator)
     event_subscription_t * subscription = generator->head;
     while(subscription) {
         object_lock(subscription);
+
         event_generator_del(generator, subscription);
-        event_subscription_event_queue_t * queue = subscription->queue;
-        event_subscription_event_t * node = queue->head;
-        while(node) {
-            queue->head = node->next;
-            if(queue->head == nil) {
-                queue->tail = nil;
-            } else {
-                node->next = nil;
-            }
-            node->queue = nil;
-            queue->size = queue->size - 1;
 
-            event_generator_control(generator, subscription, event_generator_control_type_del, node);
+        event_subscription_event_queue_clear(subscription->queue);
 
-            node = queue->head;
-        }
-
-        event_subscription_on(subscription, event_type_subscription, (event_subscription_event_t *) event_subscription_type_del);
+        event_subscription_notify(subscription, event_type_subscription, (event_subscription_event_t *) event_subscription_type_del);
 
         object_unlock(subscription);
 

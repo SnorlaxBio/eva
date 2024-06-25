@@ -22,6 +22,8 @@ typedef struct command_event_generator_func command_event_generator_func_t;
 typedef struct command_event_subscription command_event_subscription_t;
 typedef struct command_event_subscription_func command_event_subscription_func_t;
 
+typedef event_subscription_event_t * (*command_event_subscription_procedure_t)(___notnull command_event_subscription_t *, uint32_t, event_subscription_event_t *);
+
 typedef void (*command_event_subscription_handler_t)(___notnull command_event_subscription_t *, uint32_t, event_subscription_event_t *);
 typedef event_subscription_event_t * (*command_event_subscription_process_t)(___notnull command_event_subscription_t *, uint32_t, event_subscription_event_t *);
 

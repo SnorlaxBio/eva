@@ -24,7 +24,7 @@ typedef struct descriptor_event_generator_func descriptor_event_generator_func_t
 typedef struct descriptor_event_subscription descriptor_event_subscription_t;
 typedef struct descriptor_event_subscription_func descriptor_event_subscription_func_t;
 
-typedef void (*descriptor_event_subscription_handler_t)(___notnull descriptor_event_subscription_t *, uint32_t, uint64_t);
-typedef uint64_t (*descriptor_event_subscription_process_t)(___notnull descriptor_event_subscription_t *, uint32_t, uint64_t);
+typedef void (*descriptor_event_subscription_handler_t)(___notnull descriptor_event_subscription_t *, uint32_t, event_subscription_event_t *);
+typedef event_subscription_event_t * (*descriptor_event_subscription_process_t)(___notnull descriptor_event_subscription_t *, uint32_t, event_subscription_event_t *);
 
 #endif // __SNORLAX__DESCRIPTOR_EVENT__H__
