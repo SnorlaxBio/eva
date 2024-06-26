@@ -46,10 +46,13 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/command/event/generator.c
                             src/snorlax/command/event/subscription/process.c
                             src/snorlax/descriptor.c
+                            src/snorlax/descriptor/exception.c
                             src/snorlax/descriptor/event/subscription.c
                             src/snorlax/descriptor/event/generator.c
                             src/snorlax/descriptor/event/generator/epoll.c
-                            src/snorlax/descriptor/event/generator/epoll/subscription/process.c)
+                            src/snorlax/descriptor/event/generator/epoll/subscription/process.c
+                            src/snorlax/console/out.c
+                            src/snorlax/console/in.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -78,7 +81,9 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/descriptor/event/generator/epoll.h
                             src/snorlax/descriptor/event/generator/epoll/subscription/state.h
                             src/snorlax/descriptor/event/generator/epoll/subscription/process.h
-                            src/snorlax/descriptor/event/generator/epoll/control/type.h)
+                            src/snorlax/descriptor/event/generator/epoll/control/type.h
+                            src/snorlax/console/out.h
+                            src/snorlax/console/in.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})
@@ -87,3 +92,6 @@ target_compile_options(snorlax-eva PUBLIC "-ffile-prefix-map=${CMAKE_SOURCE_DIR}
 
 add_executable(snorlax-eva-command-event-check src/snorlax/command/event/main.c)
 target_link_libraries(snorlax-eva-command-event-check snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-console-event-check src/snorlax/console/main.c)
+target_link_libraries(snorlax-eva-console-event-check snorlax-eva libsnorlax-std.a)

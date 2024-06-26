@@ -13,6 +13,9 @@
 
 #include <snorlax.h>
 
+#define event_subscription_type_command         1
+#define event_subscription_type_descriptor      2
+
 struct event;
 struct event_func;
 struct event_queue;

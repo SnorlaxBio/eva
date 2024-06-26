@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include "descriptor.h"
 
@@ -36,6 +37,7 @@ extern descriptor_t * descriptor_gen(int32_t value) {
 
     if(value > invalid) {
         descriptor->status = descriptor_state_open;
+        descriptor_nonblock_on(descriptor);
     } else {
         descriptor->status = descriptor_state_close;
     }
@@ -60,7 +62,6 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
     if(descriptor->value > invalid) {
         buffer_t * buffer = descriptor->buffer.in;
         buffer_capacity_set(buffer, buffer_size_get(buffer) + 8192);
-
         int64_t n = read(descriptor->value, buffer_back(buffer), buffer_remain(buffer));
 
         if(n > 0) {
@@ -81,6 +82,8 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
                 descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, read);
             }
         }
+
+        return n;
     } else {
 #ifndef   RELEASE
         snorlaxdbg(false, true, "warning", "descriptor is not open");
@@ -116,6 +119,8 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
                     descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, write);
                 }
             }
+
+            return n;
         }
 
         return success;
@@ -171,4 +176,12 @@ extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint3
     // TODO: UPGRADE THIS
     // 1. NONBLOCK OPEN
     return (descriptor->status & state);
+}
+
+extern void descriptor_nonblock_on(___notnull descriptor_t * descriptor) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+
+    fcntl(descriptor->value, F_SETFL, fcntl(descriptor->value, F_GETFL, 0) | O_NONBLOCK);
 }

@@ -19,7 +19,6 @@ command_t * command = nil;
 event_subscription_t * subscription = nil;
 
 
-
 int main(int argc, char ** argv) {
     snorlax_eva_on();
 

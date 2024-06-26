@@ -36,10 +36,13 @@ extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___no
     subscription->func = address_of(func);
     subscription->queue = event_subscription_event_queue_gen();
     subscription->handler = (descriptor_event_subscription_handler_t *) calloc(descriptor_event_type_max, sizeof(descriptor_event_subscription_handler_t));
+    subscription->descriptor = descriptor;
+    subscription->type = event_subscription_type_descriptor;
 
     if(handler) {
         for(uint32_t i = 0; i < descriptor_event_type_max; i++) {
             subscription->handler[i] = handler[i];
+            printf("%p\n", subscription->handler[i]);
         }
     }
 

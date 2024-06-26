@@ -37,6 +37,7 @@ extern command_event_subscription_t * command_event_subscription_gen(___notnull 
     subscription->command = command;
     subscription->retry = retry;
     subscription->queue = event_subscription_event_queue_gen();
+    subscription->type = event_subscription_type_command;
 
     subscription->handler = (command_event_subscription_handler_t *) calloc(command_event_type_max, sizeof(command_event_subscription_handler_t));
 

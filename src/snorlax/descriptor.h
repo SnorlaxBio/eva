@@ -12,6 +12,7 @@
 
 #include <snorlax.h>
 #include <snorlax/buffer.h>
+#include <snorlax/event.h>
 
 #define descriptor_state_open           (0x00000001U <<  0U)
 #define descriptor_state_read           (0x00000001U <<  1U)
@@ -33,11 +34,17 @@ struct descriptor_func;
 struct descriptor_buffer;
 struct descriptor_exception;
 
+struct descriptor_event_subscription;
+
 typedef struct descriptor descriptor_t;
 typedef struct descriptor_func descriptor_func_t;
 
 typedef struct descriptor_buffer descriptor_buffer_t;
 typedef struct descriptor_exception descriptor_exception_t;
+
+typedef struct descriptor_event_subscription descriptor_event_subscription_t;
+
+typedef void (*descriptor_event_subscription_handler_t)(___notnull descriptor_event_subscription_t *, uint32_t, event_subscription_event_t *);
 
 struct descriptor_buffer {
     buffer_t * in;
@@ -89,5 +96,7 @@ extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint3
 #define descriptor_write(descriptor)            ((descriptor)->func->write(descriptor))
 #define descriptor_close(descriptor)            ((descriptor)->func->close(descriptor))
 #define descriptor_check(descriptor, state)     ((descriptor)->func->check(descriptor, state))
+
+extern void descriptor_nonblock_on(___notnull descriptor_t * descriptor);
 
 #endif // __SNORLAX__DESCRIPTOR__H__

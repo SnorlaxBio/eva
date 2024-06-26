@@ -60,6 +60,8 @@ static descriptor_event_generator_epoll_func_t func = {
 extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen(___notnull event_generator_set_t * set) {
     descriptor_event_generator_epoll_t * generator = (descriptor_event_generator_epoll_t *) calloc(1, sizeof(descriptor_event_generator_epoll_t));
 
+    generator->func = address_of(func);
+
     generator->set = set;
 
     generator->value = invalid;
@@ -98,7 +100,7 @@ static ___sync int32_t descriptor_event_generator_epoll_func_on(___notnull descr
 
     if(generator->timeout < 0) generator->timeout = 1;
 
-    generator->events = memory_gen(generator->events, generator->max);
+    generator->events = memory_gen(generator->events, generator->max * sizeof(struct epoll_event));
 
     generator->status = generator->status | event_generator_state_on;
 
@@ -180,6 +182,7 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
         uint32_t flags = 0;
         for(int32_t i = 0; i < nfds; i++) {
             subscription = events[i].data.ptr;
+            descriptor  = subscription->descriptor;
             flags = events[i].events;
 
             if(flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP)) {
@@ -317,7 +320,6 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         e.events = e.events | EPOLLOUT;
     }
     // TODO: UPGRADE
-
     if(epoll_ctl(generator->value, EPOLL_CTL_ADD, subscription->descriptor->value, &e) == fail) {
         if(errno == EEXIST) {
             if(epoll_ctl(generator->value, EPOLL_CTL_MOD, subscription->descriptor->value, &e) == fail) {
@@ -335,7 +337,7 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
                 return success;
             } else {
 #ifndef   RELEASE
-                snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+                    snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
 #endif // RELEASE
             }
         } else {
