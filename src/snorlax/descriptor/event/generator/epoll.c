@@ -4,48 +4,68 @@
  * @details
  * 
  * @author      snorlax <ceo@snorlax.bio>
- * @since       June 22, 2024
+ * @since       June 25, 2024
  */
 
-#include <stdlib.h>
-#include <errno.h>
 #include <sys/epoll.h>
+#include <errno.h>
+#include <unistd.h>
 
 #include "epoll.h"
 
-#include "state.h"
-#include "../type.h"
+#include "epoll/subscription/state.h"
+#include "epoll/subscription/process.h"
+#include "epoll/control/type.h"
 
 #include "../subscription.h"
+#include "../subscription/type.h"
+#include "../type.h"
 
-#include "../../event/queue.h"
-#include "../../event/subscription/event.h"
+#include "../../../event/queue.h"
+#include "../../../event/engine.h"
+#include "../../../event/generator.h"
+#include "../../../event/generator/state.h"
+#include "../../../event/generator/set.h"
+#include "../../../event/subscription/event/queue.h"
+#include "../../../event/subscription/event.h"
+
+#include "../../../descriptor.h"
+
+static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subscription_t * subscription, uint32_t type, event_queue_t * queue, event_engine_t * engine);
+
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription);
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_mod(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription);
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_del(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription);
 
 static descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_func_rem(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_on(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_off(___notnull descriptor_event_generator_epoll_t * generator);
 static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull descriptor_event_generator_epoll_t * generator, event_queue_t * queue);
-static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * genereator, ___notnull descriptor_event_subscription_t * subscription);
-    // ___sync int32_t (*del)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
-    // ___sync void (*clear)(___notnull descriptor_event_generator_epoll_t *);
-    // ___notsync int32_t (*reg)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
-    // ___notsync int32_t (*unreg)(___notnull descriptor_event_generator_epoll_t *, ___notnull descriptor_event_subscription_t *);
-
+static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription);
+static ___sync int32_t descriptor_event_generator_epoll_func_del(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription);
+static ___sync void descriptor_event_generator_epoll_func_clear(___notnull descriptor_event_generator_epoll_t * generator);
+static ___notsync int32_t descriptor_event_generator_epoll_func_control(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription, uint32_t type);
 
 static descriptor_event_generator_epoll_func_t func = {
     descriptor_event_generator_epoll_func_rem,
     descriptor_event_generator_epoll_func_on,
     descriptor_event_generator_epoll_func_off,
     descriptor_event_generator_epoll_func_pub,
-    descriptor_event_generator_epoll_func_add
+    descriptor_event_generator_epoll_func_add,
+    descriptor_event_generator_epoll_func_del,
+    descriptor_event_generator_epoll_func_clear,
+    descriptor_event_generator_epoll_func_control
 };
 
 extern descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_gen(___notnull event_generator_set_t * set) {
     descriptor_event_generator_epoll_t * generator = (descriptor_event_generator_epoll_t *) calloc(1, sizeof(descriptor_event_generator_epoll_t));
 
-    generator->func = address_of(func);
-    generator->value = invalid;
     generator->set = set;
+
+    generator->value = invalid;
+    generator->events = malloc(sizeof(struct epoll_event) * 1024);
+    generator->max = 1024;
+    generator->timeout = 1;
 
     return generator;
 }
@@ -54,28 +74,14 @@ static descriptor_event_generator_epoll_t * descriptor_event_generator_epoll_fun
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
+
     descriptor_event_generator_epoll_off(generator);
     descriptor_event_generator_epoll_clear(generator);
-
-    object_lock(generator);
-
-    if(generator->value > invalid) {
-        if(close(generator->value) == fail) {
-#ifndef   RELEASE
-            snorlaxdbg(false, true, "warning", "fail to close => %d", errno);
-#endif // RELEASE
-        }
-
-        generator->value = invalid;
-    }
-
-    generator->events = memory_rem(generator->events);
-
-    object_unlock(generator);
 
     generator->sync = sync_rem(generator->sync);
 
     free(generator);
+
     return nil;
 }
 
@@ -84,36 +90,17 @@ static ___sync int32_t descriptor_event_generator_epoll_func_on(___notnull descr
     snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
-    object_lock(generator);
+    if(generator->max <= 0) generator->max = 1024;
 
-    if((generator->status & descriptor_event_generator_state_on) == 0) {
-        generator->status = generator->status | descriptor_event_generator_state_on;
-        generator->timeout = 1;
-        generator->max = 1024;
-
-        generator->events = memory_gen(generator->events, sizeof(struct epoll_event) * generator->max);
-        if(generator->value <= invalid) {
-            generator->value = epoll_create(generator->max);
-        }
-
-        for(descriptor_event_subscription_t * subscription = generator->head; subscription != nil; subscription = subscription->next) {
-            object_unlock(generator);
-
-            object_lock(subscription);
-            descriptor_event_generator_epoll_reg(generator, subscription);
-            object_unlock(subscription);
-
-            object_lock(generator);
-        }
-    } else {
-#ifndef   RELEASE
-        snorlaxdbg(false, true, "notice", "generator is already on");
-#endif // RELEASE
+    if(generator->value <= invalid) {
+        generator->value = epoll_create(generator->max);
     }
 
+    if(generator->timeout < 0) generator->timeout = 1;
 
+    generator->events = memory_gen(generator->events, generator->max);
 
-    object_unlock(generator);
+    generator->status = generator->status | event_generator_state_on;
 
     return success;
 }
@@ -123,106 +110,322 @@ static ___sync int32_t descriptor_event_generator_epoll_func_off(___notnull desc
     snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
-    object_lock(generator);
-
-    if(generator->status & descriptor_event_generator_state_on) {
-        generator->status = generator->status & (~descriptor_event_generator_state_on);
-        if(generator->value > invalid) {
-            if(close(generator->value) == fail) {
+    if(generator->value > invalid) {
+        if(close(generator->value) == fail) {
 #ifndef   RELEASE
-                snorlaxdbg(false, true, "warning", "fail to close => %d", errno);
+            snorlaxdbg(false, true, "warning", "fail to close(...) caused by %d", errno);
 #endif // RELEASE
-            }
-
-            generator->value = invalid;
-        }
-        generator->events = memory_rem(generator->events);
-
-        for(descriptor_event_subscription_t * subscription = generator->head; subscription != nil; subscription = subscription->next) {
-            object_unlock(generator);
-
-            object_lock(subscription);
-            descriptor_event_generator_epoll_unreg(generator, subscription);
-            object_unlock(subscription);
-
-            object_lock(generator);
         }
     }
 
-    object_unlock(generator);
+    descriptor_event_subscription_t * subscription = generator->head;
+    descriptor_event_subscription_t * next = nil;
+    descriptor_t * descriptor = nil;
+    while(subscription) {
+        object_lock(subscription);
+        descriptor = subscription->descriptor;
+
+        event_subscription_event_queue_clear(subscription->queue);
+
+        if(subscription->status) subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+
+#ifndef   RELEASE
+        snorlaxdbg(descriptor->status & descriptor_state_exception, false, "critical", "");
+#endif // RELEASE
+
+        if(descriptor->status & descriptor_state_open) {
+            descriptor->status = descriptor->status | descriptor_state_write;
+            descriptor->status = descriptor->status & (~descriptor_state_read);
+        } else if(descriptor->status & descriptor_state_close) {
+            descriptor->status = descriptor_state_close;
+#ifndef   RELEASE
+            snorlaxdbg(descriptor->value > invalid, false, "critical", "");
+#endif // RELEASE
+        } else {
+            if(descriptor->value <= invalid) {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "check", "");
+#endif // RELEASE
+
+                descriptor->status = descriptor_state_close;
+            }
+        }
+
+        next = subscription->next;
+        object_unlock(subscription);
+        subscription = next;
+    }
+
+    generator->events = memory_rem(generator->events);
+
+    generator->status = generator->status & (~event_generator_state_on);
 
     return success;
 }
 
-static ___notsync int32_t descriptor_event_generator_epoll_func_pub(___notnull descriptor_event_generator_epoll_t * generator, event_queue_t * queue) {
+static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull descriptor_event_generator_epoll_t * generator, event_queue_t * queue) {
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, false, "critical", "");
 #endif // RELEASE
 
     struct epoll_event * events = (struct epoll_event *) generator->events;
+
+    event_generator_set_t * set = generator->set;
+    event_engine_t * engine = set->engine;
+
     int32_t nfds = epoll_wait(generator->value, events, generator->max, generator->timeout);
-
-    int32_t n = 0;
-
     if(nfds >= 0) {
+        descriptor_t * descriptor = nil;
         descriptor_event_subscription_t * subscription = nil;
+        uint32_t flags = 0;
         for(int32_t i = 0; i < nfds; i++) {
-            subscription = (descriptor_event_subscription_t *) events[i].data.ptr;
-            object_lock(subscription);
-            // 큐에 삽입을 하는 로직을 만든다.... 
-            if(events[i].events & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP)) {
-                descriptor_exception_t * exception = descriptor_exception_set(subscription->descriptor, descriptor_exception_type_system, events[i].events & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
-                if(queue) {
-                    event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription, (uint64_t) exception);
-                    event_t * event = event_gen((event_subscription_t *) subscription, descriptor_event_type_exception, node);
-                    event_queue_push(queue, event);
-                } else {
-                    descriptor_event_subscription_on(subscription, descriptor_event_type_exception, (uint64_t) exception);
-                }
-                object_unlock(subscription);
+            subscription = events[i].data.ptr;
+            flags = events[i].events;
+
+            if(flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP)) {
+                descriptor_exception_set(descriptor, descriptor_exception_type_system, flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
+
+                descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
                 continue;
             }
-            if(events[i].events & EPOLLOUT) {
-                subscription->descriptor->status = subscription->descriptor->status | descriptor_state_write;
-                if((events[i].events & EPOLLIN) == 0) {
-                    if(queue) {
-                        event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription, 0);
-                        event_t * event = event_gen((event_subscription_t *) subscription, descriptor_event_type_out, node);
-                        event_queue_push(queue, event);
-                    } else {
-                        descriptor_event_subscription_on(subscription, descriptor_event_type_out, 0);
-                    }
+            if(flags & EPOLLOUT) {
+                descriptor->status = descriptor->status | descriptor_state_write;
+                if(flags & EPOLLIN) {
+                    descriptor->status = descriptor->status | descriptor_state_read;
+
+                    descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
+
+                    continue;
                 }
+
+                descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_write, queue, engine);
             }
-            if(events[i].events & EPOLLIN) {
-                subscription->descriptor->status = subscription->descriptor->status | descriptor_state_read;
-                if(queue) {
-                    event_subscription_event_t * node = event_subscription_event_gen((event_subscription_t *) subscription, 0);
-                    event_t * event = event_gen((event_subscription_t *) subscription, descriptor_event_type_in, node);
-                    event_queue_push(queue, event);
-                } else {
-                    descriptor_event_subscription_on(subscription, descriptor_event_type_in, 0);
-                }
-                object_unlock(subscription);
-                continue;
+            if(flags & EPOLLIN) {
+                descriptor->status = descriptor->status | descriptor_state_read;
+
+                descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
             }
-            object_unlock(subscription);
         }
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, true, "warning", "fail to epoll_wait(...) caused by %d", errno);
+        snorlaxdbg(false, true, "error", "fail to epoll_wait(...) => %d", errno);
 #endif // RELEASE
     }
 
-    return n;
+    return success;
 }
 
-static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * genereator, ___notnull descriptor_event_subscription_t * subscription) {
+static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
 #ifndef   RELEASE
-    snorlaxdbg(genereator == nil, false, "critical", "");
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->generator, false, "critical", "");
+#endif // RELEASE
+
+    if(event_generator_func_add((event_generator_t *) generator, (event_subscription_t *) subscription) == success) {
+        if(descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_add) == success) {
+            subscription->status = subscription->status | (descriptor_event_generator_epoll_subscription_state_in | descriptor_event_generator_epoll_subscription_state_out);
+            descriptor_event_subscription_notify(subscription, descriptor_event_type_exception, (event_subscription_event_t *) descriptor_event_subscription_type_add);
+            return success;
+        } else {
+            event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
+        }
+    }
+
+    return fail;
+}
+
+static ___sync int32_t descriptor_event_generator_epoll_func_del(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->generator != (descriptor_event_generator_t *) generator, false, "critical", "");
+#endif // RELEASE
+
+    descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+    event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
+
+    subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+
+    descriptor_event_subscription_notify(subscription, descriptor_event_type_exception, (event_subscription_event_t *) descriptor_event_subscription_type_del);
+
+    return fail;
+}
+
+static ___sync void descriptor_event_generator_epoll_func_clear(___notnull descriptor_event_generator_epoll_t * generator) {
+#ifndef   RELEASE
+    snorlaxdbg(generator == nil, false, "critical", "");
+#endif // RELEASE
+
+    while(generator->head) {
+        descriptor_event_generator_epoll_func_del(generator, generator->head);
+    }
+}
+
+static ___notsync int32_t descriptor_event_generator_epoll_func_control(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription, uint32_t type) {
+    if(type == descriptor_event_generator_epoll_control_type_add) {
+        return descriptor_event_generator_epoll_func_control_add(generator, subscription);
+    } else if(type == descriptor_event_generator_epoll_control_type_mod) {
+        return descriptor_event_generator_epoll_func_control_mod(generator, subscription);
+    } else if(type == descriptor_event_generator_epoll_control_type_del) {
+        return descriptor_event_generator_epoll_func_control_del(generator, subscription);
+    } else {
+#ifndef   RELEASE
+        snorlaxdbg(true, false, "critical", "");
+#endif // RELEASE
+    }
+
+    return fail;
+}
+
+static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subscription_t * subscription, uint32_t type, event_queue_t * queue, event_engine_t * engine) {
+#ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
-    object_lock(genereator);
-    object_unlock(genereator);
+    if(queue) {
+        event_queue_push(queue, event_gen((event_subscription_t *) subscription,
+                                            descriptor_event_generator_epoll_subscription_process_get(type),
+                                            type,
+                                            descriptor_event_subscription_node_gen((event_subscription_t *) subscription)));
+    } else {
+        event_subscription_process_t process = descriptor_event_generator_epoll_subscription_process_get(type);
+
+        process((event_subscription_t *) subscription, type, nil);
+    }
+}
+
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+
+    descriptor_t * descriptor = subscription->descriptor;
+
+    struct epoll_event e;
+    e.data.ptr = subscription;
+
+    e.events = (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);
+
+    // TODO: UPGRADE
+    if((descriptor->status & descriptor_state_read) == 0){
+        e.events = e.events | EPOLLIN;
+    }
+
+    if(buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
+        e.events = e.events | EPOLLOUT;
+    }
+    // TODO: UPGRADE
+
+    if(epoll_ctl(generator->value, EPOLL_CTL_ADD, subscription->descriptor->value, &e) == fail) {
+        if(errno == EEXIST) {
+            if(epoll_ctl(generator->value, EPOLL_CTL_MOD, subscription->descriptor->value, &e) == fail) {
+                if(e.events & EPOLLIN) {
+                    subscription->status = subscription->status | descriptor_event_generator_epoll_subscription_state_in;
+                } else {
+                    subscription->status = subscription->status & (~descriptor_event_generator_epoll_subscription_state_in);
+                }
+
+                if(e.events & EPOLLOUT) {
+                    subscription->status = subscription->status | descriptor_event_generator_epoll_subscription_state_out;
+                } else {
+                    subscription->status = subscription->status & (~descriptor_event_generator_epoll_subscription_state_out);
+                }
+                return success;
+            } else {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+#endif // RELEASE
+            }
+        } else {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+#endif // RELEASE
+        }
+        
+        subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+        descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, epoll_ctl);
+
+        return fail;
+    }
+
+    if(e.events & EPOLLIN) {
+        subscription->status = subscription->status | descriptor_event_generator_epoll_subscription_state_in;
+    } else {
+        subscription->status = subscription->status & (~descriptor_event_generator_epoll_subscription_state_in);
+    }
+
+    if(e.events & EPOLLOUT) {
+        subscription->status = subscription->status | descriptor_event_generator_epoll_subscription_state_out;
+    } else {
+        subscription->status = subscription->status & (~descriptor_event_generator_epoll_subscription_state_out);
+    }
+
+    return success;
+}
+
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_mod(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+
+    descriptor_t * descriptor = subscription->descriptor;
+
+    struct epoll_event e;
+    e.data.ptr = subscription;
+
+    e.events = (EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP);
+
+    subscription->status = descriptor_event_generator_epoll_subscription_state_in;
+
+    if(buffer_length(descriptor->buffer.out) > 0) {
+        subscription->status = descriptor_event_generator_epoll_subscription_state_out;
+        e.events = e.events | EPOLLOUT;
+    }
+
+    if(epoll_ctl(generator->value, EPOLL_CTL_MOD, subscription->descriptor->value, &e) == fail) {
+        if(errno == ENOENT) {
+            if(epoll_ctl(generator->value, EPOLL_CTL_ADD, subscription->descriptor->value, &e) == fail) {
+                return success;
+            } else {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+#endif // RELEASE
+            }
+        } else {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+#endif // RELEASE
+        }
+
+        subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+
+        return fail;
+    }
+
+    return success;
+}
+
+static ___notsync int32_t descriptor_event_generator_epoll_func_control_del(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(generator == nil, false, "critical", "");
+    snorlaxdbg(generator->value <= invalid, false, "critical", "");
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
+    snorlaxdbg(subscription->descriptor->value <= invalid, false, "critical", "");
+#endif // RELEASE
+
+    struct epoll_event e;
+    e.events = (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP);
+    if(epoll_ctl(generator->value, EPOLL_CTL_DEL, subscription->descriptor->value, &e) == fail) {
+#ifndef   RELEASE
+        snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+#endif // RELEASE
+    }
+
+    subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+
+    return success;
 }

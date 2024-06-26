@@ -30,7 +30,7 @@ extern void command_event_subscription_process_execute(command_event_subscriptio
     command_event_subscription_handler_t on = subscription->handler[type];
 
     if(on) {
-        on(subscription, type, node ? event_subscription_event_parameter_set(node, ret) : (event_subscription_event_t *)(int64_t) ret);
+        on(subscription, type, event_subscription_event_parameter_set(node, ret));
     }
 
     if(subscription->retry > 0) {

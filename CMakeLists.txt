@@ -44,7 +44,12 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/command.c
                             src/snorlax/command/event/subscription.c
                             src/snorlax/command/event/generator.c
-                            src/snorlax/command/event/subscription/process.c)
+                            src/snorlax/command/event/subscription/process.c
+                            src/snorlax/descriptor.c
+                            src/snorlax/descriptor/event/subscription.c
+                            src/snorlax/descriptor/event/generator.c
+                            src/snorlax/descriptor/event/generator/epoll.c
+                            src/snorlax/descriptor/event/generator/epoll/subscription/process.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -63,7 +68,17 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/command/event/type.h
                             src/snorlax/command/event/subscription.h
                             src/snorlax/command/event/subscription/type.h
-                            src/snorlax/command/event/subscription/process.h)
+                            src/snorlax/command/event/subscription/process.h
+                            src/snorlax/descriptor.h
+                            src/snorlax/descriptor/event.h
+                            src/snorlax/descriptor/event/type.h
+                            src/snorlax/descriptor/event/subscription.h
+                            src/snorlax/descriptor/event/generator.h
+                            src/snorlax/descriptor/event/subscription/type.h
+                            src/snorlax/descriptor/event/generator/epoll.h
+                            src/snorlax/descriptor/event/generator/epoll/subscription/state.h
+                            src/snorlax/descriptor/event/generator/epoll/subscription/process.h
+                            src/snorlax/descriptor/event/generator/epoll/control/type.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})

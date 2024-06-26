@@ -20,7 +20,8 @@ static descriptor_func_t func = {
     descriptor_func_open,
     descriptor_func_read,
     descriptor_func_write,
-    descriptor_func_close
+    descriptor_func_close,
+    descriptor_func_check
 };
 
 extern descriptor_t * descriptor_gen(int32_t value) {
@@ -46,32 +47,13 @@ extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor){
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    if(descriptor->value > invalid) {
-        if(descriptor->status & descriptor_state_exception) {
-#ifndef   RELEASE
-            snorlaxdbg(false, true, "notice", "descriptor has exception");
-#endif // RELEASE
 
-            return fail;
-        }
-        if((descriptor->status & descriptor_state_open) == 0) {
-            descriptor->status = descriptor->status | descriptor_state_open;
-            descriptor->status = descriptor->status & (~descriptor_state_close);
-
-            return success;
-        } else if((descriptor->status & descriptor_state_close) == 0) {
-            return success;
-        } else {
-#ifndef   RELEASE
-            snorlaxdbg(false, true, "descriptor will be closed", "");
-#endif // RELEASE
-        }
-    }
+    snorlaxdbg(true, false, "critical", "");
 
     return fail;
 }
 
-extern int32_t descriptor_func_read(___notnull descriptor_t * descriptor) {
+extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -107,7 +89,7 @@ extern int32_t descriptor_func_read(___notnull descriptor_t * descriptor) {
     return fail;
 }
 
-extern int32_t descriptor_func_write(___notnull descriptor_t * descriptor) {
+extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -159,8 +141,10 @@ extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor) {
         descriptor->value = invalid;
     }
 
-    descriptor->status = descriptor->status & (~descriptor_state_open);
+    descriptor->status = descriptor->status & (~(descriptor_state_open | descriptor_state_read | descriptor_state_write));
     descriptor->status = descriptor->status | descriptor_state_close;
+
+    descriptor_exception_set(descriptor, descriptor_exception_type_none, descriptor_exception_no_none, nil);
 
     return success;
 }
@@ -178,4 +162,13 @@ static descriptor_t * descriptor_func_rem(___notnull descriptor_t * descriptor) 
     free(descriptor);
 
     return nil;
+}
+
+extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint32_t state) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+    // TODO: UPGRADE THIS
+    // 1. NONBLOCK OPEN
+    return (descriptor->status & state);
 }

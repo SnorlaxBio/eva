@@ -19,9 +19,11 @@
 #define descriptor_state_close          (0x00000001U <<  3U)
 #define descriptor_state_exception      (0x00000001U <<  4U)
 
+#define descriptor_exception_type_none      0
 #define descriptor_exception_type_system    1
 #define descriptor_exception_type_lib       2
 
+#define descriptor_exception_no_none        0
 #define descriptor_exception_no_eof         1
 
 
@@ -66,23 +68,26 @@ struct descriptor {
 struct descriptor_func {
     descriptor_t * (*rem)(___notnull descriptor_t *);
 
-    int32_t * (*open)(___notnull descriptor_t *);
-    int64_t * (*read)(___notnull descriptor_t *);
-    int64_t * (*write)(___notnull descriptor_t *);
-    int32_t * (*close)(___notnull descriptor_t *);
+    int32_t (*open)(___notnull descriptor_t *);
+    int64_t (*read)(___notnull descriptor_t *);
+    int64_t (*write)(___notnull descriptor_t *);
+    int32_t (*close)(___notnull descriptor_t *);
+    int32_t (*check)(___notnull descriptor_t *, uint32_t);
 };
 
 extern descriptor_t * descriptor_gen(int32_t value);
 
 extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor);
-extern int32_t descriptor_func_read(___notnull descriptor_t * descriptor);
-extern int32_t descriptor_func_write(___notnull descriptor_t * descriptor);
+extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor);
+extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor);
 extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor);
+extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint32_t state);
 
-#define descriptor_rem(descriptor)      ((descriptor)->func->rem(descriptor))
-#define descriptor_open(descriptor)     ((descriptor)->func->open(descriptor))
-#define descriptor_read(descriptor)     ((descriptor)->func->read(descriptor))
-#define descriptor_write(descriptor)    ((descriptor)->func->write(descriptor))
-#define descriptor_close(descriptor)    ((descriptor)->func->close(descriptor))
+#define descriptor_rem(descriptor)              ((descriptor)->func->rem(descriptor))
+#define descriptor_open(descriptor)             ((descriptor)->func->open(descriptor))
+#define descriptor_read(descriptor)             ((descriptor)->func->read(descriptor))
+#define descriptor_write(descriptor)            ((descriptor)->func->write(descriptor))
+#define descriptor_close(descriptor)            ((descriptor)->func->close(descriptor))
+#define descriptor_check(descriptor, state)     ((descriptor)->func->check(descriptor, state))
 
 #endif // __SNORLAX__DESCRIPTOR__H__

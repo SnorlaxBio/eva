@@ -47,7 +47,7 @@ extern int64_t event_subscription_event_func_parameter_get(___notnull event_subs
 extern event_subscription_event_t * event_subscription_event_func_rem(___notnull event_subscription_event_t * event);
 
 #define event_subscription_event_rem(event)                             ((event)->func->rem(event))
-#define event_subscription_event_parameter_set(event, parameter)        ((event)->func->parameter_set(event, parameter))
+#define event_subscription_event_parameter_set(event, parameter)        ((event) ? (event)->func->parameter_set(event, ((int64_t)(parameter))) : (event_subscription_event_t *)((uint64_t)(parameter)))
 #define event_subscription_event_parameter_get(event)                   ((event)->func->parameter_get(event))
 
 #endif // __SNORLAX__EVENT_SUBSCRIPTION_EVENT__H__
