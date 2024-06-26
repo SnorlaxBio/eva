@@ -42,7 +42,7 @@ extern console_out_t * console_out_gen(void) {
 
         consoleout->value = STDOUT_FILENO;
         descriptor_nonblock_on((descriptor_t *)consoleout);
-        consoleout->status = descriptor_state_open;
+        consoleout->status = descriptor_state_open_out | descriptor_state_write;
     }
     return consoleout;
 }

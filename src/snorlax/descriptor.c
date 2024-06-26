@@ -25,6 +25,10 @@ static descriptor_func_t func = {
     descriptor_func_check
 };
 
+extern descriptor_func_t * descriptor_func_get(void) {
+    return address_of(func);
+}
+
 extern descriptor_t * descriptor_gen(int32_t value) {
     descriptor_t * descriptor = (descriptor_t *) calloc(1, sizeof(descriptor_t));
 
@@ -60,30 +64,37 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
     if(descriptor->value > invalid) {
-        buffer_t * buffer = descriptor->buffer.in;
-        buffer_capacity_set(buffer, buffer_size_get(buffer) + 8192);
-        int64_t n = read(descriptor->value, buffer_back(buffer), buffer_remain(buffer));
+        if(descriptor->status & descriptor_state_open_in) {
+            buffer_t * buffer = descriptor->buffer.in;
+            buffer_capacity_set(buffer, buffer_size_get(buffer) + 8192);
+            int64_t n = read(descriptor->value, buffer_back(buffer), buffer_remain(buffer));
 
-        if(n > 0) {
-            buffer_size_set(buffer, buffer_size_get(buffer) + n);
+            if(n > 0) {
+                buffer_size_set(buffer, buffer_size_get(buffer) + n);
 
-            descriptor->status = descriptor->status | descriptor_state_read;
-        } else if(n == 0) {
-            descriptor->status = descriptor->status & (~descriptor_state_read);
+                descriptor->status = descriptor->status | descriptor_state_read;
+            } else if(n == 0) {
+                descriptor->status = descriptor->status & (~descriptor_state_read);
 
-            descriptor_exception_set(descriptor, descriptor_exception_type_lib, descriptor_exception_no_eof, read);
+                descriptor_exception_set(descriptor, descriptor_exception_type_lib, descriptor_exception_no_eof, read);
 
-            n = fail;
-        } else {
-            descriptor->status = descriptor->status & (~descriptor_state_read);
-            if(errno == EAGAIN) {
-                n = 0;
+                n = fail;
             } else {
-                descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, read);
+                descriptor->status = descriptor->status & (~descriptor_state_read);
+                if(errno == EAGAIN) {
+                    n = 0;
+                } else {
+                    descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, read);
+                }
             }
-        }
 
-        return n;
+            return n;
+        }
+#ifndef   RELEASE
+        snorlaxdbg(false, true, "caution", "(descriptor->status & descriptor_state_open_in) == 0");
+#endif // RELEASE
+
+        return success;
     } else {
 #ifndef   RELEASE
         snorlaxdbg(false, true, "warning", "descriptor is not open");
@@ -97,31 +108,37 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
     if(descriptor->value > invalid) {
-        buffer_t * buffer = descriptor->buffer.out;
+        if(descriptor->status & descriptor_state_open_out) {
+            buffer_t * buffer = descriptor->buffer.out;
 
-        if(buffer_length(buffer) > 0) {
-            int64_t n = write(descriptor->value, buffer_front(buffer), buffer_length(buffer));
+            if(buffer_length(buffer) > 0) {
+                int64_t n = write(descriptor->value, buffer_front(buffer), buffer_length(buffer));
 
-            if(n > 0) {
-                buffer_position_set(buffer, buffer_position_get(buffer) + n);
+                if(n > 0) {
+                    buffer_position_set(buffer, buffer_position_get(buffer) + n);
 
-                descriptor->status = descriptor->status | descriptor_state_write;
-            } else if(n == 0) {
+                    descriptor->status = descriptor->status | descriptor_state_write;
+                } else if(n == 0) {
 #ifndef   RELEASE
-                snorlaxdbg(false, true, "notice", "check");
+                    snorlaxdbg(false, true, "notice", "check");
 #endif // RELEASE
-            } else {
-                descriptor->status = descriptor->status & (~descriptor_state_write);
-
-                if(errno == EAGAIN) {
-                    n = 0;
                 } else {
-                    descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, write);
-                }
-            }
+                    descriptor->status = descriptor->status & (~descriptor_state_write);
 
-            return n;
+                    if(errno == EAGAIN) {
+                        n = 0;
+                    } else {
+                        descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, write);
+                    }
+                }
+
+                return n;
+            }
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "warning", "(descriptor->status & descriptor_state_open_out) == 0");
+#endif // RELEASE
         }
+        
 
         return success;
     } else {

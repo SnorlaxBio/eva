@@ -42,7 +42,7 @@ extern console_in_t * console_in_gen(void) {
 
         consolein->value = STDIN_FILENO;
         descriptor_nonblock_on((descriptor_t *) consolein);
-        consolein->status = descriptor_state_open;
+        consolein->status = descriptor_state_open_in;
     }
     return consolein;
 }

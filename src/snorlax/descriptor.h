@@ -13,12 +13,16 @@
 #include <snorlax.h>
 #include <snorlax/buffer.h>
 #include <snorlax/event.h>
+#include <snorlax/descriptor/event/type.h>
 
-#define descriptor_state_open           (0x00000001U <<  0U)
-#define descriptor_state_read           (0x00000001U <<  1U)
-#define descriptor_state_write          (0x00000001U <<  2U)
-#define descriptor_state_close          (0x00000001U <<  3U)
-#define descriptor_state_exception      (0x00000001U <<  4U)
+#define descriptor_state_open_in        (0x00000001U <<  0U)
+#define descriptor_state_open_out       (0x00000001U <<  1U)
+#define descriptor_state_read           (0x00000001U <<  2U)
+#define descriptor_state_write          (0x00000001U <<  3U)
+#define descriptor_state_close          (0x00000001U <<  4U)
+#define descriptor_state_exception      (0x00000001U <<  5U)
+
+#define descriptor_state_open           (descriptor_state_open_in | descriptor_state_open_out)
 
 #define descriptor_exception_type_none      0
 #define descriptor_exception_type_system    1
@@ -83,6 +87,8 @@ struct descriptor_func {
 };
 
 extern descriptor_t * descriptor_gen(int32_t value);
+
+extern descriptor_func_t * descriptor_func_get(void);
 
 extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor);
 extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor);

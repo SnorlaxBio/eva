@@ -309,17 +309,29 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
     struct epoll_event e;
     e.data.ptr = subscription;
 
-    e.events = (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);
+    e.events = 0;
 
-    // TODO: UPGRADE
-    if((descriptor->status & descriptor_state_read) == 0){
-        e.events = e.events | EPOLLIN;
+    if((descriptor->status & descriptor_state_read) == 0) {
+        if(descriptor->status & descriptor_state_open_in) {
+            e.events = e.events | EPOLLIN;
+        }
     }
 
     if(buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
-        e.events = e.events | EPOLLOUT;
+        if(descriptor->status & descriptor_state_open_out) {
+            e.events = e.events | EPOLLOUT;
+        }
     }
-    // TODO: UPGRADE
+
+    if(e.events == 0) {
+#ifndef   RELEASE
+        snorlaxdbg(false, true, "warning", "");
+#endif // RELEASE
+        return success;
+    }
+
+    e.events = e.events | (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);
+
     if(epoll_ctl(generator->value, EPOLL_CTL_ADD, subscription->descriptor->value, &e) == fail) {
         if(errno == EEXIST) {
             if(epoll_ctl(generator->value, EPOLL_CTL_MOD, subscription->descriptor->value, &e) == fail) {
@@ -378,14 +390,28 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_mod(___n
     struct epoll_event e;
     e.data.ptr = subscription;
 
-    e.events = (EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP);
+    e.events = 0;
 
-    subscription->status = descriptor_event_generator_epoll_subscription_state_in;
-
-    if(buffer_length(descriptor->buffer.out) > 0) {
-        subscription->status = descriptor_event_generator_epoll_subscription_state_out;
-        e.events = e.events | EPOLLOUT;
+    if((descriptor->status & descriptor_state_read) == 0) {
+        if(descriptor->status & descriptor_state_open_in) {
+            e.events = e.events | EPOLLIN;
+        }
     }
+
+    if(buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
+        if(descriptor->status & descriptor_state_open_out) {
+            e.events = e.events | EPOLLOUT;
+        }
+    }
+
+    if(e.events == 0) {
+#ifndef   RELEASE
+        snorlaxdbg(false, true, "warning", "");
+#endif // RELEASE
+        return success;
+    }
+
+    e.events = e.events | (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);
 
     if(epoll_ctl(generator->value, EPOLL_CTL_MOD, subscription->descriptor->value, &e) == fail) {
         if(errno == ENOENT) {

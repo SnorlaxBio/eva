@@ -13,12 +13,7 @@
 #include <snorlax/console/in.h>
 #include <snorlax/console/out.h>
 
-// static int32_t execute(___notnull command_t * command);
 static void cancel(const event_engine_t * engine);
-// static void on(command_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * ret);
-
-// command_t * command = nil;
-// event_subscription_t * subscription = nil;
 
 console_in_t * consolein = nil;
 console_out_t * consoleout = nil;
