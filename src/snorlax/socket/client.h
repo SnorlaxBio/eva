@@ -12,6 +12,8 @@
 
 #include <snorlax/socket.h>
 
-extern socket_func_t * socket_tcp_client_func_get(void);
+extern int32_t socket_client_func_open(___notnull socket_t * s);
+
+extern socket_func_t * socket_client_func_get(void);
 
 #endif // __SNORLAX__SOCKET_TCP_CLIENT__H__

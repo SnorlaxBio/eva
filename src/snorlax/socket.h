@@ -12,6 +12,10 @@
 
 #include <snorlax/descriptor.h>
 
+#define socket_shutdown_type_in         0
+#define socket_shutdown_type_out        1
+#define socket_shutdown_type_all        2
+
 struct socket;
 struct socket_addr;
 struct socket_func;
@@ -29,6 +33,10 @@ struct socket_addr {
 
 typedef int32_t (*socket_open_t)(___notnull socket_t *);
 typedef int64_t (*sockt_read_t)(___notnull socket_t *);
+
+struct socket_connection;
+
+typedef struct socket_connection socket_connectin_t;
 
 struct socket {
     socket_func_t * func;
@@ -62,12 +70,14 @@ typedef void (*socket_event_subscription_handler_t)(___notnull socket_event_subs
 extern socket_t * socket_gen(socket_func_t * func, int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
 
 extern socket_t * socket_func_rem(___notnull socket_t * s);
-extern int64_t socket_func_shutdown(___notnull socket_t * s, uint32_t how);
-    // int64_t (*write)(___notnull socket_t *);
-    // int32_t (*close)(___notnull socket_t *);
-    // int32_t (*check)(___notnull socket_t *, uint32_t);
+extern int32_t socket_func_open(___notnull socket_t * s);
+extern int32_t socket_func_shutdown(___notnull socket_t * s, uint32_t how);
 
-    // int32_t (*shutdown)(___notnull socket_t *, uint32_t);
+
+typedef int64_t (*socket_func_read_t)(___notnull socket_t *);
+typedef int64_t (*socket_func_write_t)(___notnull socket_t *);
+typedef int32_t (*socket_func_close_t)(___notnull socket_t *);
+typedef int32_t (*socket_func_check_t)(___notnull socket_t *, uint32_t);
 
 #define socket_rem(s)               ((s)->func->rem(s))
 #define socket_open(s)              ((s)->func->open(s))

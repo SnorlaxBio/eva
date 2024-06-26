@@ -52,7 +52,11 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/descriptor/event/generator/epoll.c
                             src/snorlax/descriptor/event/generator/epoll/subscription/process.c
                             src/snorlax/console/out.c
-                            src/snorlax/console/in.c)
+                            src/snorlax/console/in.c
+                            src/snorlax/socket.c
+                            src/snorlax/socket/session.c
+                            src/snorlax/socket/server.c
+                            src/snorlax/socket/client.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -83,7 +87,10 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/descriptor/event/generator/epoll/subscription/process.h
                             src/snorlax/descriptor/event/generator/epoll/control/type.h
                             src/snorlax/console/out.h
-                            src/snorlax/console/in.h)
+                            src/snorlax/console/in.h
+                            src/snorlax/socket/session.h
+                            src/snorlax/socket/server.h
+                            src/snorlax/socket/client.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})
@@ -95,3 +102,6 @@ target_link_libraries(snorlax-eva-command-event-check snorlax-eva libsnorlax-std
 
 add_executable(snorlax-eva-console-event-check src/snorlax/console/main.c)
 target_link_libraries(snorlax-eva-console-event-check snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-server-event-check src/snorlax/socket/main/server.c)
+target_link_libraries(snorlax-eva-server-event-check snorlax-eva libsnorlax-std.a)

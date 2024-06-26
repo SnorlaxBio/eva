@@ -13,6 +13,7 @@
 #include <snorlax.h>
 #include <snorlax/command.h>
 #include <snorlax/descriptor.h>
+#include <snorlax/socket.h>
 
 struct event_subscription;
 struct descriptor_event_subscription;
@@ -31,6 +32,7 @@ extern int32_t snorlax_eva_run(void);
 
 extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
 extern event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
+extern event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler);
 
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription);
 
