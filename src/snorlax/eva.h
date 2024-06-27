@@ -20,10 +20,18 @@ struct descriptor_event_subscription;
 struct event_engine;
 struct event_subscription_event;
 
+struct socket_server_event_subscription;
+struct socket_client_event_subscription;
+struct socket_client_pool_event_subscription;
+
+
 typedef struct descriptor_event_subscription descriptor_event_subscription_t;
 typedef struct event_subscription event_subscription_t;
 typedef struct event_engine event_engine_t;
 typedef struct event_subscription_event event_subscription_event_t;
+typedef struct socket_server_event_subscription socket_server_event_subscription_t;
+typedef struct socket_client_event_subscription socket_client_event_subscription_t;
+typedef struct socket_client_pool_event_subscription socket_client_pool_event_subscription_t;
 typedef void (*event_engine_cancel_t)(const event_engine_t *);
 
 extern int32_t snorlax_eva_on(void);
@@ -31,8 +39,7 @@ extern int32_t snorlax_eva_off(event_engine_cancel_t cancel);
 extern int32_t snorlax_eva_run(void);
 
 extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
-extern event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
-extern event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler);
+extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
 
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription);
 

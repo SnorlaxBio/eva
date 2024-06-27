@@ -108,42 +108,49 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
     event_generator_set_t * set = generator->set;
     event_engine_t * engine = set->engine;
 
-    int32_t retry = 4;
+    if(descriptor->status & descriptor_state_open_in) {
+        int32_t retry = 4;
 
-    while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
-        int64_t n = descriptor_read(descriptor);
-
-        if(n <= 0) break;
-
-        descriptor_event_subscription_notify(subscription, descriptor_event_type_read, event_subscription_event_parameter_set(node, n));
-
-        while(buffer_length(descriptor->buffer.out) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
-            int64_t n = descriptor_write(descriptor);
+        while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+            int64_t n = descriptor_read(descriptor);
 
             if(n <= 0) break;
 
-            descriptor_event_subscription_notify(subscription, descriptor_event_type_write, event_subscription_event_parameter_set(node, n));
+            // TODO: DESCRIPTOR IS SERVER CHECK
+
+            descriptor_event_subscription_notify(subscription, descriptor_event_type_read, event_subscription_event_parameter_set(node, n));
+
+            if(descriptor->status & descriptor_state_open_out) {
+                while(buffer_length(descriptor->buffer.out) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+                    int64_t n = descriptor_write(descriptor);
+
+                    if(n <= 0) break;
+
+                    descriptor_event_subscription_notify(subscription, descriptor_event_type_write, event_subscription_event_parameter_set(node, n));
+                }
+            }
+
+            retry = retry - 1;
         }
 
-        retry = retry - 1;
-    }
-
-    if(descriptor_exception_get(descriptor)) {
-        descriptor_event_subscription_process_exception(subscription, type, node);
-    } else if(descriptor->status & descriptor_state_close) {
-        descriptor_event_subscription_process_close(subscription, type, node);
-    } else {
-        buffer_adjust(descriptor->buffer.in, 0);
-        buffer_adjust(descriptor->buffer.out, 0);
-
-        if(descriptor->status & descriptor_state_read) {
-            event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
-                                                      (event_subscription_process_t) descriptor_event_subscription_process_read,
-                                                      descriptor_event_type_read,
-                                                      event_subscription_event_gen((event_subscription_t *) subscription)));
+        if(descriptor_exception_get(descriptor)) {
+            descriptor_event_subscription_process_exception(subscription, type, node);
+        } else if(descriptor->status & descriptor_state_close) {
+            descriptor_event_subscription_process_close(subscription, type, node);
         } else {
-            descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
+            buffer_adjust(descriptor->buffer.in, 0);
+            buffer_adjust(descriptor->buffer.out, 0);
+
+            if(descriptor->status & descriptor_state_read) {
+                event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
+                                                        (event_subscription_process_t) descriptor_event_subscription_process_read,
+                                                        descriptor_event_type_read,
+                                                        event_subscription_event_gen((event_subscription_t *) subscription)));
+            } else {
+                descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
+            }
         }
+
     }
 }
 
@@ -159,31 +166,33 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
     event_engine_t * engine = set->engine;
     buffer_t * buffer = descriptor->buffer.out;
 
-    while(buffer_length(buffer) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
-        int64_t n = descriptor_write(descriptor);
+    if(descriptor->status & descriptor_state_open_out) {
+        while(buffer_length(buffer) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+            int64_t n = descriptor_write(descriptor);
 
-        if(n <= 0) break;
+            if(n <= 0) break;
 
-        descriptor_event_subscription_notify(subscription, descriptor_event_type_write, event_subscription_event_parameter_set(node, n));
-    }
+            descriptor_event_subscription_notify(subscription, descriptor_event_type_write, event_subscription_event_parameter_set(node, n));
+        }
 
-    if(descriptor_exception_get(descriptor)) {
-        descriptor_event_subscription_process_exception(subscription, type, node);
-    } else if(descriptor->status & descriptor_state_close) {
-        descriptor_event_subscription_process_close(subscription, type, node);
-    } else {
-        buffer_adjust(descriptor->buffer.in, 0);
-        buffer_adjust(descriptor->buffer.out, 0);
-
-        if(descriptor->status & descriptor_state_write) {
-            if(buffer_length(descriptor->buffer.out) > 0) {
-                event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
-                                                          (event_subscription_process_t) descriptor_event_subscription_process_write,
-                                                          descriptor_event_type_write,
-                                                          event_subscription_event_gen((event_subscription_t *) subscription)));
-            }
+        if(descriptor_exception_get(descriptor)) {
+            descriptor_event_subscription_process_exception(subscription, type, node);
+        } else if(descriptor->status & descriptor_state_close) {
+            descriptor_event_subscription_process_close(subscription, type, node);
         } else {
-            descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
+            buffer_adjust(descriptor->buffer.in, 0);
+            buffer_adjust(descriptor->buffer.out, 0);
+
+            if(descriptor->status & descriptor_state_write) {
+                if(buffer_length(descriptor->buffer.out) > 0) {
+                    event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
+                                                            (event_subscription_process_t) descriptor_event_subscription_process_write,
+                                                            descriptor_event_type_write,
+                                                            event_subscription_event_gen((event_subscription_t *) subscription)));
+                }
+            } else {
+                descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
+            }
         }
     }
 }

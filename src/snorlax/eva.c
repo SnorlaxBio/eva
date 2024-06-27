@@ -16,6 +16,7 @@
 
 #include "command/event/subscription.h"
 #include "descriptor/event/subscription.h"
+#include "socket/event/subscription.h"
 
 static event_engine_t * engine = nil;
 
@@ -73,14 +74,14 @@ extern event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t
     return (event_subscription_t *) subscription;
 }
 
-extern event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler) {
+extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler) {
 #ifndef   RELEASE
     snorlaxdbg(s == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen((descriptor_t *) s, (descriptor_event_subscription_handler_t *) handler);
+    socket_event_subscription_t * subscription = socket_event_subscription_gen((descriptor_t *) s, (descriptor_event_subscription_handler_t *) handler);
 
     if(s->value <= invalid) {
         if(socket_open(s) == fail) {
