@@ -186,6 +186,10 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
             flags = events[i].events;
 
             if(flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP)) {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
+#endif // RELEASE
+
                 descriptor_exception_set(descriptor, descriptor_exception_type_system, flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
 
                 descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
@@ -228,7 +232,7 @@ static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull desc
     if(event_generator_func_add((event_generator_t *) generator, (event_subscription_t *) subscription) == success) {
         if(descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_add) == success) {
             subscription->status = subscription->status | (descriptor_event_generator_epoll_subscription_state_in | descriptor_event_generator_epoll_subscription_state_out);
-            descriptor_event_subscription_notify(subscription, descriptor_event_type_exception, (event_subscription_event_t *) descriptor_event_subscription_type_add);
+            descriptor_event_subscription_notify(subscription, descriptor_event_type_subscription, (event_subscription_event_t *) descriptor_event_subscription_type_add);
             return success;
         } else {
             event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
@@ -246,11 +250,12 @@ static ___sync int32_t descriptor_event_generator_epoll_func_del(___notnull desc
 #endif // RELEASE
 
     descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+
     event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
 
     subscription->status = descriptor_event_generator_epoll_subscription_state_none;
 
-    descriptor_event_subscription_notify(subscription, descriptor_event_type_exception, (event_subscription_event_t *) descriptor_event_subscription_type_del);
+    descriptor_event_subscription_notify(subscription, descriptor_event_type_subscription, (event_subscription_event_t *) descriptor_event_subscription_type_del);
 
     return fail;
 }
@@ -359,6 +364,10 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         }
         
         subscription->status = descriptor_event_generator_epoll_subscription_state_none;
+
+#ifndef   RELEASE
+        snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, epoll_ctl);
+#endif // RELEASE
         descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, epoll_ctl);
 
         return fail;

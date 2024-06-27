@@ -83,7 +83,6 @@ static console_out_t * console_out_func_rem(___notnull console_out_t * o) {
 #ifndef   RELEASE
     snorlaxdbg(o == nil, false, "critical", "");
 #endif // RELEASE
-    printf("%p\n", o->buffer.in);
     o->buffer.in = buffer_rem(o->buffer.in);
     o->buffer.out = buffer_rem(o->buffer.out);
 

@@ -32,15 +32,24 @@ extern int32_t socket_server_func_open(___notnull socket_t * s) {
         if(s->value > invalid) {
             descriptor_nonblock_on((descriptor_t *) s);
             if(bind(s->value, (struct sockaddr *) s->addr.value, (socklen_t) s->addr.len) == fail) {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, bind);
+#endif // RELEASE
                 descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, bind);
                 return fail;
             }
             if(listen(s->value, SOMAXCONN) == fail) {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, listen);
+#endif // RELEASE
                 descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, listen);
                 return fail;
             }
             s->status = s->status | descriptor_state_open_in;
         } else {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, socket);
+#endif // RELEASE
             descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, socket);
             return fail;
         }
@@ -74,6 +83,14 @@ extern int64_t socket_server_func_read(___notnull socket_t * s) {
 
                 return sizeof(int32_t) + s->addr.len;
             } else {
+                if(errno == EAGAIN || errno == EWOULDBLOCK) {
+                    s->status = s->status & (~descriptor_state_read);
+
+                    return success;
+                }
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, accept);
+#endif // RELEASE
                 descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, accept);
 #ifndef   RELEASE
                 snorlaxdbg(true, false, "critical", "");

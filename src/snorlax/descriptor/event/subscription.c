@@ -42,7 +42,6 @@ extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___no
     if(handler) {
         for(uint32_t i = 0; i < descriptor_event_type_max; i++) {
             subscription->handler[i] = handler[i];
-            printf("%p\n", subscription->handler[i]);
         }
     }
 

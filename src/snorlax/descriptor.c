@@ -75,6 +75,9 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
                 descriptor->status = descriptor->status | descriptor_state_read;
             } else if(n == 0) {
                 descriptor->status = descriptor->status & (~descriptor_state_read);
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_lib, descriptor_exception_no_eof, read);
+#endif // RELEASE
 
                 descriptor_exception_set(descriptor, descriptor_exception_type_lib, descriptor_exception_no_eof, read);
 
@@ -84,6 +87,9 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
                 if(errno == EAGAIN) {
                     n = 0;
                 } else {
+#ifndef   RELEASE
+                    snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, read);
+#endif // RELEASE
                     descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, read);
                 }
             }
@@ -128,6 +134,9 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
                     if(errno == EAGAIN) {
                         n = 0;
                     } else {
+#ifndef   RELEASE
+                        snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, write);
+#endif // RELEASE
                         descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, write);
                     }
                 }
@@ -165,6 +174,10 @@ extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor) {
 
     descriptor->status = descriptor->status & (~(descriptor_state_open | descriptor_state_read | descriptor_state_write));
     descriptor->status = descriptor->status | descriptor_state_close;
+
+#ifndef   RELEASE
+    snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_none, descriptor_exception_no_none, nil);
+#endif // RELEASE
 
     descriptor_exception_set(descriptor, descriptor_exception_type_none, descriptor_exception_no_none, nil);
 

@@ -34,6 +34,7 @@ extern int32_t socket_client_func_open(___notnull socket_t * s) {
             if(connect(s->value, (struct sockaddr *) s->addr.value, (socklen_t) s->addr.len) == fail) {
 #ifndef   RELEASE
                 snorlaxdbg(false, true, "implement", "nonblock connect");
+                snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, connect);
 #endif // RELEASE
                 descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, connect);
                 return fail;
@@ -41,6 +42,9 @@ extern int32_t socket_client_func_open(___notnull socket_t * s) {
                 s->status = s->status | (descriptor_state_open | descriptor_state_write);
             }
         } else {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, socket);
+#endif // RELEASE
             descriptor_exception_set((descriptor_t *) s, descriptor_exception_type_system, errno, socket);
             return fail;
         }
