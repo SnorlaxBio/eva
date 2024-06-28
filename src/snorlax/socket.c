@@ -12,18 +12,6 @@
 
 #include "socket.h"
 
-struct socket_func {
-    socket_t * (*rem)(___notnull socket_t *);
-
-    int32_t (*open)(___notnull socket_t *);
-    int64_t (*read)(___notnull socket_t *);
-    int64_t (*write)(___notnull socket_t *);
-    int32_t (*close)(___notnull socket_t *);
-    int32_t (*check)(___notnull socket_t *, uint32_t);
-
-    int32_t (*shutdown)(___notnull socket_t *, uint32_t);
-};
-
 typedef int32_t (*socket_open_t)(___notnull socket_t *);
 typedef int64_t (*socket_read_t)(___notnull socket_t *);
 typedef int64_t (*socket_write_t)(___notnull socket_t *);

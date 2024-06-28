@@ -77,4 +77,13 @@ extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t h
 
 extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
 
+
+#define socket_rem(descriptor)                  ((descriptor)->func->rem(descriptor))
+#define socket_open(descriptor)                 ((descriptor)->func->open(descriptor))
+#define socket_read(descriptor)                 ((descriptor)->func->read(descriptor))
+#define socket_write(descriptor)                ((descriptor)->func->write(descriptor))
+#define socket_close(descriptor)                ((descriptor)->func->close(descriptor))
+#define socket_check(descriptor, state)         ((descriptor)->func->check(descriptor, state))
+#define socket_shutdown(descriptor, how)        ((descriptor)->func->shutdown(descriptor, how))
+
 #endif // __SNORLAX__SOCKET__H__

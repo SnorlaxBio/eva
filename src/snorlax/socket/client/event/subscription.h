@@ -12,8 +12,10 @@
 
 #include <snorlax/socket/client.h>
 
+struct socket_client_event_subscription;
 struct socket_client_event_subscription_func;
 
+typedef struct socket_client_event_subscription socket_client_event_subscription_t;
 typedef struct socket_client_event_subscription_func socket_client_event_subscription_func_t;
 
 struct socket_client_event_subscription {
@@ -35,7 +37,7 @@ struct socket_client_event_subscription_func {
     void (*notify)(___notnull socket_client_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
-#define socket_client_event_subscription_gen(descriptor, handler)                  (descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler))
+#define socket_client_event_subscription_gen(descriptor, handler)                  ((socket_client_event_subscription_t *) descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler))
 
 #define socket_client_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
 

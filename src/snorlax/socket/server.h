@@ -32,7 +32,7 @@ struct socket_server {
 };
 
 struct socket_server_func {
-    socket_t * (*rem)(___notnull socket_server_t *);
+    socket_server_t * (*rem)(___notnull socket_server_t *);
 
     int32_t (*open)(___notnull socket_server_t *);
     int64_t (*read)(___notnull socket_server_t *);

@@ -16,6 +16,7 @@
 
 #include "command/event/subscription.h"
 #include "descriptor/event/subscription.h"
+#include "socket.h"
 #include "socket/event/subscription.h"
 #include "socket/client/event/subscription.h"
 
@@ -72,7 +73,7 @@ extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull d
 
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
-    return (event_subscription_t *) subscription;
+    return subscription;
 }
 
 extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler) {
@@ -86,13 +87,13 @@ extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t 
 
     if(s->value <= invalid) {
         if(socket_open(s) == fail) {
-            return (event_subscription_t *) socket_event_subscription_rem((socket_event_subscription_t *) subscription);
+            return (socket_event_subscription_t *) socket_event_subscription_rem((socket_event_subscription_t *) subscription);
         }
     }
 
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
-    return (event_subscription_t *) subscription;
+    return subscription;
 }
 
 extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * s, socket_client_event_subscription_handler_t * handler) {
@@ -102,17 +103,17 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    socket_event_subscription_t * subscription = socket_client_event_subscription_gen((descriptor_t *) s, (descriptor_event_subscription_handler_t *) handler);
+    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(s, handler);
 
     if(s->value <= invalid) {
         if(socket_client_open(s) == fail) {
-            return (event_subscription_t *) socket_client_event_subscription_rem((socket_client_event_subscription_t *) subscription);
+            return socket_client_event_subscription_rem((socket_client_event_subscription_t *) subscription);
         }
     }
 
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
-    return (event_subscription_t *) subscription; 
+    return subscription; 
 }
 
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription) {

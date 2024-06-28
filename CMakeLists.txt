@@ -103,5 +103,8 @@ target_link_libraries(snorlax-eva-command-event-check snorlax-eva libsnorlax-std
 add_executable(snorlax-eva-console-event-check src/snorlax/console/main.c)
 target_link_libraries(snorlax-eva-console-event-check snorlax-eva libsnorlax-std.a)
 
-add_executable(snorlax-eva-server-event-check src/snorlax/socket/main/server.c)
-target_link_libraries(snorlax-eva-server-event-check snorlax-eva libsnorlax-std.a)
+# add_executable(snorlax-eva-server-event-check src/snorlax/socket/main/server.c)
+# target_link_libraries(snorlax-eva-server-event-check snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-client-check src/snorlax/socket/client/main.c)
+target_link_libraries(snorlax-eva-client-check snorlax-eva libsnorlax-std.a)
