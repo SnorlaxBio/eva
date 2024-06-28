@@ -35,7 +35,10 @@ struct descriptor_event_subscription_func {
 
 extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
 
-#define descriptor_event_subscription_node_gen                                  event_subscription_event_gen
+extern void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
+extern void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
+
+#define descriptor_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
 
 #define descriptor_event_subscription_rem(subscription)                         ((subscription)->func->rem(subscription))
 #define descriptor_event_subscription_on(subscription, process, type, node)     ((subscription)->func->on(subscription, process, type, node))

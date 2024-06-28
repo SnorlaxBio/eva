@@ -17,8 +17,6 @@
 #include "../../event/subscription/event/queue.h"
 
 static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(___notnull descriptor_event_subscription_t * subscription);
-static void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
-static void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
 static descriptor_event_subscription_func_t func = {
     descriptor_event_subscription_func_rem,
@@ -71,7 +69,7 @@ static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(
     return nil;
 }
 
-static void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node) {
+extern void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(process == nil, false, "critical", "");
@@ -80,7 +78,7 @@ static void descriptor_event_subscription_func_on(___notnull descriptor_event_su
     process(subscription, type, node);
 }
 
-static void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
+extern void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE

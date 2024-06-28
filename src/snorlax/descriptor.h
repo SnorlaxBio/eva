@@ -39,6 +39,9 @@ struct descriptor_buffer;
 struct descriptor_exception;
 
 struct descriptor_event_subscription;
+struct descriptor_event_generator;
+
+typedef struct descriptor_event_generator descriptor_event_generator_t;
 
 typedef struct descriptor descriptor_t;
 typedef struct descriptor_func descriptor_func_t;
@@ -64,8 +67,8 @@ struct descriptor_exception {
 extern descriptor_exception_t * descriptor_exception_func_set(___notnull descriptor_t * descriptor, int32_t type, int32_t no, void * f);
 extern descriptor_exception_t * descriptor_exception_func_get(___notnull descriptor_t * descriptor);
 
-#define descriptor_exception_set(descriptor, type, no, f)    descriptor_exception_func_set(descriptor, type, no, f)
-#define descriptor_exception_get(descriptor)                 descriptor_exception_func_get(descriptor)
+#define descriptor_exception_set(descriptor, type, no, f)    descriptor_exception_func_set((descriptor_t *) descriptor, type, no, f)
+#define descriptor_exception_get(descriptor)                 descriptor_exception_func_get((descriptor_t *) descriptor)
 
 struct descriptor {
     descriptor_func_t * func;

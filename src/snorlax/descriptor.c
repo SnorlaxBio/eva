@@ -54,9 +54,13 @@ extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor){
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    snorlaxdbg(true, false, "critical", "");
+    if(descriptor->value > invalid) {
+        if((descriptor->status & descriptor_state_open) == 0) {
+            descriptor->status = descriptor->status | descriptor_state_open;
+        }
+    }
 
-    return fail;
+    return descriptor->value > invalid ? success : fail;
 }
 
 extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
@@ -208,6 +212,10 @@ extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint3
     return (descriptor->status & state);
 }
 
+/**
+ * 
+ * @todo        error handling
+ */
 extern void descriptor_nonblock_on(___notnull descriptor_t * descriptor) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");

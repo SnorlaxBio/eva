@@ -11,96 +11,113 @@
 #include <string.h>
 
 #include "socket.h"
-#include "descriptor.h"
 
-extern socket_t * socket_gen(socket_func_t * func, int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen) {
-    socket_t * s = (socket_t *) calloc(1, sizeof(socket_t));
+struct socket_func {
+    socket_t * (*rem)(___notnull socket_t *);
 
-    s->func = func;
-    s->domain = domain;
-    s->type = type;
-    s->protocol = protocol;
+    int32_t (*open)(___notnull socket_t *);
+    int64_t (*read)(___notnull socket_t *);
+    int64_t (*write)(___notnull socket_t *);
+    int32_t (*close)(___notnull socket_t *);
+    int32_t (*check)(___notnull socket_t *, uint32_t);
+
+    int32_t (*shutdown)(___notnull socket_t *, uint32_t);
+};
+
+typedef int32_t (*socket_open_t)(___notnull socket_t *);
+typedef int64_t (*socket_read_t)(___notnull socket_t *);
+typedef int64_t (*socket_write_t)(___notnull socket_t *);
+typedef int32_t (*socket_close_t)(___notnull socket_t *);
+typedef int32_t (*socket_check_t)(___notnull socket_t *, uint32_t);
+
+static socket_func_t func = {
+    socket_func_rem,
+    (socket_open_t) descriptor_func_open,
+    (socket_read_t) descriptor_func_read,
+    (socket_write_t) descriptor_func_write,
+    (socket_close_t) descriptor_func_close,
+    (socket_check_t) descriptor_func_check,
+    socket_func_shutdown
+};
+
+extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen) {
+    socket_t * descriptor = (socket_t *) calloc(1, sizeof(socket_t));
+
+    descriptor->func = address_of(func);
+
+    descriptor->value = invalid;
+    descriptor->buffer.in = buffer_gen(0);
+    descriptor->buffer.out = buffer_gen(0);
+    descriptor->status = descriptor_state_close;
+    descriptor->domain = domain;
+    descriptor->type = type;
+    descriptor->protocol = protocol;
+
     if(addr && addrlen) {
-        s->addr.value = malloc(s->addr.len = addrlen);
-        memcpy(s->addr.value, addr, addrlen);
+        descriptor->addr.value = malloc(addrlen);
+        descriptor->addr.len = addrlen;
+    } else {
+#ifndef   RELEASE
+        snorlaxdbg(addr == nil || addrlen == 0, false, "critical", "");
+#endif // RELEASE
     }
-    s->value = invalid;
 
-    s->buffer.in = buffer_gen(0);
-    s->buffer.out = buffer_gen(0);
-
-    return s;
+    return descriptor;
 }
 
-extern int32_t socket_func_shutdown(___notnull socket_t * s, uint32_t how) {
+extern socket_t * socket_func_rem(___notnull socket_t * descriptor) {
 #ifndef   RELEASE
-    snorlaxdbg(s == nil, false, "critical", "");
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+    snorlaxdbg(descriptor->value > invalid, false, "critical", "");
 #endif // RELEASE
-    if(s->value > invalid) {
+
+    descriptor->buffer.in = buffer_rem(descriptor->buffer.in);
+    descriptor->buffer.out = buffer_rem(descriptor->buffer.out);
+    descriptor->addr.value = memory_rem(descriptor->addr.value);
+    descriptor->sync = sync_rem(descriptor->sync);
+
+    free(descriptor);
+
+    return nil;
+}
+
+extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t how) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+    
+    if(descriptor->value > invalid) {
         int32_t v = invalid;
         if(how == socket_shutdown_type_in) {
             v = SHUT_RD;
         } else if(how == socket_shutdown_type_out) {
             v = SHUT_WR;
-        } else if(how == socket_shutdown_type_all) {
+        } else if(how == socket_shutdown_type_all){
             v = SHUT_RDWR;
         } else {
 #ifndef   RELEASE
             snorlaxdbg(true, false, "critical", "");
 #endif // RELEASE
         }
-
-        if(shutdown(s->value, v) == fail) {
+        if(v != invalid) {
+            if(shutdown(descriptor->value, v) == fail) {
 #ifndef   RELEASE
-            snorlaxdbg(false, true, "warning", "fail to shutdown => %d", errno);
+                snorlaxdbg(false, true, "warning", "fail to shutdown => %d", errno);
 #endif // RELEASE
-        } else {
+            }
             if(how == socket_shutdown_type_in) {
-                s->status = s->status & (~descriptor_state_open_in);
+                descriptor->status = descriptor->status & (~descriptor_state_open_in);
             } else if(how == socket_shutdown_type_out) {
-                s->status = s->status & (~descriptor_state_open_out);
-            } else if(how == socket_shutdown_type_all) {
-                s->status = s->status & (~descriptor_state_open);
-            } else {
-#ifndef   RELEASE
-                snorlaxdbg(true, false, "critical", "");
-#endif // RELEASE
+                descriptor->status = descriptor->status & (~descriptor_state_open_out);
+            } else if(how == socket_shutdown_type_all){
+                descriptor->status = descriptor->status & (~descriptor_state_open);
             }
 
-            if((s->status & descriptor_state_open) == 0) {
-                s->value = invalid;
-                s->status = s->status | descriptor_state_close;
-            }
+            return success;
         }
+
+        return fail;
     }
 
     return success;
-}
-
-extern int32_t socket_func_open(___notnull socket_t * s) {
-#ifndef   RELEASE
-    snorlaxdbg(s == nil, false, "critical", "");
-#endif // RELEASE
-
-    snorlaxdbg(true, false, "critical", "");
-
-    return success;
-}
-
-extern socket_t * socket_func_rem(___notnull socket_t * s) {
-#ifndef   RELEASE
-    snorlaxdbg(s == nil, false, "critical", "");
-    snorlaxdbg(s->value >= invalid, false, "critical", "");
-#endif // RELEASE
-
-    s->addr.value = memory_rem(s->addr.value);
-
-    s->buffer.in = buffer_rem(s->buffer.in);
-    s->buffer.out = buffer_rem(s->buffer.out);
-
-    s->sync = sync_rem(s->sync);
-
-    free(s);
-
-    return nil;
 }
