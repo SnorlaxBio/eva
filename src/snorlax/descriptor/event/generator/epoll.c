@@ -10,6 +10,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 #include "epoll.h"
 

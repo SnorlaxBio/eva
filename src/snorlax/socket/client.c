@@ -9,6 +9,8 @@
 
 #include <sys/socket.h>
 #include <errno.h>
+#include <unistd.h>
+#include <string.h>
 
 #include "client.h"
 
@@ -23,7 +25,7 @@ static socket_client_func_t func = {
 };
 
 extern socket_client_t * socket_client_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen) {
-    socket_t * descriptor = (socket_t *) calloc(1, sizeof(socket_t));
+    socket_client_t * descriptor = (socket_client_t *) calloc(1, sizeof(socket_client_t));
 
     descriptor->func = address_of(func);
 
@@ -38,6 +40,7 @@ extern socket_client_t * socket_client_gen(int32_t domain, int32_t type, int32_t
     if(addr && addrlen) {
         descriptor->addr.value = malloc(addrlen);
         descriptor->addr.len = addrlen;
+        memcpy(descriptor->addr.value, addr, addrlen);
     } else {
 #ifndef   RELEASE
         snorlaxdbg(addr == nil || addrlen == 0, false, "critical", "");
@@ -52,7 +55,7 @@ extern int32_t socket_client_func_open(___notnull socket_client_t * descriptor) 
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    if(descriptor_exception_get(descriptor) || (descriptor->status & (descriptor_state_exception | descriptor_state_close))) {
+    if(descriptor_exception_get(descriptor)) {
         return fail;
     }
 
@@ -80,7 +83,7 @@ extern int32_t socket_client_func_open(___notnull socket_client_t * descriptor) 
             return fail;
         }
 
-        descriptor->status = descriptor->status | descriptor_state_open;
+        descriptor->status = descriptor->status | (descriptor_state_open | descriptor_state_write);
         descriptor->status = descriptor->status & (~descriptor_state_close);
 
         return success;

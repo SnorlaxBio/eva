@@ -22,7 +22,6 @@ struct descriptor_event_subscription {
     event_subscription_event_queue_t * queue;
     descriptor_event_subscription_handler_t * handler;
     uint32_t type;
-
     uint32_t status;
     descriptor_t * descriptor;
 };

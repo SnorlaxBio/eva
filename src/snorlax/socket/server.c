@@ -57,10 +57,6 @@ extern int32_t socket_server_func_open(___notnull socket_server_t * descriptor) 
         return fail;
     }
 
-    if(descriptor->status & (descriptor_state_exception | descriptor_state_close)) {
-        return fail;
-    }
-
     if(descriptor->value <= invalid) {
         descriptor->value = socket(descriptor->domain, descriptor->type, descriptor->protocol);
         if(descriptor->value <= invalid) {
