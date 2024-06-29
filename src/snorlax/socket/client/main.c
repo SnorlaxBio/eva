@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <snorlax/eva.h>
 #include <snorlax/socket/client.h>
@@ -49,5 +50,15 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
 
     } else if(type == descriptor_event_type_read) {
         printf("read\n");
+        buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
+        if(buffer_length(buffer) < 16) {
+            char buf[16];
+            memcpy(buf, buffer_front(buffer), buffer_length(buffer));
+            buf[buffer_length(buffer)] = 0;
+            printf("%s", buf);
+        }
+        buffer_position_set(buffer, buffer_size_get(buffer));
+
+
     }
 }
