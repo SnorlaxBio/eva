@@ -179,10 +179,6 @@ extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor) {
     descriptor->status = descriptor->status & (~(descriptor_state_open | descriptor_state_read | descriptor_state_write));
     descriptor->status = descriptor->status | descriptor_state_close;
 
-#ifndef   RELEASE
-    snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_none, descriptor_exception_no_none, nil);
-#endif // RELEASE
-
     descriptor_exception_set(descriptor, descriptor_exception_type_none, descriptor_exception_no_none, nil);
 
     return success;

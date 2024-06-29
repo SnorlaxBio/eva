@@ -17,6 +17,7 @@
 #include <snorlax/eva.h>
 #include <snorlax/socket/client.h>
 
+static void cancel(const event_engine_t * engine);
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
 int main(int argc, char ** argv) {
@@ -58,7 +59,16 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
             printf("%s", buf);
         }
         buffer_position_set(buffer, buffer_size_get(buffer));
+        snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
 
-
+    } else if(type == descriptor_event_type_close) {
+        // printf("todo: close 이정신으로는 짜지 못한다.\n");
+        // snorlax_eva_descriptor_rem(subscription);
+        // snorlax_eva_subscription_rem(subscription);
+        // snorlax_eva_off(cancel);
     }
+}
+
+static void cancel(const event_engine_t * engine) {
+
 }

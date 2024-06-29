@@ -239,7 +239,6 @@ extern void descriptor_event_subscription_process_exception(___notnull descripto
     }
 
     descriptor_close(subscription->descriptor);
-
     descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(node, value));
 
     buffer_reset(descriptor->buffer.in, 0);

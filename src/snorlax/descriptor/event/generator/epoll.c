@@ -298,7 +298,7 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
                                             type,
                                             descriptor_event_subscription_node_gen((event_subscription_t *) subscription)));
     } else {
-        if((subscription->descriptor->status & (descriptor_state_open | descriptor_state_close)) == 0) {
+        if((subscription->descriptor->status & (descriptor_state_open | descriptor_state_close)) == 0 && subscription->descriptor->value > invalid) {
             type = descriptor_event_type_open;
         }
 
