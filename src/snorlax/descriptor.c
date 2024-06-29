@@ -225,8 +225,7 @@ extern void descriptor_nonblock_on(___notnull descriptor_t * descriptor) {
         fcntl(descriptor->value, F_SETFL, ret | O_NONBLOCK);
     } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, true, "fail to fcntl => %d", errno);
+        snorlaxdbg(false, true, "warning", "fail to fcntl => %d", errno);
 #endif // RELEASE
     }
-    
 }
