@@ -24,7 +24,7 @@ static socket_func_t func = {
     (socket_read_t) descriptor_func_read,
     (socket_write_t) descriptor_func_write,
     (socket_close_t) descriptor_func_close,
-    (socket_check_t) descriptor_func_check,
+    socket_func_check,
     socket_func_shutdown
 };
 
@@ -108,4 +108,30 @@ extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t h
     }
 
     return success;
+}
+
+extern int32_t socket_func_check(___notnull socket_t * descriptor, uint32_t state) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+    int32_t err = 0;
+    socklen_t n = sizeof(int32_t);
+    if(getsockopt(descriptor->value, SOL_SOCKET, SO_ERROR, &err, &n) == 0) {
+        if(err == EAGAIN || err == EINPROGRESS) {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "check", "again || progress");
+#endif // RELEASE
+        }
+
+        if(err == 0) {
+            descriptor->status = descriptor->status | (descriptor_state_open | descriptor_state_write);
+            return true;
+        }
+    } else {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "check", "fail to getsockopt => %d", errno);
+#endif // RELEASE
+    }
+
+    return false;
 }

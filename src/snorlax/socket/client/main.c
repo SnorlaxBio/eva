@@ -43,4 +43,11 @@ int main(int argc, char ** argv) {
 
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
     printf("%p %d %p\n", subscription, type, node);
+    if(type == descriptor_event_type_open) {
+        printf("open\n");
+        snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, "PING\r\n", 6);
+
+    } else if(type == descriptor_event_type_read) {
+        printf("read\n");
+    }
 }

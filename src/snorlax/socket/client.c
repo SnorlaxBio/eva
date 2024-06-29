@@ -20,7 +20,7 @@ static socket_client_func_t func = {
     (socket_client_read_t) descriptor_func_read,
     (socket_client_write_t) descriptor_func_write,
     (socket_client_close_t) descriptor_func_close,
-    (socket_client_check_t) descriptor_func_check,
+    (socket_client_check_t) socket_func_check,
     (socket_client_shutdown_t) socket_func_shutdown
 };
 
@@ -68,9 +68,13 @@ extern int32_t socket_client_func_open(___notnull socket_client_t * descriptor) 
         descriptor_nonblock_on((descriptor_t *) descriptor);
 
         if(connect(descriptor->value, (struct sockaddr *) descriptor->addr.value, descriptor->addr.len) == fail) {
-            if(errno == EAGAIN || errno == EALREADY) {
+            if(errno == EAGAIN || errno == EALREADY || errno == EINPROGRESS) {
+                descriptor->status = descriptor->status & (~descriptor_state_close);
                 return success;
             }
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "warning", "fail to connect => %d", errno);
+#endif // RELEASE
 
             if(close(descriptor->value) == fail) {
 #ifndef   RELEASE

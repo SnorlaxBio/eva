@@ -298,6 +298,10 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
                                             type,
                                             descriptor_event_subscription_node_gen((event_subscription_t *) subscription)));
     } else {
+        if((subscription->descriptor->status & (descriptor_state_open | descriptor_state_close)) == 0) {
+            type = descriptor_event_type_open;
+        }
+
         event_subscription_process_t process = descriptor_event_generator_epoll_subscription_process_get(type);
 
         process((event_subscription_t *) subscription, type, nil);
@@ -330,10 +334,14 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
     }
 
     if(e.events == 0) {
+        if((descriptor->status == descriptor_state_close) == 0) {
+            e.events = e.events | (EPOLLIN | EPOLLOUT);
+        } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, true, "warning", "");
+            snorlaxdbg(false, true, "warning", "");
 #endif // RELEASE
-        return success;
+            return success;
+        }
     }
 
     e.events = e.events | (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);
@@ -415,10 +423,14 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_mod(___n
     }
 
     if(e.events == 0) {
+        if((descriptor->status == descriptor_state_close) == 0) {
+            e.events = e.events | (EPOLLIN | EPOLLOUT);
+        } else {
 #ifndef   RELEASE
-        snorlaxdbg(false, true, "warning", "");
+            snorlaxdbg(false, true, "warning", "");
 #endif // RELEASE
-        return success;
+            return success;
+        }
     }
 
     e.events = e.events | (EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP | EPOLLONESHOT | EPOLLET);

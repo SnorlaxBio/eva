@@ -48,6 +48,7 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/descriptor.c
                             src/snorlax/descriptor/exception.c
                             src/snorlax/descriptor/event/subscription.c
+                            src/snorlax/descriptor/event/subscription/process.c
                             src/snorlax/descriptor/event/generator.c
                             src/snorlax/descriptor/event/generator/epoll.c
                             src/snorlax/descriptor/event/generator/epoll/subscription/process.c
@@ -82,6 +83,7 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/descriptor/event/subscription.h
                             src/snorlax/descriptor/event/generator.h
                             src/snorlax/descriptor/event/subscription/type.h
+                            src/snorlax/descriptor/event/subscription/process.h
                             src/snorlax/descriptor/event/generator/epoll.h
                             src/snorlax/descriptor/event/generator/epoll/subscription/state.h
                             src/snorlax/descriptor/event/generator/epoll/subscription/process.h

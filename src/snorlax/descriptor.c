@@ -207,9 +207,8 @@ extern int32_t descriptor_func_check(___notnull descriptor_t * descriptor, uint3
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    // TODO: UPGRADE THIS
-    // 1. NONBLOCK OPEN
-    return (descriptor->status & state);
+
+    return true;
 }
 
 /**

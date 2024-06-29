@@ -19,7 +19,7 @@ static socket_server_func_t func = {
     (socket_server_read_t) socket_server_func_read,
     (socket_server_write_t) socket_server_func_write,
     (socket_server_close_t) descriptor_func_close,
-    (socket_server_check_t) descriptor_func_check,
+    (socket_server_check_t) socket_func_check,
     (socket_server_shutdown_t) socket_func_shutdown,
 };
 

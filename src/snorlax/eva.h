@@ -46,6 +46,8 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
 
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription);
 
+extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subscription, const char * data, uint64_t len);
+
 #define snorlax_eva_subscription_rem(subscription)      (object_rem((object_t *) subscription))
 
 #endif // __SNORLAX__EVA__H__

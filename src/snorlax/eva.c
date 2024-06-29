@@ -16,6 +16,7 @@
 
 #include "command/event/subscription.h"
 #include "descriptor/event/subscription.h"
+#include "descriptor/event/subscription/process.h"
 #include "socket.h"
 #include "socket/event/subscription.h"
 #include "socket/client/event/subscription.h"
@@ -111,6 +112,10 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
         }
     }
 
+    if(subscription->descriptor->status & (descriptor_state_open)) {
+        socket_client_event_subscription_notify(subscription, descriptor_event_type_open, nil);
+    }
+
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
     return subscription; 
@@ -122,4 +127,17 @@ extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscrip
 #endif // RELEASE
 
     return subscription->descriptor->buffer.in;
+}
+
+extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subscription, const char * data, uint64_t len) {
+#ifndef   RELEASE
+    snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
+#endif // RELEASE
+    buffer_write(subscription->descriptor->buffer.out, data, len);
+
+    if(subscription->descriptor->status & descriptor_state_open_out) {
+        event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
+        process((event_subscription_t *) subscription, descriptor_event_type_write, nil);
+    }
 }
