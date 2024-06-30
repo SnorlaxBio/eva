@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "server.h"
 
@@ -39,6 +40,7 @@ extern socket_server_t * socket_server_gen(int32_t domain, int32_t type, int32_t
     if(addr && addrlen) {
         descriptor->addr.value = malloc(addrlen);
         descriptor->addr.len = addrlen;
+        memcpy(descriptor->addr.value, addr, addrlen);
     } else {
 #ifndef   RELEASE
         snorlaxdbg(addr == nil || addrlen == 0, false, "critical", "");
@@ -65,6 +67,13 @@ extern int32_t socket_server_func_open(___notnull socket_server_t * descriptor) 
         }
 
         descriptor_nonblock_on((descriptor_t *) descriptor);
+
+        int value = 1;
+        if(setsockopt(descriptor->value, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) == fail) {
+#ifndef   RELEASE
+            snorlaxdbg(false, true, "warning", "fail to setsockopt => %d", errno);
+#endif // RELEASE
+        }
 
         if(bind(descriptor->value, (struct sockaddr *) descriptor->addr.value, (socklen_t) descriptor->addr.len) == fail) {
             if(close(descriptor->value) == fail) {
@@ -112,6 +121,10 @@ extern int64_t socket_server_func_read(___notnull socket_server_t * descriptor) 
 
     if(descriptor->value > invalid) {
         buffer_t * buffer = descriptor->buffer.in;
+        if(buffer_remain(buffer) < sizeof(struct sockaddr) + sizeof(socklen_t) + sizeof(int)) {
+            buffer_capacity_set(buffer, buffer_capacity_get(buffer) + 4 * (sizeof(struct sockaddr) + sizeof(socklen_t) + sizeof(int)));
+        }
+        *((socklen_t *) (buffer_back(buffer))) = sizeof(struct sockaddr);
         int32_t value = accept(descriptor->value, (struct sockaddr *)(buffer_back(buffer) + sizeof(socklen_t)), (socklen_t *) (buffer_back(buffer)));
         if(value > invalid) {
             uint64_t n = *((socklen_t *) (buffer_back(buffer))) + sizeof(socklen_t);

@@ -329,7 +329,7 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         }
     }
 
-    if(buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
+    if(descriptor->buffer.out && buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
         if(descriptor->status & descriptor_state_open_out) {
             e.events = e.events | EPOLLOUT;
         }
@@ -418,7 +418,7 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_mod(___n
         }
     }
 
-    if(buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
+    if(descriptor->buffer.out && buffer_length(descriptor->buffer.out) > 0 && (descriptor->status & descriptor_state_write) == 0) {
         if(descriptor->status & descriptor_state_open_out) {
             e.events = e.events | EPOLLOUT;
         }

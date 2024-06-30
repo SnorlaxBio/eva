@@ -18,8 +18,11 @@
 #include "../../session/event/subscription.h"
 
 #include "../../../descriptor/event/generator.h"
+#include "../../../descriptor/event/subscription.h"
 #include "../../../descriptor/event/subscription/type.h"
 #include "../../../descriptor/event/subscription/process.h"
+
+#include "../../../event/subscription/event/queue.h"
 
 static socket_server_event_subscription_func_t func = {
     socket_server_event_subscription_func_rem,
@@ -64,7 +67,7 @@ extern socket_server_event_subscription_t * socket_server_event_subscription_fun
 
     descriptor_event_generator_t * generator = subscription->generator;
 
-    if(generator) descriptor_event_generator_del(generator, subscription);
+    if(generator) descriptor_event_generator_del(generator, (descriptor_event_subscription_t *) subscription);
 
     event_subscription_event_queue_clear(subscription->queue);
 
@@ -101,11 +104,11 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
 
         socket_session_event_subscription_notify(session, descriptor_event_type_open, nil);
 
-        if(descriptor_event_generator_add(subscription->generator, session) == success) {
+        if(descriptor_event_generator_add(subscription->generator, (descriptor_event_subscription_t *) session) == success) {
             if(descriptor->status & descriptor_state_write) {
                 event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
 
-                process(session, descriptor_event_type_write, nil);
+                process((event_subscription_t *) session, descriptor_event_type_write, nil);
             }
         } else {
             socket_session_event_subscription_rem(session);

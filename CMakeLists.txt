@@ -57,7 +57,11 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/socket.c
                             src/snorlax/socket/session.c
                             src/snorlax/socket/server.c
-                            src/snorlax/socket/client.c)
+                            src/snorlax/socket/client.c
+                            src/snorlax/socket/session/event/subscription.c
+                            src/snorlax/socket/server/event/subscription.c
+                            src/snorlax/socket/server/event/subscription/list.c
+                            src/snorlax/socket/server/event/subscription/list/node.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -92,7 +96,11 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/console/in.h
                             src/snorlax/socket/session.h
                             src/snorlax/socket/server.h
-                            src/snorlax/socket/client.h)
+                            src/snorlax/socket/client.h
+                            src/snorlax/socket/client/event/subscription.h
+                            src/snorlax/socket/server/event/subscription.h
+                            src/snorlax/socket/server/event/subscription/list.h
+                            src/snorlax/socket/session/event/subscription.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})
@@ -110,3 +118,6 @@ target_link_libraries(snorlax-eva-client-check snorlax-eva libsnorlax-std.a)
 
 add_executable(snorlax-eva-client-pool-check src/snorlax/socket/client/pool.c)
 target_link_libraries(snorlax-eva-client-pool-check snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-server-check src/snorlax/socket/server/main.c)
+target_link_libraries(snorlax-eva-server-check snorlax-eva libsnorlax-std.a)

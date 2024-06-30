@@ -9,6 +9,10 @@
 
 #include "subscription.h"
 #include "../../../descriptor/event/subscription.h"
+#include "../../../descriptor/event/subscription/process.h"
+#include "../../../descriptor/event/generator.h"
+#include "../../server/event/subscription/list.h"
+#include "../../../event/subscription/event/queue.h"
 
 typedef void (*socket_session_event_subscription_on_t)(___notnull socket_session_event_subscription_t *, socket_session_event_subscription_process_t, uint32_t, event_subscription_event_t *);
 typedef void (*socket_session_event_subscription_notify_t)(___notnull socket_session_event_subscription_t *, uint32_t, event_subscription_event_t *);
@@ -53,4 +57,36 @@ static void socket_session_event_subscription_func_notify(___notnull socket_sess
     if(type == descriptor_event_type_close) {
         socket_session_event_subscription_func_rem(subscription);
     }
+}
+
+static socket_session_event_subscription_t * socket_session_event_subscription_func_rem(___notnull socket_session_event_subscription_t * subscription) {
+#ifndef   RELEASE
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+
+    socket_session_t * descriptor = subscription->descriptor;
+    if(descriptor) {
+        if(descriptor->value > invalid) {
+            if(subscription->generator) {
+                descriptor_event_generator_del(subscription->generator, (descriptor_event_subscription_t *) subscription);
+            }
+
+            event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
+
+            process((event_subscription_t *) subscription, descriptor_event_type_close, nil);
+        }
+
+        subscription->descriptor = descriptor_rem(subscription->descriptor);
+    }
+
+    if(subscription->node) {
+        if(subscription->node->collection) {
+            socket_server_event_subscription_list_del(subscription->node->collection, subscription->node);
+        }
+        subscription->node = socket_server_event_subscription_list_node_rem(subscription->node);
+    }
+
+    free(subscription);
+
+    return nil;
 }

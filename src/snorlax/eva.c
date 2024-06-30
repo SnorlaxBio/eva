@@ -20,6 +20,9 @@
 #include "socket.h"
 #include "socket/event/subscription.h"
 #include "socket/client/event/subscription.h"
+#include "socket/server.h"
+#include "socket/server/event/subscription.h"
+#include "socket/session/event/subscription.h"
 
 static event_engine_t * engine = nil;
 
@@ -120,6 +123,31 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
 
     return subscription; 
 }
+
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+    snorlaxdbg(engine == nil, false, "critical", "");
+    snorlaxdbg(engine->set == nil, false, "critical", "");
+    snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
+#endif // RELEASE
+    socket_server_event_subscription_t * subscription = socket_server_event_subscription_gen(descriptor, sessionOn, serverOn);
+
+    if(descriptor->value <= invalid) {
+        if(socket_server_open(descriptor) == fail) {
+            return socket_server_event_subscription_rem((socket_server_event_subscription_t *) subscription);
+        }
+    }
+
+    if(subscription->descriptor->status & (descriptor_state_open)) {
+        socket_server_event_subscription_notify(subscription, descriptor_event_type_open, nil);
+    }
+
+    event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
+
+    return subscription; 
+}
+
 
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription) {
 #ifndef   RELEASE

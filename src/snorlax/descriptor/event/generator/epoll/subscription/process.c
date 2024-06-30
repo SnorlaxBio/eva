@@ -139,7 +139,7 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
             descriptor_event_subscription_process_close(subscription, type, node);
         } else {
             buffer_adjust(descriptor->buffer.in, 0);
-            buffer_adjust(descriptor->buffer.out, 0);
+            if(descriptor->buffer.out) buffer_adjust(descriptor->buffer.out, 0);
 
             if(descriptor->status & descriptor_state_read) {
                 event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
@@ -167,7 +167,7 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
     buffer_t * buffer = descriptor->buffer.out;
 
     if(descriptor->status & descriptor_state_open_out) {
-        while(buffer_length(buffer) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+        while(buffer && buffer_length(buffer) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
             int64_t n = descriptor_write(descriptor);
 
             if(n <= 0) break;
@@ -242,5 +242,5 @@ extern void descriptor_event_subscription_process_exception(___notnull descripto
     descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(node, value));
 
     buffer_reset(descriptor->buffer.in, 0);
-    buffer_reset(descriptor->buffer.out, 0);
+    if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
 }

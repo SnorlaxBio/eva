@@ -39,14 +39,17 @@ typedef void (*socket_session_event_subscription_callback_t)(socket_session_even
 struct socket_server_event_subscription_list_func {
     socket_server_event_subscription_list_t * (*rem)(socket_server_event_subscription_list_t *);
     socket_server_event_subscription_list_node_t * (*add)(socket_server_event_subscription_list_t *, socket_session_event_subscription_t *);
-    socket_server_event_subscription_list_node_t * (*del)(socket_server_event_subscription_list_t *, socket_session_event_subscription_t *);
+    socket_server_event_subscription_list_node_t * (*del)(socket_server_event_subscription_list_t *, socket_server_event_subscription_list_node_t *);
 
     void (*clear)(socket_server_event_subscription_list_t *, socket_session_event_subscription_callback_t);
 };
 
 extern socket_server_event_subscription_list_t * socket_server_event_subscription_list_gen(___notnull socket_server_event_subscription_t * server);
 
-#define socket_server_event_subscription_list_rem(collection)       ((collection)->func->rem(collection))
+#define socket_server_event_subscription_list_rem(collection)                   ((collection)->func->rem(collection))
+#define socket_server_event_subscription_list_add(collection, subscription)     ((collection)->func->add(collection, subscription))
+#define socket_server_event_subscription_list_del(collection, node)             ((collection)->func->del(collection, node))
+#define socket_server_event_subscription_list_clear(collection, callback)       ((collection)->func->clear(collection, callback))
 
 struct socket_server_event_subscription_list_node {
     socket_server_event_subscription_list_node_func_t * func;
