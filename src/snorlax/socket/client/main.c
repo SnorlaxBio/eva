@@ -17,6 +17,10 @@
 #include <snorlax/eva.h>
 #include <snorlax/socket/client.h>
 
+socket_client_event_subscription_t * subscription = nil;
+socket_client_t * client = nil;
+
+
 static void cancel(const event_engine_t * engine);
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
@@ -38,8 +42,8 @@ int main(int argc, char ** argv) {
         on
     };
 
-    socket_client_t * client = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-    socket_client_event_subscription_t * subscription = snorlax_eva_socket_client_sub(client, handler);
+    client = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
+    subscription = snorlax_eva_socket_client_sub(client, handler);
     return snorlax_eva_run();
 }
 
@@ -62,13 +66,12 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
         snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
 
     } else if(type == descriptor_event_type_close) {
-        // printf("todo: close 이정신으로는 짜지 못한다.\n");
-        // snorlax_eva_descriptor_rem(subscription);
-        // snorlax_eva_subscription_rem(subscription);
-        // snorlax_eva_off(cancel);
+        // NEED TO RECONNECT
+        snorlax_eva_off(cancel);
     }
 }
 
 static void cancel(const event_engine_t * engine) {
-
+    subscription = (socket_client_event_subscription_t * ) object_rem((object_t *) subscription);
+    client = (socket_client_t *) object_rem((object_t *) client);
 }

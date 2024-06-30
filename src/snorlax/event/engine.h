@@ -44,8 +44,6 @@ struct event_engine_func {
 
 extern event_engine_t * event_engine_gen(void);
 
-
-
 #define event_engine_rem(engine)            ((engine)->func->rem(engine))
 #define event_engine_on(engine)             ((engine)->func->on(engine))
 #define event_engine_off(engine, cancel)    ((engine)->func->off(engine, cancel))

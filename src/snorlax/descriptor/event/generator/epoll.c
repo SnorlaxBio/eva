@@ -250,7 +250,9 @@ static ___sync int32_t descriptor_event_generator_epoll_func_del(___notnull desc
     snorlaxdbg(subscription->generator != (descriptor_event_generator_t *) generator, false, "critical", "");
 #endif // RELEASE
 
-    descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+    if(subscription->descriptor->value > invalid) {
+        descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+    }    
 
     event_generator_func_del((event_generator_t *) generator, (event_subscription_t *) subscription);
 

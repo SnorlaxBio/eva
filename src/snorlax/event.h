@@ -82,6 +82,15 @@ typedef void (*event_subscription_handler_t)(___notnull event_subscription_t *, 
  *              멤버 변수로 가지고 있어서, 이벤트 큐에서 추출하면 서브스크립션의 이벤트 타입과 관련한 액션을 수행할
  *              것입니다. 이벤트의 파라미터가 필요한 경우 node 의 생성 시에 파라미터 정보를 가지고 있도록 할 수 있습니다.
  * 
+ *              c로 이벤트 라이브러리를 만들고 있는 과정에서 이벤트 객체에 대한 설계 컨셉을 포스트합니다. 보통의 객체보다 크기가 큰데,
+ *              O(1) 으로 삭제될 수 있도록 컨셉을 잡았기 때문입니다. 디스크립터 객체가 중간에 삭제되었을 경우 이벤트 큐에 있는 관련
+ *              이벤트가 삭제되어야 하는데, 이 때 역시 리스트의 노드를 이벤트 객체가 변수로 가지고 있어서, O(1) 의 삭제가 가능합니다.
+ * 
+ *              In the process of creating an event library in C, I am posting a design concept for an event object.
+ *              It is larger than a normal object, and this is because the concept was designed so that it can be deleted in O(1).
+ *              If the descriptor object is deleted in the middle, the related event in the event queue must be deleted.
+ *              In this case, the event object also has the node in the list as a variable, so deletion is possible in O(1).
+ * 
  * @version     0.0.1
  */
 struct event {
