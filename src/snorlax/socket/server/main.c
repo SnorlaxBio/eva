@@ -73,6 +73,9 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
     } else if(type == descriptor_event_type_close) {
         count = count - 1;
         printf("count => %d\n", count);
+    } else if(type == descriptor_event_type_read) {
+        
+        // quit\r\n
     }
 }
 
