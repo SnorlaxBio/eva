@@ -16,6 +16,7 @@
 
 #include <snorlax/eva.h>
 #include <snorlax/socket/client.h>
+#include <snorlax/nanosecond.h>
 
 const int total = 100;
 
@@ -23,6 +24,10 @@ const int size = 1024;
 const int repeat = 16;
 const int request = 1000000;
 int response = 0;
+
+nanosecond_t start = { 0, };
+nanosecond_t current = { 0, };
+nanosecond_t end = { 0, };
 
 
 socket_client_event_subscription_t * subscriptions[100] = { 0, };
@@ -67,6 +72,9 @@ static int count = 0;
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
     if(type == descriptor_event_type_open) {
         count = count + 1;
+        if(count == 1) {
+            nanosecond_get(&start);
+        }
 
         snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size * repeat);
 
@@ -82,11 +90,21 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
 
             if(response <= request) {
                 if(response == request) {
+                    nanosecond_get(&end);
+                    nanosecond_t elapse;
+                    nanosecond_elapse(&start, &end, &elapse);
+                    printf("%ld.%09ld\n", elapse.second, elapse.nano);
                     for(int i = 0; i < total; i++) {
                         snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscriptions[i]);
                     }
                     
                 } else {
+                    if(response % 10000 == 0) {
+                        nanosecond_get(&current);
+                        nanosecond_t elapse;
+                        nanosecond_elapse(&start, &current, &elapse);
+                        printf("%ld.%09ld\n", elapse.second, elapse.nano);
+                    }
                     snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size);
                 }
                 break;
