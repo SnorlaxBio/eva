@@ -56,29 +56,23 @@ int main(int argc, char ** argv) {
 static int count = 0;
 
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
-    printf("%p %d %p\n", subscription, type, node);
     if(type == descriptor_event_type_open) {
-        printf("open\n");
         count = count + 1;
-        printf("count = %d\n", count);
+
         snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, "PING\r\n", 6);
 
     } else if(type == descriptor_event_type_read) {
-        printf("read\n");
         buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
         if(buffer_length(buffer) < 16) {
             char buf[16];
             memcpy(buf, buffer_front(buffer), buffer_length(buffer));
             buf[buffer_length(buffer)] = 0;
-            printf("%s", buf);
         }
         buffer_position_set(buffer, buffer_size_get(buffer));
         snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
 
     } else if(type == descriptor_event_type_close) {
-        // NEED TO RECONNECT
         count = count - 1;
-        printf("count = %d\n", count);
         if(count >= total) {
             snorlax_eva_off(cancel);
         }

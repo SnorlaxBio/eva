@@ -61,47 +61,24 @@ int main(int argc, char ** argv) {
 }
 
 static void serverOn(___notnull socket_server_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
-    printf("server => %p %d %p\n", subscription, type, node);
-
 }
 
 static int count = 0;
 
 static void sessionOn(___notnull socket_session_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node) {
-    printf("session => %p %d %p\n", subscription, type, node);
-
     if(type == descriptor_event_type_open) {
         count = count + 1;
-        printf("count => %d\n", count);
     } else if(type == descriptor_event_type_close) {
         count = count - 1;
-        printf("count => %d\n", count);
     } else if(type == descriptor_event_type_read) {
         buffer_t * in = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
         buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
         deserialize(in, out);
-        printf("1\n");
-        
-        // buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
-        // int64_t n = 0;
-        // while(n = string_simple_deserialize(in, out)) {
-        //     char * s = index(buffer_front(out), '\r');
-        //     if(s) {
-        //         *s = '\n';
-        //     }
-        //     printf("%s\n", buffer_front(out));
-        //     if(strncmp(buffer_front(out), "quit\n\n", 6) == 0) {
-        //         snorlax_eva_off(cancel);
-        //         break;
-        //     }
-        // }
     }
 }
 
 static void cancel(const event_engine_t * engine) {
-    printf("quit\n");
     subscription = (socket_server_event_subscription_t * ) object_rem((object_t *) subscription);
     socket_close(server);
     server = (socket_server_t *) object_rem((object_t *) server);
-    printf("quit\n");
 }

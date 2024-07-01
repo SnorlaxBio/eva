@@ -142,7 +142,6 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
             if(descriptor->buffer.out) buffer_adjust(descriptor->buffer.out, 0);
 
             if(descriptor->status & descriptor_state_read) {
-                printf("queued ============================================\n");
                 event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
                                                         (event_subscription_process_t) descriptor_event_subscription_process_read,
                                                         descriptor_event_type_read,

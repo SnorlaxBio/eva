@@ -38,8 +38,6 @@ static int32_t execute(___notnull command_t * command) {
 }
 
 static void cancel(const event_engine_t * engine) {
-    printf("cancel\n");
-
     subscription = (event_subscription_t *) snorlax_eva_subscription_rem(subscription);
     command = command_rem(command);
 }
@@ -48,5 +46,4 @@ static void on(command_event_subscription_t * subscription, uint32_t type, event
     if(type == 0 && ret == (event_subscription_event_t *) 2) {
         snorlax_eva_off(cancel);
     }
-    printf("type => %u, ret => %p\n", type, ret);
 }

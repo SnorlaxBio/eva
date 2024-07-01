@@ -50,7 +50,6 @@ static void on(descriptor_event_subscription_t * subscription, uint32_t type, ev
             snorlax_eva_off(cancel);
         }
     }
-    printf("type => %u, ret => %p\n", type, ret);
 }
 
 static void cancel(const event_engine_t * engine) {
