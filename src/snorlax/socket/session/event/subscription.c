@@ -68,6 +68,8 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
+    subscription->queue = event_subscription_event_queue_rem(subscription->queue);
+
     socket_session_t * descriptor = subscription->descriptor;
     if(descriptor) {
         if(descriptor->value > invalid) {
@@ -97,6 +99,8 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
 
         subscription->node = socket_server_event_subscription_list_node_rem(node);
     }
+
+    
 
     free(subscription);
 

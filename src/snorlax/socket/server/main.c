@@ -82,8 +82,10 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
         int64_t n = 0;
         while(n = string_simple_deserialize(in, out)) {
             char * s = index(buffer_front(out), '\r');
-            *s = '\n';
-            printf("%s", buffer_front(out));
+            if(s) {
+                *s = '\n';
+            }
+            printf("%s\n", buffer_front(out));
             if(strncmp(buffer_front(out), "quit\n\n", 6) == 0) {
                 snorlax_eva_off(cancel);
                 break;
