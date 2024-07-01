@@ -113,11 +113,23 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
         } else {
             socket_session_event_subscription_rem(session);
         }
+
+        socket_server_event_subscription_handler_t on = subscription->handler[type];
+
+        if(on) {
+            on(subscription, type, node);
+        }
+
+        buffer_position_set(buffer, buffer_position_get(buffer) + sizeof(socklen_t) + addrlen + sizeof(int));
+        buffer_adjust(buffer, 64);
+
+    } else {
+        socket_server_event_subscription_handler_t on = subscription->handler[type];
+
+        if(on) {
+            on(subscription, type, node);
+        }
     }
 
-    socket_server_event_subscription_handler_t on = subscription->handler[type];
 
-    if(on) {
-        on(subscription, type, node);
-    }
 }

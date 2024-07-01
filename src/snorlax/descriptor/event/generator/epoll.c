@@ -335,6 +335,8 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         }
     }
 
+    snorlaxdbg(false, true, "debug", "descriptor->value => %d", subscription->descriptor->value);
+
     if(e.events == 0) {
         if((descriptor->status == descriptor_state_close) == 0) {
             e.events = e.events | (EPOLLIN | EPOLLOUT);
@@ -375,11 +377,6 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         }
         
         subscription->status = descriptor_event_generator_epoll_subscription_state_none;
-
-#ifndef   RELEASE
-        snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, errno, epoll_ctl);
-#endif // RELEASE
-        descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, epoll_ctl);
 
         return fail;
     }

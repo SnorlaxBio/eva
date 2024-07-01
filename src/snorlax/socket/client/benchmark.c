@@ -19,20 +19,29 @@
 
 const int total = 100;
 
-socket_client_event_subscription_t * subscription[total] = { 0, };
-socket_client_t * client[total] = { 0, };
+const int size = 1024;
+const int repeat = 16;
+const int request = 1000000;
+int response = 0;
 
 
+socket_client_event_subscription_t * subscriptions[100] = { 0, };
+socket_client_t * clients[100] = { 0, };
+
+char * data = nil;
+
+static void init(void);
 static void cancel(const event_engine_t * engine);
 static void on(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
 int main(int argc, char ** argv) {
+    init();
     snorlax_eva_on();
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    addr.sin_port = htons(6379);
+    addr.sin_port = htons(3371);
     socklen_t addrlen = sizeof(struct sockaddr_in);
 
     socket_client_event_subscription_handler_t handler[descriptor_event_type_max] = {
@@ -45,8 +54,8 @@ int main(int argc, char ** argv) {
     };
 
     for(int i = 0; i < total; i++) {
-        client[i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-        subscription[i] = snorlax_eva_socket_client_sub(client[i], handler);
+        clients[i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
+        subscriptions[i] = snorlax_eva_socket_client_sub(clients[i], handler);
     }
 
 
@@ -59,32 +68,68 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
     printf("%p %d %p\n", subscription, type, node);
     if(type == descriptor_event_type_open) {
         printf("open\n");
-        snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, "PING\r\n", 6);
+        count = count + 1;
+
+        printf("count => %d\n", count);
+
+        snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size * repeat);
 
     } else if(type == descriptor_event_type_read) {
-        printf("read\n");
         buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
-        if(buffer_length(buffer) < 16) {
-            char buf[16];
-            memcpy(buf, buffer_front(buffer), buffer_length(buffer));
-            buf[buffer_length(buffer)] = 0;
-            printf("%s", buf);
+        uint64_t n = buffer_length(buffer);
+        uint64_t res = n / size;
+        buffer_position_set(buffer, buffer_position_get(buffer) + res * size);
+        for(int i = 0; i < res && response < request; i++) {
+            snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size);
+            response = response + 1;
+            if(request <= response) {
+                printf("done\n");
+                break;
+            }
         }
-        buffer_position_set(buffer, buffer_size_get(buffer));
-        snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
+        printf("res => %ld\n", response);
+
+        
+
+        // snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size * repeat);
+
+        // printf("read\n");
+        // buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
+        // if(buffer_length(buffer) < 16) {
+        //     char buf[16];
+        //     memcpy(buf, buffer_front(buffer), buffer_length(buffer));
+        //     buf[buffer_length(buffer)] = 0;
+        //     printf("%s", buf);
+        // }
+        // buffer_position_set(buffer, buffer_size_get(buffer));
+        // snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
 
     } else if(type == descriptor_event_type_close) {
         // NEED TO RECONNECT
-        count = count + 1;
-        if(count >= total) {
-            snorlax_eva_off(cancel);
-        }
+        count = count - 1;
+        // if(count >= total) {
+        //     snorlax_eva_off(cancel);
+        // }
     }
 }
 
 static void cancel(const event_engine_t * engine) {
     for(int i = 0; i < total; i++) {
-        subscription[i] = (socket_client_event_subscription_t * ) object_rem((object_t *) subscription[i]);
-        client[i] = (socket_client_t *) object_rem((object_t *) client[i]);
+        subscriptions[i] = (socket_client_event_subscription_t * ) object_rem((object_t *) subscriptions[i]);
+        clients[i] = (socket_client_t *) object_rem((object_t *) clients[i]);
     }
+    free(data);
+}
+
+static void init(void) {
+    data = malloc(size * repeat);
+    char * origin = malloc(size);
+    for(int i = 0; i < size; i++) {
+        origin[i] = (char) i;
+    }
+    origin[1023] = 0;
+    for(int i = 0; i < repeat; i++) {
+        memcpy(&data[i], origin, 1024);
+    }
+    free(origin);
 }

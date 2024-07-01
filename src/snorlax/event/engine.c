@@ -110,7 +110,7 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
 
         queue = engine->queue;
 
-        if(queue == nil) {
+        if(queue != nil) {
             queue = engine->queue;
             object_lock(queue);
             uint64_t limit = queue->size;
@@ -118,6 +118,7 @@ static int32_t event_engine_func_run(___notnull event_engine_t * engine) {
                 event_t * event = event_queue_pop(queue);
                 if(event) {
                     object_unlock(queue);
+                    printf("event => %p\n", event);
                     event_on(event);
                     object_lock(queue);
                     continue;;

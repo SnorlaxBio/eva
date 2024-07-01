@@ -121,3 +121,9 @@ target_link_libraries(snorlax-eva-client-pool-check snorlax-eva libsnorlax-std.a
 
 add_executable(snorlax-eva-server-check src/snorlax/socket/server/main.c)
 target_link_libraries(snorlax-eva-server-check snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-client-benchmark src/snorlax/socket/client/benchmark.c)
+target_link_libraries(snorlax-eva-client-benchmark snorlax-eva libsnorlax-std.a)
+
+add_executable(snorlax-eva-server-benchmark src/snorlax/socket/server/benchmark.c)
+target_link_libraries(snorlax-eva-server-benchmark snorlax-eva libsnorlax-std.a)

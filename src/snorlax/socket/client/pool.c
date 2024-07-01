@@ -17,8 +17,10 @@
 #include <snorlax/eva.h>
 #include <snorlax/socket/client.h>
 
-socket_client_event_subscription_t * subscription[25] = { 0, };
-socket_client_t * client[25] = { 0, };
+const int total = 100;
+
+socket_client_event_subscription_t * subscriptions[100];
+socket_client_t * clients[100];
 
 
 static void cancel(const event_engine_t * engine);
@@ -42,9 +44,9 @@ int main(int argc, char ** argv) {
         on
     };
 
-    for(int i = 0; i < 25; i++) {
-        client[i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-        subscription[i] = snorlax_eva_socket_client_sub(client[i], handler);
+    for(int i = 0; i < total; i++) {
+        clients[i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
+        subscriptions[i] = snorlax_eva_socket_client_sub(clients[i], handler);
     }
 
 
@@ -57,6 +59,8 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
     printf("%p %d %p\n", subscription, type, node);
     if(type == descriptor_event_type_open) {
         printf("open\n");
+        count = count + 1;
+        printf("count = %d\n", count);
         snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, "PING\r\n", 6);
 
     } else if(type == descriptor_event_type_read) {
@@ -73,16 +77,17 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
 
     } else if(type == descriptor_event_type_close) {
         // NEED TO RECONNECT
-        count = count + 1;
-        if(count >= 25) {
+        count = count - 1;
+        printf("count = %d\n", count);
+        if(count >= total) {
             snorlax_eva_off(cancel);
         }
     }
 }
 
 static void cancel(const event_engine_t * engine) {
-    for(int i = 0; i < 25; i++) {
-        subscription[i] = (socket_client_event_subscription_t * ) object_rem((object_t *) subscription[i]);
-        client[i] = (socket_client_t *) object_rem((object_t *) client[i]);
+    for(int i = 0; i < total; i++) {
+        subscriptions[i] = (socket_client_event_subscription_t * ) object_rem((object_t *) subscriptions[i]);
+        clients[i] = (socket_client_t *) object_rem((object_t *) clients[i]);
     }
 }
