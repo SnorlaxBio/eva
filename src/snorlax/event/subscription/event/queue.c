@@ -36,7 +36,7 @@ extern event_subscription_event_queue_t * event_subscription_event_queue_gen(voi
 static event_subscription_event_queue_t * event_subscription_event_queue_func_rem(___notnull event_subscription_event_queue_t * queue) {
 #ifndef   RELEASE
     snorlaxdbg(queue == nil, false, "critical", "");
-    snorlaxdbg(queue->size > 0, false, "critical", "");
+    snorlaxdbg(queue->size > 0, false, "critical", "%lu", queue->size);
     snorlaxdbg(queue->head, false, "critical", "");
     snorlaxdbg(queue->tail, false, "critical", "");
 #endif // RELEASE
@@ -94,7 +94,7 @@ static event_subscription_event_t * event_subscription_event_queue_func_del(___n
         queue->tail = prev;
     }
 
-    queue->size = queue->size + 1;
+    queue->size = queue->size - 1;
 
     event->queue = nil;
 

@@ -75,15 +75,33 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
         uint64_t n = buffer_length(buffer);
         uint64_t res = n / size;
         buffer_position_set(buffer, buffer_position_get(buffer) + res * size);
+        // printf("response => %d\n", response);
         for(int i = 0; i < res && response < request; i++) {
-            snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size);
             response = response + 1;
-            if(request <= response) {
+            
+
+            if(response <= request) {
+                if(response == request) {
+                    for(int i = 0; i < total; i++) {
+                        snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscriptions[i]);
+                    }
+                    
+                } else {
+                    snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size);
+                }
                 break;
             }
         }
+
     } else if(type == descriptor_event_type_close) {
-        count = count - 1;
+        if(count > 0) {
+            count = count - 1;
+            if(count == 0) {
+                printf("cancel\n");
+                snorlax_eva_off(cancel);
+            }
+        }
+        
     }
 }
 
@@ -93,6 +111,7 @@ static void cancel(const event_engine_t * engine) {
         clients[i] = (socket_client_t *) object_rem((object_t *) clients[i]);
     }
     free(data);
+    printf("response => %d\n", response);
 }
 
 static void init(void) {

@@ -15,6 +15,7 @@
 #include "../../../generator.h"
 
 #include "../../../../../event/subscription/event.h"
+#include "../../../../../event/subscription/event/queue.h"
 #include "../../../../../event/generator/set.h"
 #include "../../../../../event/engine.h"
 #include "../../../../../event/queue.h"
@@ -45,6 +46,13 @@ extern void descriptor_event_subscription_process_subscription(___notnull descri
 #endif // RELEASE
 
     // TODO: CHECK THIS METHOD ... 구현할 필요 없어 보인다....
+    if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
+    }
 }
 
 extern void descriptor_event_subscription_process_open(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_node_t * node) {
@@ -94,6 +102,12 @@ extern void descriptor_event_subscription_process_open(___notnull descriptor_eve
         descriptor_event_subscription_process_exception(subscription, type, node);
     } else if(descriptor->status & descriptor_state_close) {
         descriptor_event_subscription_process_close(subscription, type, node);
+    } else if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
     }
 }
 
@@ -138,8 +152,24 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
         } else if(descriptor->status & descriptor_state_close) {
             if(descriptor->value > invalid) {
                 descriptor_event_subscription_process_close(subscription, type, node);
+            } else {
+                if(node) {
+                    if(node->origin) {
+                        node->origin->node = nil;
+                        node->origin = nil;
+                    }
+                    event_subscription_event_rem(node);
+                }
             }
         } else {
+            if(node) {
+                if(node->origin) {
+                    node->origin->node = nil;
+                    node->origin = nil;
+                }
+                event_subscription_event_rem(node);
+            }
+
             buffer_adjust(descriptor->buffer.in, 0);
             if(descriptor->buffer.out) buffer_adjust(descriptor->buffer.out, 0);
 
@@ -152,7 +182,12 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
                 descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
             }
         }
-
+    } else if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
     }
 }
 
@@ -182,6 +217,14 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
         } else if(descriptor->status & descriptor_state_close) {
             descriptor_event_subscription_process_close(subscription, type, node);
         } else {
+            if(node) {
+                if(node->origin) {
+                    node->origin->node = nil;
+                    node->origin = nil;
+                }
+                event_subscription_event_rem(node);
+            }
+
             buffer_adjust(descriptor->buffer.in, 0);
             buffer_adjust(descriptor->buffer.out, 0);
 
@@ -196,6 +239,12 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
                 descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
             }
         }
+    } else if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
     }
 }
 
@@ -222,6 +271,14 @@ extern void descriptor_event_subscription_process_close(___notnull descriptor_ev
 
     if(descriptor->buffer.in) buffer_reset(descriptor->buffer.in, 0);
     if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
+
+    if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
+    }
 }
 
 extern void descriptor_event_subscription_process_exception(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_node_t * node) {
@@ -247,4 +304,12 @@ extern void descriptor_event_subscription_process_exception(___notnull descripto
 
     buffer_reset(descriptor->buffer.in, 0);
     if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
+
+    if(node) {
+        if(node->origin) {
+            node->origin->node = nil;
+            node->origin = nil;
+        }
+        event_subscription_event_rem(node);
+    }
 }

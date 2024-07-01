@@ -335,8 +335,6 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
         }
     }
 
-    snorlaxdbg(false, true, "debug", "descriptor->value => %d", subscription->descriptor->value);
-
     if(e.events == 0) {
         if((descriptor->status == descriptor_state_close) == 0) {
             e.events = e.events | (EPOLLIN | EPOLLOUT);
@@ -463,16 +461,19 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_del(___n
     snorlaxdbg(generator->value <= invalid, false, "critical", "");
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
-    snorlaxdbg(subscription->descriptor->value <= invalid, false, "critical", "");
+//    snorlaxdbg(subscription->descriptor->value <= invalid, false, "critical", "");
 #endif // RELEASE
 
-    struct epoll_event e;
-    e.events = (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP);
-    if(epoll_ctl(generator->value, EPOLL_CTL_DEL, subscription->descriptor->value, &e) == fail) {
+    if(subscription->descriptor->value > invalid) {
+        struct epoll_event e;
+        e.events = (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP | EPOLLPRI | EPOLLRDHUP);
+        if(epoll_ctl(generator->value, EPOLL_CTL_DEL, subscription->descriptor->value, &e) == fail) {
 #ifndef   RELEASE
-        snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
+            snorlaxdbg(false, true, "warning", "fail to epoll_ctl(...) => %d", errno);
 #endif // RELEASE
+        }
     }
+
 
     subscription->status = descriptor_event_generator_epoll_subscription_state_none;
 
