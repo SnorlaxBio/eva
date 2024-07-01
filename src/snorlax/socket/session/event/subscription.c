@@ -13,6 +13,7 @@
 #include "../../../descriptor/event/generator.h"
 #include "../../server/event/subscription/list.h"
 #include "../../../event/subscription/event/queue.h"
+#include "../../../event/subscription/event.h"
 
 typedef void (*socket_session_event_subscription_on_t)(___notnull socket_session_event_subscription_t *, socket_session_event_subscription_process_t, uint32_t, event_subscription_event_t *);
 typedef void (*socket_session_event_subscription_notify_t)(___notnull socket_session_event_subscription_t *, uint32_t, event_subscription_event_t *);
@@ -39,6 +40,7 @@ extern socket_session_event_subscription_t * socket_session_event_subscription_g
     subscription->descriptor = descriptor;
     subscription->type = event_subscription_type_descriptor;
     subscription->node = node;
+    subscription->node->session = subscription;
 
     return subscription;
 }
@@ -55,7 +57,9 @@ static void socket_session_event_subscription_func_notify(___notnull socket_sess
     }
 
     if(type == descriptor_event_type_close) {
-        socket_session_event_subscription_func_rem(subscription);
+        if(subscription->descriptor->value > invalid) {
+            socket_session_event_subscription_func_rem(subscription);
+        }
     }
 }
 
@@ -71,19 +75,27 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
                 descriptor_event_generator_del(subscription->generator, (descriptor_event_subscription_t *) subscription);
             }
 
-            event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
+            int32_t value = descriptor->value;
+            descriptor_close(descriptor);
 
-            process((event_subscription_t *) subscription, descriptor_event_type_close, nil);
+            descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(nil, value));
+
+            if(descriptor->buffer.in) buffer_reset(descriptor->buffer.in, 0);
+            if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
         }
 
-        subscription->descriptor = descriptor_rem(subscription->descriptor);
+        subscription->descriptor = descriptor_rem(descriptor);
     }
 
     if(subscription->node) {
         if(subscription->node->collection) {
             socket_server_event_subscription_list_del(subscription->node->collection, subscription->node);
         }
-        subscription->node = socket_server_event_subscription_list_node_rem(subscription->node);
+        socket_server_event_subscription_list_node_t * node = subscription->node;
+        subscription->node = nil;
+        node->session = nil;
+
+        subscription->node = socket_server_event_subscription_list_node_rem(node);
     }
 
     free(subscription);

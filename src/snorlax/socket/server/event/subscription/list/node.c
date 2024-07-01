@@ -28,6 +28,7 @@ extern socket_server_event_subscription_list_node_t * socket_server_event_subscr
         list->head = node;
     }
 
+    node->collection = list;
     list->tail = node;
     list->size = list->size + 1;
 
@@ -41,7 +42,9 @@ static socket_server_event_subscription_list_node_t * socket_server_event_subscr
 
     if(node->collection) socket_server_event_subscription_list_del(node->collection, node);
 
-    node->session = socket_session_event_subscription_rem(node->session);
+    if(node->session) {
+        node->session = socket_session_event_subscription_rem(node->session);
+    }
 
     free(node);
 

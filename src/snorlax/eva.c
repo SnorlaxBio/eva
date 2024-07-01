@@ -184,12 +184,8 @@ extern void snorlax_eva_descriptor_close(descriptor_event_subscription_t * subsc
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
 #endif // RELEASE
     if(subscription->generator) {
-        printf("1\n");
-
         subscription->descriptor->status = subscription->descriptor->status | descriptor_state_close;
     } else {
-        printf("2\n");
-
         event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_close);
         process((event_subscription_t *) subscription, descriptor_event_type_close, nil);
     }

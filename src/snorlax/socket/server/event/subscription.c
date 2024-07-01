@@ -75,11 +75,11 @@ extern socket_server_event_subscription_t * socket_server_event_subscription_fun
 
     subscription->sync = sync_rem(subscription->sync);
 
-    subscription->session.handler = memory_rem(subscription->session.handler);
     subscription->session.list = socket_server_event_subscription_list_rem(subscription->session.list);
+    subscription->session.handler = memory_rem(subscription->session.handler);
 
-    subscription->handler = memory_rem(subscription->handler);
     subscription->queue = event_subscription_event_queue_rem(subscription->queue);
+    subscription->handler = memory_rem(subscription->handler);
 
     free(subscription);
 

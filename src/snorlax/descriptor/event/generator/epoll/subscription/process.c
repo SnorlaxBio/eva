@@ -208,16 +208,18 @@ extern void descriptor_event_subscription_process_close(___notnull descriptor_ev
     descriptor_t * descriptor = subscription->descriptor;
     descriptor_event_generator_epoll_t * generator = (descriptor_event_generator_epoll_t *) subscription->generator;
 
-    if(value > invalid) {
-        descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+    if(generator) {
+        if(value > invalid) {
+            descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_del);
+        }
     }
 
     descriptor_close(subscription->descriptor);
 
     descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(node, value));
 
-    buffer_reset(descriptor->buffer.in, 0);
-    buffer_reset(descriptor->buffer.out, 0);
+    if(descriptor->buffer.in) buffer_reset(descriptor->buffer.in, 0);
+    if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
 }
 
 extern void descriptor_event_subscription_process_exception(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_node_t * node) {

@@ -59,8 +59,8 @@ extern socket_t * socket_func_rem(___notnull socket_t * descriptor) {
     snorlaxdbg(descriptor->value > invalid, false, "critical", "");
 #endif // RELEASE
 
-    descriptor->buffer.in = buffer_rem(descriptor->buffer.in);
-    descriptor->buffer.out = buffer_rem(descriptor->buffer.out);
+    if(descriptor->buffer.in) descriptor->buffer.in = buffer_rem(descriptor->buffer.in);
+    if(descriptor->buffer.out) descriptor->buffer.out = buffer_rem(descriptor->buffer.out);
     descriptor->addr.value = memory_rem(descriptor->addr.value);
     descriptor->sync = sync_rem(descriptor->sync);
 

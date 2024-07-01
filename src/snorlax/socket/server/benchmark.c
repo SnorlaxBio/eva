@@ -1,5 +1,5 @@
 /**
- * @file        snorlax/socket/server/main.c
+ * @file        snorlax/socket/server/benchmark.c
  * @brief
  * @details
  * 
@@ -81,21 +81,12 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
         buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
         int64_t n = 0;
         while(n = string_simple_deserialize(in, out)) {
-            char * s = index(buffer_front(out), '\r');
-            *s = '\n';
-            printf("%s", buffer_front(out));
-            if(strncmp(buffer_front(out), "quit\n\n", 6) == 0) {
-                snorlax_eva_off(cancel);
-                break;
-            }
+            buffer_size_set(out, buffer_size_get(out) + n);
         }
     }
 }
 
 static void cancel(const event_engine_t * engine) {
-    printf("quit\n");
     subscription = (socket_server_event_subscription_t * ) object_rem((object_t *) subscription);
-    socket_close(server);
     server = (socket_server_t *) object_rem((object_t *) server);
-    printf("quit\n");
 }

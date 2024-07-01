@@ -43,8 +43,7 @@ static socket_server_event_subscription_list_t * socket_server_event_subscriptio
 #endif // RELEASE
 
     while(list->head) {
-        list->head->session = socket_session_event_subscription_rem(list->head->session);
-        socket_server_event_subscription_list_node_rem(list->head);
+        socket_session_event_subscription_rem(list->head->session);
     }
 
     free(list);
@@ -88,7 +87,7 @@ static socket_server_event_subscription_list_node_t * socket_server_event_subscr
         list->tail = prev;
     }
 
-    list->size = list->size + 1;
+    list->size = list->size - 1;
     node->collection = nil;
 
     return node;
@@ -100,7 +99,6 @@ static void socket_server_event_subscription_list_func_clear(socket_server_event
 #endif // RELEASE
 
     while(list->head) {
-        list->head->session = socket_session_event_subscription_rem(list->head->session);
-        socket_server_event_subscription_list_node_rem(list->head);
+        socket_session_event_subscription_rem(list->head->session);
     }
 }
