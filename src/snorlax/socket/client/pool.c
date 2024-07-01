@@ -19,6 +19,9 @@
 
 const int total = 100;
 
+int request = 0;
+int response = 0;
+
 socket_client_event_subscription_t * subscriptions[100];
 socket_client_t * clients[100];
 
@@ -69,12 +72,19 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
             buf[buffer_length(buffer)] = 0;
         }
         buffer_position_set(buffer, buffer_size_get(buffer));
-        snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscription);
+        response = response + 1;
 
+        if(response == 100 && count == 100) {
+            for(int i = 0; i < 100; i++) {
+                snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscriptions[i]);
+            }
+        }
     } else if(type == descriptor_event_type_close) {
-        count = count - 1;
-        if(count >= total) {
-            snorlax_eva_off(cancel);
+        if(count > 0) {
+            count = count - 1;
+            if(count == 0) {
+                snorlax_eva_off(cancel);
+            }
         }
     }
 }

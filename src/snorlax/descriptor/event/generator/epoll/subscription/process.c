@@ -136,7 +136,9 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
         if(descriptor_exception_get(descriptor)) {
             descriptor_event_subscription_process_exception(subscription, type, node);
         } else if(descriptor->status & descriptor_state_close) {
-            descriptor_event_subscription_process_close(subscription, type, node);
+            if(descriptor->value > invalid) {
+                descriptor_event_subscription_process_close(subscription, type, node);
+            }
         } else {
             buffer_adjust(descriptor->buffer.in, 0);
             if(descriptor->buffer.out) buffer_adjust(descriptor->buffer.out, 0);
