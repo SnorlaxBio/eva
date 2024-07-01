@@ -18,6 +18,9 @@
 #include <snorlax/socket/server.h>
 #include <snorlax/socket/session.h>
 
+#include <snorlax/string/simple/deserializer.h>
+#include <snorlax/string/simple/serializer.h>
+
 socket_server_event_subscription_t * subscription = nil;
 socket_server_t * server = nil;
 
@@ -74,8 +77,14 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
         count = count - 1;
         printf("count => %d\n", count);
     } else if(type == descriptor_event_type_read) {
-        
-        // quit\r\n
+        buffer_t * in = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
+        buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
+        int64_t n = 0;
+        while(n = string_simple_deserialize(in, out)) {
+            printf("n => %ld\n", n);
+            printf("%s", buffer_front(out));
+            buffer_size_set(out, buffer_size_get(out) + n);
+        }
     }
 }
 

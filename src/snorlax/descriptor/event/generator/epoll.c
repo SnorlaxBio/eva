@@ -340,7 +340,7 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_add(___n
             e.events = e.events | (EPOLLIN | EPOLLOUT);
         } else {
 #ifndef   RELEASE
-            snorlaxdbg(false, true, "warning", "");
+            snorlaxdbg(false, true, "warning", "descriptor->value => %d", subscription->descriptor->value);
 #endif // RELEASE
             return success;
         }

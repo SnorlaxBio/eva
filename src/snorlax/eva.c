@@ -157,6 +157,14 @@ extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscrip
     return subscription->descriptor->buffer.in;
 }
 
+extern buffer_t * snorlax_eva_descriptor_buffer_out_get(descriptor_event_subscription_t * subscription) {
+ #ifndef   RELEASE
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+
+    return subscription->descriptor->buffer.out;   
+}
+
 extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subscription, const char * data, uint64_t len) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");

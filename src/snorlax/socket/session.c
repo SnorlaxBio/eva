@@ -22,5 +22,7 @@ extern socket_session_t * socket_session_gen(int32_t value, int32_t domain, int3
 
     descriptor->value = value;
 
+    descriptor->status = (descriptor_state_open | descriptor_state_write);
+
     return descriptor;
 }
