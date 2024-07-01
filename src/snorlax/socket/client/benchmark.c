@@ -93,7 +93,7 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
                     nanosecond_get(&end);
                     nanosecond_t elapse;
                     nanosecond_elapse(&start, &end, &elapse);
-                    printf("%ld.%09ld\n", elapse.second, elapse.nano);
+                    printf("| %d | %ld.%09ld |\n", response, elapse.second, elapse.nano);
                     for(int i = 0; i < total; i++) {
                         snorlax_eva_descriptor_close((descriptor_event_subscription_t *) subscriptions[i]);
                     }
@@ -103,7 +103,7 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
                         nanosecond_get(&current);
                         nanosecond_t elapse;
                         nanosecond_elapse(&start, &current, &elapse);
-                        printf("%ld.%09ld\n", elapse.second, elapse.nano);
+                        printf("| %d | %ld.%09ld |\n", response, elapse.second, elapse.nano);
                     }
                     snorlax_eva_descriptor_write((descriptor_event_subscription_t *) subscription, data, size);
                 }
