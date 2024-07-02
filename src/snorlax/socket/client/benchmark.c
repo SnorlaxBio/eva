@@ -86,7 +86,6 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
         // printf("response => %d\n", response);
         for(int i = 0; i < res && response < request; i++) {
             response = response + 1;
-            
 
             if(response <= request) {
                 if(response == request) {
