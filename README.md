@@ -1,6 +1,10 @@
 __EVA<sup style="font-size: .8rem">EVENT LIB</sup>__
 ====================================================
 
+High Performance Event Loop
+
+
+
 로컬 에코 1024 바이트 1백만건 전송 결과 초당 약 300,000 건 전송 가능
 
 | RESPONSE | ELAPSE (NANO) |
@@ -16,4 +20,3 @@ __EVA<sup style="font-size: .8rem">EVENT LIB</sup>__
 |  900000  | 2.954828010   |
 | 1000000  | 3.267341360   |
 
-<!-- A full-featured and high-performance (see benchmark) event loop that is loosely modelled after libevent, but without its limitations and bugs. It is used in GNU Virtual Private Ethernet, rxvt-unicode, auditd, the Deliantra MORPG Server and Client, and many other programs. -->
