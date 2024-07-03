@@ -1,13 +1,3 @@
-/**
- * @file        snorlax/event.h
- * @brief       
- * @details
- * 
- * @author      snorlax <ceo@snorlax.bio>
- * @since       June 21, 2024
- * @version     0.0.1
- */
-
 #ifndef   __SNORLAX__EVENT__H__
 #define   __SNORLAX__EVENT__H__
 

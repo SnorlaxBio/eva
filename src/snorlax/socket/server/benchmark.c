@@ -1,13 +1,3 @@
-/**
- * @file        snorlax/socket/server/main.c
- * @brief
- * @details
- * 
- * @author      snorlax <ceo@snorlax.bio>
- * @since       June 30, 2024
- */
-
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
