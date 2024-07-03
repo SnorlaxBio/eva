@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(SnorlaxSTD C)
+project(SnorlaxEva C)
 include(ExternalProject)
 
 set(CMAKE_C_STANDARD 11)
