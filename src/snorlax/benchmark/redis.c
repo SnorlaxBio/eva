@@ -12,7 +12,7 @@ const int total = 100;
 
 int size = 1024;
 const int repeat = 16;
-const int request = 1000000;
+const int request = 10000000;
 int response = 0;
 
 nanosecond_t start = { 0, };
