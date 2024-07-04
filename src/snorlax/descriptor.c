@@ -14,8 +14,6 @@
 
 #include "descriptor.h"
 
-static descriptor_t * descriptor_func_rem(___notnull descriptor_t * descriptor);
-
 static descriptor_func_t func = {
     descriptor_func_rem,
     descriptor_func_open,
@@ -184,7 +182,7 @@ extern int32_t descriptor_func_close(___notnull descriptor_t * descriptor) {
     return success;
 }
 
-static descriptor_t * descriptor_func_rem(___notnull descriptor_t * descriptor) {
+extern descriptor_t * descriptor_func_rem(___notnull descriptor_t * descriptor) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE

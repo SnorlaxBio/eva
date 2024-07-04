@@ -93,6 +93,7 @@ extern descriptor_t * descriptor_gen(int32_t value);
 
 extern descriptor_func_t * descriptor_func_get(void);
 
+extern descriptor_t * descriptor_func_rem(___notnull descriptor_t * descriptor);
 extern int32_t descriptor_func_open(___notnull descriptor_t * descriptor);
 extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor);
 extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor);
