@@ -47,8 +47,17 @@ extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t 
 extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler);
 extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn);
 
+/**
+ * @deprecated
+ */
 extern buffer_t * snorlax_eva_descriptor_buffer_in_get(descriptor_event_subscription_t * subscription);
+/**
+ * @deprecated
+ */
 extern buffer_t * snorlax_eva_descriptor_buffer_out_get(descriptor_event_subscription_t * subscription);
+
+extern buffer_t * snorlax_eva_descriptor_event_subscription_buffer_in_get(descriptor_event_subscription_t * subscription);
+extern buffer_t * snorlax_eva_descriptor_event_subscription_buffer_out_get(descriptor_event_subscription_t * subscription);
 
 extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subscription, const char * data, uint64_t len);
 extern void snorlax_eva_descriptor_close(descriptor_event_subscription_t * subscription);

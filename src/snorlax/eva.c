@@ -200,3 +200,11 @@ extern void snorlax_eva_descriptor_close(descriptor_event_subscription_t * subsc
         process((event_subscription_t *) subscription, descriptor_event_type_close, nil);
     }
 }
+
+extern buffer_t * snorlax_eva_descriptor_event_subscription_buffer_in_get(descriptor_event_subscription_t * subscription) {
+    return subscription->descriptor->buffer.in;
+}
+
+extern buffer_t * snorlax_eva_descriptor_event_subscription_buffer_out_get(descriptor_event_subscription_t * subscription) {
+    return subscription->descriptor->buffer.out;
+}
