@@ -5,6 +5,9 @@
  * 
  * @author      snorlax <ceo@snorlax.bio>
  * @since       June 23, 2024
+ * 
+ * 이름은 별로 마음에 들지 않는다. 
+ * 이 타입들은 생성기에 SUBSCRIPTION 의 등록 상태를 조작하는 것인가?
  */
 
 #ifndef   __SNORLAX__EVENT_GENERATOR_CONTROL_TYPE__H__
