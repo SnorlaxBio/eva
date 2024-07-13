@@ -22,11 +22,10 @@ static event_queue_func_t func = {
     event_queue_func_del
 };
 
-extern event_queue_t * event_queue_gen(sync_t * sync) {
+extern event_queue_t * event_queue_gen(void) {
     event_queue_t * queue = (event_queue_t *) calloc(1, sizeof(event_queue_t));
 
     queue->func = address_of(func);
-    queue->sync = sync;
 
     return queue;
 }

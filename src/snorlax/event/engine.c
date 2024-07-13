@@ -34,7 +34,9 @@ extern event_engine_t * event_engine_gen(void) {
 
     engine->pool = event_processor_pool_gen(0, engine);
     engine->set = event_generator_set_gen(engine);
-    engine->queue = event_queue_gen(engine->pool->size > 0 ? sync_gen() : nil);
+    engine->queue = event_queue_gen();
+
+    if(engine->pool->size > 0) sync_on(engine->queue);
 
     return engine;
 }

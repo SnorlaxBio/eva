@@ -39,7 +39,7 @@ struct event_queue_func {
     ___sync void (*del)(___notnull event_queue_t *, ___notnull event_t *);
 };
 
-extern event_queue_t * event_queue_gen(sync_t * sync);
+extern event_queue_t * event_queue_gen(void);
 
 #define event_queue_rem(queue)              ((queue)->func->rem(queue))
 #define event_queue_push(queue, event)      ((queue)->func->push(queue, event))
