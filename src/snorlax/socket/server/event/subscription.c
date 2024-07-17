@@ -121,7 +121,7 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
         }
 
         buffer_position_set(buffer, buffer_position_get(buffer) + sizeof(socklen_t) + addrlen + sizeof(int));
-        buffer_adjust(buffer, 64);
+        buffer_adjust(buffer, 64);      // TODO: ADJUST VALUE
 
     } else {
         socket_server_event_subscription_handler_t on = subscription->handler[type];
