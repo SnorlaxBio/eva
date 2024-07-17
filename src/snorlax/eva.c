@@ -172,9 +172,7 @@ extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subsc
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
 #endif // RELEASE
     buffer_t * out = subscription->descriptor->buffer.out;
-    if(buffer_remain(out) < len) {
-        buffer_capacity_set(out, buffer_capacity_get(out) + len);
-    }
+
     buffer_write(subscription->descriptor->buffer.out, data, len);
 
     if(subscription->descriptor->status & descriptor_state_open_out) {
