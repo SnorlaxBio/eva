@@ -20,7 +20,7 @@ typedef int32_t (*socket_check_t)(___notnull socket_t *, uint32_t);
 
 static socket_func_t func = {
     socket_func_rem,
-    (socket_open_t) descriptor_func_open,
+    socket_func_open,
     (socket_read_t) descriptor_func_read,
     (socket_write_t) descriptor_func_write,
     (socket_close_t) descriptor_func_close,
@@ -51,6 +51,26 @@ extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, voi
     }
 
     return descriptor;
+}
+
+extern int32_t socket_func_open(___notnull socket_t * descriptor) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+
+    if(descriptor->value <= invalid) {
+        descriptor->value = socket(descriptor->domain, descriptor->type, descriptor->protocol);
+
+        if(descriptor->value <= invalid){
+            descriptor_exception_set(descriptor, descriptor_exception_type_system, errno, socket);
+            return fail;
+        }
+
+        descriptor->status = descriptor->status & (~descriptor_state_close);
+        descriptor->status = descriptor->status | (descriptor_state_open | descriptor_state_write);
+    }
+
+    return success;
 }
 
 extern socket_t * socket_func_rem(___notnull socket_t * descriptor) {

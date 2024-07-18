@@ -73,6 +73,7 @@ typedef int32_t (*socket_close_t)(___notnull socket_t *);
 typedef int32_t (*socket_check_t)(___notnull socket_t *, uint32_t);
 
 extern socket_t * socket_func_rem(___notnull socket_t * descriptor);
+extern int32_t socket_func_open(___notnull socket_t * descriptor);
 extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t how);
 extern int32_t socket_func_check(___notnull socket_t * descriptir, uint32_t state);
 extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
