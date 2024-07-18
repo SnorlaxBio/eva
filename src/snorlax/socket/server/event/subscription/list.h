@@ -53,6 +53,7 @@ extern socket_server_event_subscription_list_t * socket_server_event_subscriptio
 
 struct socket_server_event_subscription_list_node {
     socket_server_event_subscription_list_node_func_t * func;
+    sync_t * sync;
     socket_server_event_subscription_list_t * collection;
     socket_server_event_subscription_list_node_t * prev;
     socket_server_event_subscription_list_node_t * next;

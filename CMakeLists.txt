@@ -61,7 +61,10 @@ set(SNORLAX_EVA_SOURCE      src/snorlax/eva.c
                             src/snorlax/socket/session/event/subscription.c
                             src/snorlax/socket/server/event/subscription.c
                             src/snorlax/socket/server/event/subscription/list.c
-                            src/snorlax/socket/server/event/subscription/list/node.c)
+                            src/snorlax/socket/server/event/subscription/list/node.c
+                            src/snorlax/socket/client/event/subscription.c
+                            src/snorlax/socket/client/event/subscription/pool.c
+                            src/snorlax/socket/client/event/subscription/pool/node.c)
 
 set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/event.h
@@ -100,7 +103,9 @@ set(SNORLAX_EVA_HEADER      src/snorlax/eva.h
                             src/snorlax/socket/client/event/subscription.h
                             src/snorlax/socket/server/event/subscription.h
                             src/snorlax/socket/server/event/subscription/list.h
-                            src/snorlax/socket/session/event/subscription.h)
+                            src/snorlax/socket/session/event/subscription.h
+                            src/snorlax/socket/client/event/subscription.h
+                            src/snorlax/socket/client/event/subscription/pool.h)
 
 add_library(snorlax-eva ${SNORLAX_EVA_SOURCE}
                         ${SNORLAX_EVA_HEADER})

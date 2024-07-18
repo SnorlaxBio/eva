@@ -11,6 +11,7 @@
 #define   __SNORLAX__SOCKET_CLIENT_EVENT_SUBSCRIPTION__H__
 
 #include <snorlax/socket/client.h>
+#include <snorlax/socket/client/event/subscription/pool.h>
 
 struct socket_client_event_subscription;
 struct socket_client_event_subscription_func;
@@ -29,6 +30,8 @@ struct socket_client_event_subscription {
     uint32_t type;
     uint32_t status;
     socket_client_t * descriptor;
+
+    socket_client_event_subscription_pool_node_t * node;
 };
 
 struct socket_client_event_subscription_func {
@@ -37,13 +40,14 @@ struct socket_client_event_subscription_func {
     void (*notify)(___notnull socket_client_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
-#define socket_client_event_subscription_gen(descriptor, handler)                  ((socket_client_event_subscription_t *) descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler))
+extern socket_client_event_subscription_t * socket_client_event_subscription_gen(socket_client_t * client, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool);
 
-#define socket_client_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
+extern socket_client_event_subscription_t * socket_client_event_subscription_func_rem(___notnull socket_client_event_subscription_t * subscription);
+extern void socket_client_event_subscription_func_on(___notnull socket_client_event_subscription_t * subscription, socket_client_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
+extern void socket_client_event_subscription_func_notify(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
 #define socket_client_event_subscription_rem(subscription)                         ((subscription)->func->rem(subscription))
 #define socket_client_event_subscription_on(subscription, process, type, node)     ((subscription)->func->on(subscription, process, type, node))
 #define socket_client_event_subscription_notify(subscription, type, node)          ((subscription)->func->notify(subscription, type, node))
-
 
 #endif // __SNORLAX__SOCKET_CLIENT_EVENT_SUBSCRIPTION__H__

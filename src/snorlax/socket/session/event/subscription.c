@@ -58,7 +58,7 @@ static void socket_session_event_subscription_func_notify(___notnull socket_sess
 
     if(type == descriptor_event_type_close) {
         if(subscription->descriptor->value > invalid) {
-            socket_session_event_subscription_func_rem(subscription);
+            socket_session_event_subscription_rem(subscription);
         }
     }
 }
@@ -99,8 +99,6 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
 
         subscription->node = socket_server_event_subscription_list_node_rem(node);
     }
-
-    
 
     free(subscription);
 

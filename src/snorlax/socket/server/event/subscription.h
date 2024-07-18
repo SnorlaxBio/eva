@@ -58,5 +58,4 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
 #define socket_server_event_subscription_on(subscription, process, type, node)     ((subscription)->func->on(subscription, process, type, node))
 #define socket_server_event_subscription_notify(subscription, type, node)          ((subscription)->func->notify(subscription, type, node))
 
-
 #endif // __SNORLAX__SOCKET_SERVER_EVENT_SUBSCRIPTION__H__

@@ -108,7 +108,7 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(s, handler);
+    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(s, handler, nil);
 
     if(s->value <= invalid) {
         if(socket_client_open(s) == fail) {
