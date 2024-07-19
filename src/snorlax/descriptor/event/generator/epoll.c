@@ -223,6 +223,10 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
     return success;
 }
 
+/**
+ * @todo        디스크립터가 오픈 상태가 아니라면 오픈을 하고 epoll control add 를 수행해야 한다.
+ *              그 외에 다양한 에러처리가 필요하다.
+ */
 static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull descriptor_event_generator_epoll_t * generator, ___notnull descriptor_event_subscription_t * subscription) {
 #ifndef   RELEASE
     snorlaxdbg(generator == nil, false, "critical", "");
@@ -231,6 +235,7 @@ static ___sync int32_t descriptor_event_generator_epoll_func_add(___notnull desc
 #endif // RELEASE
 
     if(event_generator_func_add((event_generator_t *) generator, (event_subscription_t *) subscription) == success) {
+        // TODO: DESCRIPTOR OPEN => 
         if(descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_add) == success) {
             subscription->status = subscription->status | (descriptor_event_generator_epoll_subscription_state_in | descriptor_event_generator_epoll_subscription_state_out);
             descriptor_event_subscription_notify(subscription, descriptor_event_type_subscription, (event_subscription_event_t *) descriptor_event_subscription_type_add);

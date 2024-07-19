@@ -156,7 +156,13 @@ extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engin
 
     descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler);
 
-    event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
+    if(descriptor_open(descriptor) == success) {
+        event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
+    } else {
+#ifndef   RELEASE
+        snorlaxdbg(true, false, "error handling & fail over", "");
+#endif // RELEASE
+    }
 
     return subscription;
 }
