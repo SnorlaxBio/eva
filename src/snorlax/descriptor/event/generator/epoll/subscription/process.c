@@ -125,12 +125,8 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
     if(descriptor->status & descriptor_state_open_in) {
         int32_t retry = 4;
 
-        printf("descriptor_read %d\n", descriptor->value);
-
         while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
             int64_t n = descriptor_read(descriptor);
-
-            printf("descriptor_read %d => n => %ld\n", descriptor->value, n);
 
             if(n <= 0) break;
 
