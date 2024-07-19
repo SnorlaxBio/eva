@@ -96,6 +96,10 @@ extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t 
         }
     }
 
+    if(subscription->descriptor->status & (descriptor_state_open)) {
+        socket_event_subscription_notify(subscription, descriptor_event_type_open, nil);
+    }
+
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
     return subscription;
