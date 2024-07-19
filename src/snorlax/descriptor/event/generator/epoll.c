@@ -302,6 +302,8 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
+    printf("6 => descriptor->value %d\n", subscription->descriptor->value);
+
     if(queue) {
         event_queue_push(queue, event_gen((event_subscription_t *) subscription,
                                             descriptor_event_generator_epoll_subscription_process_get(type),
@@ -313,7 +315,7 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
         }
 
         event_subscription_process_t process = descriptor_event_generator_epoll_subscription_process_get(type);
-
+        printf("7 => descriptor->value %d\n", subscription->descriptor->value);
         process((event_subscription_t *) subscription, type, nil);
     }
 }
