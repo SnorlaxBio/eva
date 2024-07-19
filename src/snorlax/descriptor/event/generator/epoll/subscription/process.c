@@ -116,6 +116,7 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
 #endif // RELEASE
+    printf("1\n");
 
     descriptor_t * descriptor = subscription->descriptor;
     descriptor_event_generator_epoll_t * generator = (descriptor_event_generator_epoll_t *) subscription->generator;
@@ -123,9 +124,11 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
     event_engine_t * engine = set->engine;
 
     if(descriptor->status & descriptor_state_open_in) {
+        printf("2\n");
         int32_t retry = 4;
 
         while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+            printf("3\n");
             int64_t n = descriptor_read(descriptor);
 
             if(n <= 0) break;
