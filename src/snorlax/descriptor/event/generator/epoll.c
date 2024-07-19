@@ -197,8 +197,10 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 continue;
             }
             if(flags & EPOLLOUT) {
+                printf("%d epoll out\n", descriptor->value);
                 descriptor->status = descriptor->status | descriptor_state_write;
                 if(flags & EPOLLIN) {
+                    printf("%d epoll in\n", descriptor->value);
                     descriptor->status = descriptor->status | descriptor_state_read;
 
                     descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
@@ -209,6 +211,7 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_write, queue, engine);
             }
             if(flags & EPOLLIN) {
+                printf("%d epoll in\n", descriptor->value);
                 descriptor->status = descriptor->status | descriptor_state_read;
 
                 descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
