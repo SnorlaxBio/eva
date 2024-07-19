@@ -197,10 +197,8 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 continue;
             }
             if(flags & EPOLLOUT) {
-                printf("%d epoll out\n", descriptor->value);
                 descriptor->status = descriptor->status | descriptor_state_write;
                 if(flags & EPOLLIN) {
-                    printf("%d epoll in\n", descriptor->value);
                     descriptor->status = descriptor->status | descriptor_state_read;
 
                     descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
@@ -211,7 +209,6 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_write, queue, engine);
             }
             if(flags & EPOLLIN) {
-                printf("%d epoll in\n", descriptor->value);
                 descriptor->status = descriptor->status | descriptor_state_read;
 
                 descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_read, queue, engine);
@@ -302,8 +299,6 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
 
-    printf("6 => descriptor->value %d\n", subscription->descriptor->value);
-
     if(queue) {
         event_queue_push(queue, event_gen((event_subscription_t *) subscription,
                                             descriptor_event_generator_epoll_subscription_process_get(type),
@@ -315,7 +310,7 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
         }
 
         event_subscription_process_t process = descriptor_event_generator_epoll_subscription_process_get(type);
-        printf("7 => descriptor->value %d\n", subscription->descriptor->value);
+        
         process((event_subscription_t *) subscription, type, nil);
     }
 }
