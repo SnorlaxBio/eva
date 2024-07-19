@@ -49,4 +49,8 @@ extern event_engine_t * event_engine_gen(void);
 #define event_engine_off(engine, cancel)    ((engine)->func->off(engine, cancel))
 #define event_engine_run(engine)            ((engine)->func->run(engine))
 
+#include <snorlax/descriptor.h>
+
+extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
+
 #endif // __SNORLAX__EVENT_ENGINE__H__

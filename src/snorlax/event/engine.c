@@ -12,6 +12,8 @@
 #include "queue.h"
 #include "processor/pool.h"
 #include "generator/set.h"
+#include "generator.h"
+#include "../descriptor/event/subscription.h"
 
 static void event_engine_func_default_cancel(const event_engine_t * engine);
 
@@ -144,3 +146,17 @@ static void event_engine_func_default_cancel(const event_engine_t * engine) {
     
 }
 
+extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler) {
+#ifndef   RELEASE
+    snorlaxdbg(engine == nil, false, "critical", "");
+    snorlaxdbg(engine->set == nil, false, "critical", "");
+    snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+
+    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler);
+
+    event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
+
+    return subscription;
+}
