@@ -128,6 +128,8 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
         while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
             int64_t n = descriptor_read(descriptor);
 
+            pritnf("descriptor_read => n => %ld\n", n);
+
             if(n <= 0) break;
 
             // TODO: DESCRIPTOR IS SERVER CHECK
