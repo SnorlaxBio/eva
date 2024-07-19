@@ -127,6 +127,8 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
         printf("2\n");
         int32_t retry = 4;
 
+        printf("2 => %p\n", descriptor_exception_get(descriptor));
+
         while(retry > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
             printf("3\n");
             int64_t n = descriptor_read(descriptor);
