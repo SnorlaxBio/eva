@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <snorlax/buffer/mem.h>
+
 #include "in.h"
 
 static console_in_t * consolein = nil;
@@ -37,8 +39,8 @@ extern console_in_t * console_in_gen(void) {
 
         consolein->func = address_of(func);
         
-        consolein->buffer.in = buffer_gen(0);
-        consolein->buffer.out = buffer_gen(0);
+        consolein->buffer.in = (buffer_t *) buffer_mem_gen(0);
+        consolein->buffer.out = (buffer_t *) buffer_mem_gen(0);
 
         consolein->value = STDIN_FILENO;
         descriptor_nonblock_on((descriptor_t *) consolein);

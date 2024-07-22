@@ -93,11 +93,11 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
 
     if(type == descriptor_event_type_read) {
         socket_server_t * server = subscription->descriptor;
-        buffer_t * buffer = server->buffer.in;
+        buffer_node_t * buffer = buffer_front(server->buffer.in);
 
-        socklen_t addrlen = *((socklen_t *) buffer_front(buffer));
-        struct sockaddr * addr = (struct sockaddr *) (buffer_front(buffer) + sizeof(socklen_t));
-        int32_t value = *((int32_t *)((buffer_front(buffer) + sizeof(socklen_t) + addrlen)));
+        socklen_t addrlen = *((socklen_t *) buffer_node_front(buffer));
+        struct sockaddr * addr = (struct sockaddr *) (buffer_node_front(buffer) + sizeof(socklen_t));
+        int32_t value = *((int32_t *)((buffer_node_front(buffer) + sizeof(socklen_t) + addrlen)));
 
         socket_session_t * descriptor = socket_session_gen(value, server->domain, server->type, server->protocol, addr, addrlen);
         socket_session_event_subscription_t * session = socket_session_event_subscription_gen(descriptor, subscription->session.handler, socket_server_event_subscription_list_node_gen(subscription->session.list));
@@ -120,8 +120,10 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
             on(subscription, type, node);
         }
 
-        buffer_position_set(buffer, buffer_position_get(buffer) + sizeof(socklen_t) + addrlen + sizeof(int));
-        buffer_adjust(buffer, 64);      // TODO: ADJUST VALUE
+        buffer_node_position_set(buffer, buffer_node_position_get(buffer) + sizeof(socklen_t) + addrlen + sizeof(int));
+
+        // buffer_position_set(buffer, buffer_position_get(buffer) + sizeof(socklen_t) + addrlen + sizeof(int));
+        // buffer_adjust(buffer, 64);      // TODO: ADJUST VALUE
 
     } else {
         socket_server_event_subscription_handler_t on = subscription->handler[type];

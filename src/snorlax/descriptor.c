@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include <snorlax/buffer/mem.h>
+
 #include "descriptor.h"
 
 static descriptor_func_t func = {
@@ -27,15 +29,15 @@ extern descriptor_func_t * descriptor_func_get(void) {
     return address_of(func);
 }
 
-extern descriptor_t * descriptor_gen(int32_t value) {
+extern descriptor_t * descriptor_gen(int32_t value, buffer_t * in, buffer_t * out) {
     descriptor_t * descriptor = (descriptor_t *) calloc(1, sizeof(descriptor_t));
 
     descriptor->func = address_of(func);
 
     descriptor->value = value;
 
-    descriptor->buffer.in = buffer_gen(0);
-    descriptor->buffer.out = buffer_gen(0);
+    descriptor->buffer.in = in ? in : (buffer_t *) buffer_mem_gen(0);
+    descriptor->buffer.out = out ? out : (buffer_t *) buffer_mem_gen(0);
 
     if(value > invalid) {
         descriptor->status = descriptor_state_open;
@@ -67,12 +69,11 @@ extern int64_t descriptor_func_read(___notnull descriptor_t * descriptor) {
 #endif // RELEASE
     if(descriptor->value > invalid) {
         if(descriptor->status & descriptor_state_open_in) {
-            buffer_t * buffer = descriptor->buffer.in;
-            buffer_capacity_set(buffer, buffer_size_get(buffer) + 8192);
-            int64_t n = read(descriptor->value, buffer_back(buffer), buffer_remain(buffer));
+            buffer_node_t * buffer = buffer_back(descriptor->buffer.in, 8192);
+            int64_t n = read(descriptor->value, buffer_node_back(buffer), buffer_node_remain(buffer));
 
             if(n > 0) {
-                buffer_size_set(buffer, buffer_size_get(buffer) + n);
+                buffer_node_size_set(buffer, buffer_node_size_get(buffer) + n);
 
                 descriptor->status = descriptor->status | descriptor_state_read;
             } else if(n == 0) {
@@ -117,13 +118,13 @@ extern int64_t descriptor_func_write(___notnull descriptor_t * descriptor) {
 #endif // RELEASE
     if(descriptor->value > invalid) {
         if(descriptor->status & descriptor_state_open_out) {
-            buffer_t * buffer = descriptor->buffer.out;
+            buffer_node_t * buffer = buffer_front(descriptor->buffer.out);
 
-            if(buffer_length(buffer) > 0) {
-                int64_t n = write(descriptor->value, buffer_front(buffer), buffer_length(buffer));
+            if(buffer_node_length(buffer) > 0) {
+                int64_t n = write(descriptor->value, buffer_node_front(buffer), buffer_node_length(buffer));
 
                 if(n > 0) {
-                    buffer_position_set(buffer, buffer_position_get(buffer) + n);
+                    buffer_node_position_set(buffer, buffer_node_position_get(buffer) + n);
 
                     descriptor->status = descriptor->status | descriptor_state_write;
                 } else if(n == 0) {

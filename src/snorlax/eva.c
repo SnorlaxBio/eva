@@ -177,7 +177,9 @@ extern void snorlax_eva_descriptor_write(descriptor_event_subscription_t * subsc
 #endif // RELEASE
     buffer_t * out = subscription->descriptor->buffer.out;
 
-    buffer_write(subscription->descriptor->buffer.out, data, len);
+    buffer_push(subscription->descriptor->buffer.out, data, len);
+
+    // buffer_write(subscription->descriptor->buffer.out, data, len);
 
     if(subscription->descriptor->status & descriptor_state_open_out) {
         event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);

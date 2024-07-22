@@ -82,8 +82,8 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
 
             descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(nil, value));
 
-            if(descriptor->buffer.in) buffer_reset(descriptor->buffer.in, 0);
-            if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
+            if(descriptor->buffer.in) buffer_clear(descriptor->buffer.in);
+            if(descriptor->buffer.out) buffer_clear(descriptor->buffer.out);
         }
 
         subscription->descriptor = descriptor_rem(descriptor);

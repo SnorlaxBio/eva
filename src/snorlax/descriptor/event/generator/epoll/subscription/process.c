@@ -135,7 +135,7 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
             descriptor_event_subscription_notify(subscription, descriptor_event_type_read, event_subscription_event_parameter_set(node, n));
 
             if(descriptor->status & descriptor_state_open_out) {
-                while(buffer_length(descriptor->buffer.out) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+                while(buffer_node_length(buffer_front(descriptor->buffer.out)) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
                     int64_t n = descriptor_write(descriptor);
 
                     if(n <= 0) break;
@@ -170,8 +170,12 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
                 event_subscription_event_rem(node);
             }
 
+#if       0
             buffer_adjust(descriptor->buffer.in, 0);
             if(descriptor->buffer.out) buffer_adjust(descriptor->buffer.out, 0);
+#else
+
+#endif // 0
 
             if(descriptor->status & descriptor_state_read) {
                 event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
@@ -204,7 +208,7 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
     buffer_t * buffer = descriptor->buffer.out;
 
     if(descriptor->status & descriptor_state_open_out) {
-        while(buffer && buffer_length(buffer) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+        while(buffer && buffer_node_length(buffer_front(buffer)) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
             int64_t n = descriptor_write(descriptor);
 
             if(n <= 0) break;
@@ -225,11 +229,13 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
                 event_subscription_event_rem(node);
             }
 
+#if 0
             buffer_adjust(descriptor->buffer.in, 0);
             buffer_adjust(descriptor->buffer.out, 0);
+#endif // 0
 
             if(descriptor->status & descriptor_state_write) {
-                if(buffer_length(descriptor->buffer.out) > 0) {
+                if(buffer_node_length(buffer_front(descriptor->buffer.out)) > 0) {
                     event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
                                                             (event_subscription_process_t) descriptor_event_subscription_process_write,
                                                             descriptor_event_type_write,
@@ -269,8 +275,8 @@ extern void descriptor_event_subscription_process_close(___notnull descriptor_ev
 
     descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(node, value));
 
-    if(descriptor->buffer.in) buffer_reset(descriptor->buffer.in, 0);
-    if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
+    if(descriptor->buffer.in) buffer_clear(descriptor->buffer.in);
+    if(descriptor->buffer.out) buffer_clear(descriptor->buffer.out);
 
     if(node) {
         if(node->origin) {
@@ -302,8 +308,8 @@ extern void descriptor_event_subscription_process_exception(___notnull descripto
     descriptor_close(subscription->descriptor);
     descriptor_event_subscription_notify(subscription, descriptor_event_type_close, event_subscription_event_parameter_set(node, value));
 
-    buffer_reset(descriptor->buffer.in, 0);
-    if(descriptor->buffer.out) buffer_reset(descriptor->buffer.out, 0);
+    buffer_clear(descriptor->buffer.in);
+    if(descriptor->buffer.out) buffer_clear(descriptor->buffer.out);
 
     if(node) {
         if(node->origin) {

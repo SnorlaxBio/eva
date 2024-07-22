@@ -66,12 +66,12 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
 
     } else if(type == descriptor_event_type_read) {
         buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
-        if(buffer_length(buffer) < 16) {
+        if(buffer_node_length(buffer_front(buffer)) < 16) {
             char buf[16];
-            memcpy(buf, buffer_front(buffer), buffer_length(buffer));
-            buf[buffer_length(buffer)] = 0;
+            memcpy(buf, buffer_node_front(buffer_front(buffer)), buffer_node_length(buffer_front(buffer)));
+            buf[buffer_node_length(buffer_front(buffer))] = 0;
         }
-        buffer_position_set(buffer, buffer_size_get(buffer));
+        buffer_node_position_set(buffer_front(buffer), buffer_node_size_get(buffer_front(buffer)));
         response = response + 1;
 
         if(response == 100 && count == 100) {

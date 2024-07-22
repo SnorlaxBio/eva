@@ -46,7 +46,7 @@ int main(int argc, char ** argv) {
 static void on(descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * ret) {
     if(type == descriptor_event_type_read) {
         buffer_t * in = snorlax_eva_descriptor_buffer_in_get(subscription);
-        if(strncmp(buffer_front(in), "cancel\n", 7) == 0) {
+        if(strncmp(buffer_node_front(buffer_front(in)), "cancel\n", 7) == 0) {
             snorlax_eva_off(cancel);
         }
     }

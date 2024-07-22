@@ -89,7 +89,7 @@ struct descriptor_func {
     int32_t (*check)(___notnull descriptor_t *, uint32_t);
 };
 
-extern descriptor_t * descriptor_gen(int32_t value);
+extern descriptor_t * descriptor_gen(int32_t value, buffer_t * in, buffer_t * out);
 
 extern descriptor_func_t * descriptor_func_get(void);
 

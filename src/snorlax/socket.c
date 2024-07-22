@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include <snorlax/buffer/mem.h>
+
 #include "socket.h"
 
 typedef int32_t (*socket_open_t)(___notnull socket_t *);
@@ -34,8 +36,8 @@ extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, voi
     descriptor->func = address_of(func);
 
     descriptor->value = invalid;
-    descriptor->buffer.in = buffer_gen(0);
-    descriptor->buffer.out = buffer_gen(0);
+    descriptor->buffer.in = (buffer_t *) buffer_mem_gen(0);
+    descriptor->buffer.out = (buffer_t *) buffer_mem_gen(0);
     descriptor->status = descriptor_state_close;
     descriptor->domain = domain;
     descriptor->type = type;

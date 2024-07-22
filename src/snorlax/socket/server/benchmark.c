@@ -63,7 +63,8 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
     } else if(type == descriptor_event_type_read) {
         buffer_t * in = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
         buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
-        deserialize(in, out);
+        // TODO: CONCEPT DESERIALIZER & SERIALZER
+        // deserialize(in, out);
     }
 }
 

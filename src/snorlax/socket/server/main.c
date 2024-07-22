@@ -74,16 +74,18 @@ static void sessionOn(___notnull socket_session_event_subscription_t * subscript
         buffer_t * in = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
         buffer_t * out = snorlax_eva_descriptor_buffer_out_get((descriptor_event_subscription_t *) subscription);
         int64_t n = 0;
-        while(n = string_simple_deserialize(in, out)) {
-            char * s = index(buffer_front(out), '\r');
-            if(s) {
-                *s = '\n';
-            }
-            if(strncmp(buffer_front(out), "quit\n\n", 6) == 0) {
-                snorlax_eva_off(cancel);
-                break;
-            }
-        }
+        // UPGRADE & CONCEPT SERIALIZER & DESERIALIZER
+
+        // while(n = string_simple_deserialize(in, out)) {
+        //     char * s = index(buffer_node_front(buffer_front(out)), '\r');
+        //     if(s) {
+        //         *s = '\n';
+        //     }
+        //     if(strncmp(buffer_node_front(buffer_front(out)), "quit\n\n", 6) == 0) {
+        //         snorlax_eva_off(cancel);
+        //         break;
+        //     }
+        // }
     }
 }
 

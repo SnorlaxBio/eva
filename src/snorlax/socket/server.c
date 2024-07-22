@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <snorlax/buffer/mem.h>
+
 #include "server.h"
 
 static socket_server_func_t func = {
@@ -30,7 +32,7 @@ extern socket_server_t * socket_server_gen(int32_t domain, int32_t type, int32_t
     descriptor->func = address_of(func);
 
     descriptor->value = invalid;
-    descriptor->buffer.in = buffer_gen(0);
+    descriptor->buffer.in = (buffer_t *) buffer_mem_gen(0);
     descriptor->buffer.out = nil;
     descriptor->status = descriptor_state_close;
     descriptor->domain = domain;
@@ -120,20 +122,19 @@ extern int64_t socket_server_func_read(___notnull socket_server_t * descriptor) 
     }
 
     if(descriptor->value > invalid) {
-        buffer_t * buffer = descriptor->buffer.in;
-        if(buffer_remain(buffer) < sizeof(struct sockaddr) + sizeof(socklen_t) + sizeof(int)) {
-            buffer_capacity_set(buffer, buffer_capacity_get(buffer) + 4 * (sizeof(struct sockaddr) + sizeof(socklen_t) + sizeof(int)));
-        }
-        *((socklen_t *) (buffer_back(buffer))) = sizeof(struct sockaddr);
-        int32_t value = accept(descriptor->value, (struct sockaddr *)(buffer_back(buffer) + sizeof(socklen_t)), (socklen_t *) (buffer_back(buffer)));
-        if(value > invalid) {
-            uint64_t n = *((socklen_t *) (buffer_back(buffer))) + sizeof(socklen_t);
+        buffer_node_t * buffer = buffer_back(descriptor->buffer.in, 4 * (sizeof(struct sockaddr) + sizeof(socklen_t) + sizeof(int)));
 
-            *(int32_t *)(buffer_back(buffer) + n) = value;
+        *((socklen_t *) (buffer_node_back(buffer))) = sizeof(struct sockaddr);
+
+        int32_t value = accept(descriptor->value, (struct sockaddr *)(buffer_node_back(buffer) + sizeof(socklen_t)), (socklen_t *) (buffer_node_back(buffer)));
+        if(value > invalid) {
+            uint64_t n = *((socklen_t *) (buffer_node_back(buffer))) + sizeof(socklen_t);
+
+            *(int32_t *)(buffer_node_back(buffer) + n) = value;
 
             n = n + sizeof(int32_t);
 
-            buffer_size_set(buffer, buffer_size_get(buffer) + n);
+            buffer_node_size_set(buffer, buffer_node_size_get(buffer) + n);
 
             return n;
         } else {

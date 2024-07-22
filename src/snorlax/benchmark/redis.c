@@ -79,9 +79,9 @@ static void on(___notnull socket_client_event_subscription_t * subscription, uin
 
     } else if(type == descriptor_event_type_read) {
         buffer_t * buffer = snorlax_eva_descriptor_buffer_in_get((descriptor_event_subscription_t *) subscription);
-        uint64_t n = buffer_length(buffer);
+        uint64_t n = buffer_node_length(buffer_front(buffer));
         uint64_t res = n / 1033;
-        buffer_position_set(buffer, buffer_position_get(buffer) + res * 1033);
+        buffer_node_position_set(buffer_front(buffer), buffer_node_position_get(buffer_front(buffer)) + res * 1033);
         // printf("response => %d\n", response);
         for(int i = 0; i < res && response < request; i++) {
             response = response + 1;
