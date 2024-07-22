@@ -140,6 +140,9 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
             descriptor_event_subscription_notify(subscription, descriptor_event_type_read, event_subscription_event_parameter_set(node, n));
 
             if(descriptor->status & descriptor_state_open_out) {
+#ifndef   RELEASE
+                snorlaxdbg(false, true, "debug", "%p %p", descriptor->buffer.out, buffer_front(descriptor->buffer.out));
+#endif // RELEASE
                 while(buffer_node_length(buffer_front(descriptor->buffer.out)) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
                     int64_t n = descriptor_write(descriptor);
 
