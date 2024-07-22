@@ -35,6 +35,7 @@ typedef struct socket_event_subscription socket_event_subscription_t;
 
 typedef void (*socket_event_subscription_handler_t)(___notnull socket_event_subscription_t *, uint32_t, event_subscription_event_t *);
 typedef void (*socket_event_subscription_process_t)(___notnull socket_event_subscription_t *, uint32_t, event_subscription_event_t *);
+typedef descriptor_buffer_t socket_buffer_t;
 
 struct socket_addr {
     uint8_t * value;
@@ -44,7 +45,7 @@ struct socket_addr {
 struct socket {
     socket_func_t * func;
     sync_t * sync;
-    descriptor_buffer_t buffer;
+    socket_buffer_t buffer;
     descriptor_exception_t exception;
     int32_t value;
     uint32_t status;
@@ -77,7 +78,6 @@ extern int32_t socket_func_open(___notnull socket_t * descriptor);
 extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t how);
 extern int32_t socket_func_check(___notnull socket_t * descriptir, uint32_t state);
 extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
-
 
 #define socket_rem(descriptor)                  ((descriptor)->func->rem(descriptor))
 #define socket_open(descriptor)                 ((descriptor)->func->open(descriptor))

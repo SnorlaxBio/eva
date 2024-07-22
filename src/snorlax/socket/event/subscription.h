@@ -35,6 +35,8 @@ struct socket_event_subscription_func {
     void (*notify)(___notnull socket_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
+#define socket_event_subscription_buffer_get(subscription)                  (&(subscription)->descriptor->buffer)
+
 #define socket_event_subscription_gen(descriptor, handler)                  ((socket_event_subscription_t *) descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler))
 
 #define socket_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
