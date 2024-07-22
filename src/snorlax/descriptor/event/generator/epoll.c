@@ -481,7 +481,6 @@ static ___notsync int32_t descriptor_event_generator_epoll_func_control_del(___n
         }
     }
 
-
     subscription->status = descriptor_event_generator_epoll_subscription_state_none;
 
     return success;

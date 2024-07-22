@@ -43,6 +43,7 @@ extern event_subscription_process_t descriptor_event_generator_epoll_subscriptio
 extern void descriptor_event_subscription_process_subscription(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_node_t * node) {
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     // TODO: CHECK THIS METHOD ... 구현할 필요 없어 보인다....
@@ -63,6 +64,8 @@ extern void descriptor_event_subscription_process_open(___notnull descriptor_eve
 
     snorlaxdbg(descriptor_exception_get(subscription->descriptor), false, "critical", "");
     snorlaxdbg(subscription->descriptor->status & descriptor_state_close, false, "critical", "");
+
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     descriptor_t * descriptor = subscription->descriptor;
@@ -115,6 +118,8 @@ extern void descriptor_event_subscription_process_read(___notnull descriptor_eve
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
+
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     descriptor_t * descriptor = subscription->descriptor;
@@ -199,6 +204,8 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
+
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     descriptor_t * descriptor = subscription->descriptor;
@@ -258,6 +265,8 @@ extern void descriptor_event_subscription_process_close(___notnull descriptor_ev
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
+
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     int value = subscription->descriptor->value;
@@ -292,6 +301,8 @@ extern void descriptor_event_subscription_process_exception(___notnull descripto
     snorlaxdbg(subscription == nil, false, "critical", "");
     snorlaxdbg(subscription->descriptor == nil, false, "critical", "");
     snorlaxdbg(descriptor_exception_get(subscription->descriptor) == nil, false, "critical", "");
+
+    snorlaxdbg(false, true, "debug", "descriptor => %d", subscription->descriptor->value);
 #endif // RELEASE
 
     descriptor_event_subscription_notify(subscription, descriptor_event_type_exception, event_subscription_event_parameter_set(node, descriptor_exception_get(subscription->descriptor)));
