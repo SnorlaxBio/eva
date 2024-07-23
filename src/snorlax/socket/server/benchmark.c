@@ -8,9 +8,6 @@
 #include <snorlax/socket/server.h>
 #include <snorlax/socket/session.h>
 
-#include <snorlax/deserializer.h>
-#include <snorlax/serializer.h>
-
 socket_server_event_subscription_t * subscription = nil;
 socket_server_t * server = nil;
 
