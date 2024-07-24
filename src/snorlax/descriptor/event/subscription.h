@@ -37,6 +37,8 @@ extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___no
 extern void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
 extern void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
+#define descriptor_event_subscription_buffer_get(subscription)                  (&((descriptor_event_subscription_t *)(subscription))->descriptor->buffer)
+
 #define descriptor_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
 
 #define descriptor_event_subscription_rem(subscription)                         ((subscription)->func->rem(subscription))
