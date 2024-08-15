@@ -44,8 +44,10 @@ struct socket_client_func {
 };
 
 struct socket_client_event_subscription;
+struct socket_client_event_subscription_pool;
 
 typedef struct socket_client_event_subscription socket_client_event_subscription_t;
+typedef struct socket_client_event_subscription_pool socket_client_event_subscription_pool_t;
 
 typedef void (*socket_client_event_subscription_handler_t)(___notnull socket_client_event_subscription_t *, uint32_t, event_subscription_event_t *);
 typedef void (*socket_client_event_subscription_process_t)(___notnull socket_client_event_subscription_t *, uint32_t, event_subscription_event_t *);

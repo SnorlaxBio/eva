@@ -16,6 +16,7 @@
 #include "../descriptor/event/subscription.h"
 #include "../socket/event/subscription.h"
 #include "../socket/server/event/subscription.h"
+#include "../socket/client/event/subscription.h"
 
 static void event_engine_func_default_cancel(const event_engine_t * engine);
 
@@ -218,6 +219,32 @@ extern socket_server_event_subscription_t * event_engine_socket_server_sub(event
 
     if(subscription->descriptor->status & (descriptor_state_open)) {
         socket_server_event_subscription_notify(subscription, descriptor_event_type_open, nil);
+    }
+
+    // TODO: CHECK ERROR HANDLING
+    event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
+
+    return subscription;
+}
+
+extern socket_client_event_subscription_t * event_engine_socket_client_sub(event_engine_t * engine, socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool) {
+#ifndef   RELEASE
+    snorlaxdbg(engine == nil, false, "critical", "");
+    snorlaxdbg(engine->set == nil, false, "critical", "");
+    snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+
+    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(descriptor, handler, pool);
+
+    if(descriptor->value <= invalid) {
+        if(socket_client_open(descriptor) == fail) {
+            return socket_client_event_subscription_rem(subscription);
+        }
+    }
+
+    if(subscription->descriptor->status & (descriptor_state_open)) {
+        socket_client_event_subscription_notify(subscription, descriptor_event_type_open, nil);
     }
 
     // TODO: CHECK ERROR HANDLING
