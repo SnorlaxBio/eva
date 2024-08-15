@@ -242,7 +242,7 @@ extern socket_client_event_subscription_t * event_engine_socket_client_sub(event
             return socket_client_event_subscription_rem(subscription);
         }
     }
-
+    
     if(subscription->descriptor->status & (descriptor_state_open)) {
         socket_client_event_subscription_notify(subscription, descriptor_event_type_open, nil);
     }
