@@ -63,6 +63,8 @@ typedef int32_t (*socket_client_shutdown_t)(___notnull socket_client_t *, uint32
 extern int32_t socket_client_func_open(___notnull socket_client_t * descriptor);
 
 extern socket_client_t * socket_client_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
+extern socket_client_t * socket_client_tcp4_gen(uint32_t destination, uint16_t port);
+extern socket_client_t * socket_client_tcp6_gen(uint8_t * destination, uint16_t port);
 
 #define socket_client_rem(descriptor)               ((descriptor)->func->rem(descriptor))
 #define socket_client_open(descriptor)              ((descriptor)->func->open(descriptor))

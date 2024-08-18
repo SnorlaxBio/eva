@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <netinet/in.h>
 
 #include <snorlax/buffer/mem.h>
 
@@ -25,6 +26,24 @@ static socket_client_func_t func = {
     (socket_client_check_t) socket_func_check,
     (socket_client_shutdown_t) socket_func_shutdown
 };
+
+extern socket_client_t * socket_client_tcp4_gen(uint32_t destination, uint16_t port) {
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htons(destination);
+    addr.sin_port = htons(port);
+
+    return socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in));
+}
+
+extern socket_client_t * socket_client_tcp6_gen(uint8_t * destination, uint16_t port) {
+    struct sockaddr_in6 addr;
+    addr.sin6_family = AF_INET6;
+    memcpy(addr.sin6_addr.s6_addr, destination, 16);
+    addr.sin6_port = htons(port);
+
+    return socket_client_gen(AF_INET6, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in6));
+}
 
 extern socket_client_t * socket_client_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen) {
     socket_client_t * descriptor = (socket_client_t *) calloc(1, sizeof(socket_client_t));
