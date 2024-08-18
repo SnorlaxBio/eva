@@ -104,3 +104,7 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
 
     return nil;
 }
+
+extern descriptor_buffer_t * socket_session_event_subscription_buffer_get(___notnull socket_session_event_subscription_t * subscription) {
+    return address_of(subscription->descriptor->buffer);
+}

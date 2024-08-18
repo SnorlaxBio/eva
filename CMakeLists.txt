@@ -136,6 +136,9 @@ target_link_libraries(snorlax-eva-server-benchmark snorlax-eva libsnorlax-std.a)
 add_executable(snorlax-eva-redis-benchmark src/snorlax/benchmark/redis.c)
 target_link_libraries(snorlax-eva-redis-benchmark snorlax-eva libsnorlax-std.a)
 
+add_executable(snorlax-eva-benchmark-server src/snorlax/benchmark/server.c)
+target_link_libraries(snorlax-eva-benchmark-server snorlax-eva libsnorlax-std.a)
+
 install(TARGETS snorlax-eva ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/src/ DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
                   FILES_MATCHING PATTERN "*.h")

@@ -109,3 +109,7 @@ extern void socket_client_event_subscription_func_notify(___notnull socket_clien
         }
     }
 }
+
+extern descriptor_buffer_t * socket_client_event_subscription_buffer_get(___notnull socket_client_event_subscription_t * subscription) {
+    return address_of(subscription->descriptor->buffer);
+}

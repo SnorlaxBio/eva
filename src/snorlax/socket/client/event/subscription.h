@@ -46,6 +46,8 @@ extern socket_client_event_subscription_t * socket_client_event_subscription_fun
 extern void socket_client_event_subscription_func_on(___notnull socket_client_event_subscription_t * subscription, socket_client_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
 extern void socket_client_event_subscription_func_notify(___notnull socket_client_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 
+extern descriptor_buffer_t * socket_client_event_subscription_buffer_get(___notnull socket_client_event_subscription_t * subscription);
+
 #define socket_client_event_subscription_rem(subscription)                         ((subscription)->func->rem(subscription))
 #define socket_client_event_subscription_on(subscription, process, type, node)     ((subscription)->func->on(subscription, process, type, node))
 #define socket_client_event_subscription_notify(subscription, type, node)          ((subscription)->func->notify(subscription, type, node))

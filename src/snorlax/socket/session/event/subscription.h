@@ -48,5 +48,6 @@ extern socket_session_event_subscription_t * socket_session_event_subscription_g
 #define socket_session_event_subscription_on(subscription, process, type, node)     ((subscription)->func->on(subscription, process, type, node))
 #define socket_session_event_subscription_notify(subscription, type, node)          ((subscription)->func->notify(subscription, type, node))
 
+extern descriptor_buffer_t * socket_session_event_subscription_buffer_get(___notnull socket_session_event_subscription_t * subscription);
 
 #endif // __SNORLAX__SESSION_EVENT_SUBSCRIPTION__H__
