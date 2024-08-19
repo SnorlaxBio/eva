@@ -31,7 +31,7 @@ static socket_server_event_subscription_func_t func = {
     socket_server_event_subscription_func_notify
 };
 
-extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta) {
+extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
