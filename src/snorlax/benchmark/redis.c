@@ -19,7 +19,6 @@ nanosecond_t start = { 0, };
 nanosecond_t current = { 0, };
 nanosecond_t end = { 0, };
 
-
 socket_client_event_subscription_t * subscriptions[2][100] = { 0, };
 socket_client_t * clients[2][100] = { 0, };
 
@@ -51,7 +50,7 @@ int main(int argc, char ** argv) {
 
     for(int i = 0; i < total; i++) {
         clients[0][i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-        subscriptions[0][i] = snorlax_eva_socket_client_sub(clients[0][i], handler);
+        subscriptions[0][i] = snorlax_eva_socket_client_sub(clients[0][i], handler, nil);
     }
 
     // addr.sin_port = htons(6378);

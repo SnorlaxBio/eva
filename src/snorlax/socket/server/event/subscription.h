@@ -33,6 +33,7 @@ struct socket_server_event_subscription {
     event_subscription_event_queue_t * queue;
     socket_server_event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
     uint32_t status;
     socket_server_t * descriptor;
     socket_server_session_t session;
@@ -48,7 +49,10 @@ typedef socket_server_event_subscription_t * (*socket_server_event_subscription_
 typedef void (*socket_server_event_subscription_on_t)(___notnull socket_server_event_subscription_t *, socket_server_event_subscription_process_t, uint32_t, event_subscription_event_t *);
 typedef void (*socket_server_event_subscription_notify_t)(___notnull socket_server_event_subscription_t *, uint32_t, event_subscription_event_t *);
 
-extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn);
+/**
+ * 서버의 meta 파라미터는 meta generation 이 되도록 구현할 필요가 있다.
+ */
+extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta);
 extern socket_server_event_subscription_t * socket_server_event_subscription_func_rem(socket_server_event_subscription_t * subscription);
 extern void socket_server_event_subscription_func_notify(___notnull socket_server_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);
 

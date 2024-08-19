@@ -14,6 +14,7 @@
 #include "../../server/event/subscription/list.h"
 #include "../../../event/subscription/event/queue.h"
 #include "../../../event/subscription/event.h"
+#include "../../../event/subscription/meta.h"
 
 typedef void (*socket_session_event_subscription_on_t)(___notnull socket_session_event_subscription_t *, socket_session_event_subscription_process_t, uint32_t, event_subscription_event_t *);
 typedef void (*socket_session_event_subscription_notify_t)(___notnull socket_session_event_subscription_t *, uint32_t, event_subscription_event_t *);
@@ -27,7 +28,7 @@ static socket_session_event_subscription_func_t func = {
     socket_session_event_subscription_func_notify
 };
 
-extern socket_session_event_subscription_t * socket_session_event_subscription_gen(socket_session_t * descriptor, socket_session_event_subscription_handler_t * handler, socket_server_event_subscription_list_node_t * node) {
+extern socket_session_event_subscription_t * socket_session_event_subscription_gen(socket_session_t * descriptor, socket_session_event_subscription_handler_t * handler, socket_server_event_subscription_list_node_t * node, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -41,6 +42,7 @@ extern socket_session_event_subscription_t * socket_session_event_subscription_g
     subscription->type = event_subscription_type_descriptor;
     subscription->node = node;
     subscription->node->session = subscription;
+    subscription->meta = meta;
 
     return subscription;
 }
@@ -99,6 +101,10 @@ static socket_session_event_subscription_t * socket_session_event_subscription_f
 
         subscription->node = socket_server_event_subscription_list_node_rem(node);
     }
+
+    if(subscription->meta) subscription->meta = event_subscription_meta_rem(subscription->meta);
+
+    subscription->sync = sync_rem(subscription->sync);
 
     free(subscription);
 

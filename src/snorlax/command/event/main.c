@@ -26,7 +26,7 @@ int main(int argc, char ** argv) {
 
     command_event_subscription_handler_t handler[2] = { on, on };
 
-    subscription = snorlax_eva_command_sub(command, 5, handler);
+    subscription = snorlax_eva_command_sub(command, 5, handler, nil);
 
     return snorlax_eva_run();
 }

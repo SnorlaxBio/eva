@@ -22,6 +22,7 @@ struct descriptor_event_subscription {
     event_subscription_event_queue_t * queue;
     descriptor_event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
     uint32_t status;
     descriptor_t * descriptor;
 };
@@ -32,7 +33,7 @@ struct descriptor_event_subscription_func {
     void (*notify)(___notnull descriptor_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
-extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
+extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
 
 extern void descriptor_event_subscription_func_on(___notnull descriptor_event_subscription_t * subscription, descriptor_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);
 extern void descriptor_event_subscription_func_notify(___notnull descriptor_event_subscription_t * subscription, uint32_t type, event_subscription_event_t * node);

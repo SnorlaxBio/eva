@@ -149,7 +149,7 @@ static void event_engine_func_default_cancel(const event_engine_t * engine) {
     
 }
 
-extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler) {
+extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
@@ -157,7 +157,7 @@ extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engin
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler);
+    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler, meta);
 
     if(descriptor->value <= invalid) {
         if(descriptor_open(descriptor) == fail) {
@@ -175,7 +175,7 @@ extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engin
     return subscription;
 }
 
-extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * engine, socket_t * descriptor, socket_event_subscription_handler_t * handler) {
+extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * engine, socket_t * descriptor, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
@@ -183,7 +183,7 @@ extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * en
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    socket_event_subscription_t * subscription = socket_event_subscription_gen(descriptor, handler);
+    socket_event_subscription_t * subscription = socket_event_subscription_gen(descriptor, handler, meta);
 
     if(descriptor->value <= invalid) {
         if(socket_open(descriptor) == fail) {
@@ -201,7 +201,7 @@ extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * en
     return subscription;
 }
 
-extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn) {
+extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
@@ -209,7 +209,7 @@ extern socket_server_event_subscription_t * event_engine_socket_server_sub(event
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    socket_server_event_subscription_t * subscription = socket_server_event_subscription_gen(descriptor, sessionOn, serverOn);
+    socket_server_event_subscription_t * subscription = socket_server_event_subscription_gen(descriptor, sessionOn, serverOn, meta);
 
     if(descriptor->value <= invalid) {
         if(socket_server_open(descriptor) == fail) {
@@ -227,7 +227,7 @@ extern socket_server_event_subscription_t * event_engine_socket_server_sub(event
     return subscription;
 }
 
-extern socket_client_event_subscription_t * event_engine_socket_client_sub(event_engine_t * engine, socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool) {
+extern socket_client_event_subscription_t * event_engine_socket_client_sub(event_engine_t * engine, socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
@@ -235,7 +235,7 @@ extern socket_client_event_subscription_t * event_engine_socket_client_sub(event
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
 
-    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(descriptor, handler, pool);
+    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(descriptor, handler, pool, meta);
 
     if(descriptor->value <= invalid) {
         if(socket_client_open(descriptor) == fail) {

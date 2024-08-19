@@ -3,6 +3,7 @@
 #include "../../../descriptor/event/subscription/type.h"
 #include "../../../descriptor/event/subscription.h"
 #include "../../../descriptor/event/generator.h"
+#include "../../../event/subscription/meta.h"
 #include "../../../event/subscription/event/queue.h"
 #include "../../../event/subscription/event.h"
 
@@ -12,7 +13,7 @@ static socket_client_event_subscription_func_t func = {
     socket_client_event_subscription_func_notify
 };
 
-extern socket_client_event_subscription_t * socket_client_event_subscription_gen(socket_client_t * client, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool) {
+extern socket_client_event_subscription_t * socket_client_event_subscription_gen(socket_client_t * client, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(client == nil, false, "critical", "");
 #endif // RELEASE
@@ -36,6 +37,8 @@ extern socket_client_event_subscription_t * socket_client_event_subscription_gen
         subscription->node = socket_client_event_subscription_pool_node_gen(subscription);
         socket_client_event_subscription_pool_push(pool, subscription->node);
     }
+
+    subscription->meta = meta;
 
     return subscription;
 }
@@ -76,6 +79,10 @@ extern socket_client_event_subscription_t * socket_client_event_subscription_fun
 
         subscription->node = socket_client_event_subscription_pool_node_rem(node);
     }
+
+    if(subscription->meta) subscription->meta = event_subscription_meta_rem(subscription->meta);
+
+    subscription->sync = sync_rem(subscription->sync);
 
     free(subscription);
 

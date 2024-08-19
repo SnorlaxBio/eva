@@ -36,6 +36,7 @@ struct event_subscription {
     event_subscription_event_queue_t * queue;
     event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
 };
 
 struct event_subscription_func {

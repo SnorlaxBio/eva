@@ -28,6 +28,7 @@ struct socket_client_event_subscription {
     event_subscription_event_queue_t * queue;
     socket_client_event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
     uint32_t status;
     socket_client_t * descriptor;
 
@@ -40,7 +41,7 @@ struct socket_client_event_subscription_func {
     void (*notify)(___notnull socket_client_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
-extern socket_client_event_subscription_t * socket_client_event_subscription_gen(socket_client_t * client, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool);
+extern socket_client_event_subscription_t * socket_client_event_subscription_gen(socket_client_t * client, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool, event_subscription_meta_t * meta);
 
 extern socket_client_event_subscription_t * socket_client_event_subscription_func_rem(___notnull socket_client_event_subscription_t * subscription);
 extern void socket_client_event_subscription_func_on(___notnull socket_client_event_subscription_t * subscription, socket_client_event_subscription_process_t process, uint32_t type, event_subscription_event_t * node);

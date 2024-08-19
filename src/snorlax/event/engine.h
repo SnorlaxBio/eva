@@ -55,9 +55,9 @@ extern event_engine_t * event_engine_gen(void);
 #include <snorlax/socket/session.h>
 #include <snorlax/socket/client.h>
 
-extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
-extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * engine, socket_t * descriptor, socket_event_subscription_handler_t * handler);
-extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn);
-extern socket_client_event_subscription_t * event_engine_socket_client_sub(event_engine_t * engine, socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool);
+extern descriptor_event_subscription_t * event_engine_descriptor_sub(event_engine_t * engine, descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * engine, socket_t * descriptor, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta);
+extern socket_client_event_subscription_t * event_engine_socket_client_sub(event_engine_t * engine, socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, socket_client_event_subscription_pool_t * pool, event_subscription_meta_t * meta);
 
 #endif // __SNORLAX__EVENT_ENGINE__H__

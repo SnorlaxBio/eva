@@ -22,6 +22,7 @@ struct command_event_subscription {
     event_subscription_event_queue_t * queue;
     command_event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
 
     int32_t retry;
     command_t * command;
@@ -33,7 +34,7 @@ struct command_event_subscription_func {
     void (*notify)(___notnull command_event_subscription_t *, uint32_t, event_subscription_event_t *);
 };
 
-extern command_event_subscription_t * command_event_subscription_gen(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
+extern command_event_subscription_t * command_event_subscription_gen(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
 
 #define command_event_subscription_node_gen                                 event_subscription_event_gen
 

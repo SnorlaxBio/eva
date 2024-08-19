@@ -22,6 +22,7 @@ struct event_subscription;
 struct descriptor_event_subscription;
 struct event_engine;
 struct event_subscription_event;
+struct event_subscription_meta;
 
 struct socket_server_event_subscription;
 struct socket_client_event_subscription;
@@ -35,17 +36,18 @@ typedef struct event_subscription_event event_subscription_event_t;
 typedef struct socket_server_event_subscription socket_server_event_subscription_t;
 typedef struct socket_client_event_subscription socket_client_event_subscription_t;
 typedef struct socket_client_pool_event_subscription socket_client_pool_event_subscription_t;
+typedef struct event_subscription_meta event_subscription_meta_t;
 typedef void (*event_engine_cancel_t)(const event_engine_t *);
 
 extern int32_t snorlax_eva_on(void);
 extern int32_t snorlax_eva_off(event_engine_cancel_t cancel);
 extern int32_t snorlax_eva_run(void);
 
-extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
-extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
-extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * descriptor, socket_event_subscription_handler_t * handler);
-extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler);
-extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn);
+extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * descriptor, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta);
 
 /**
  * @deprecated

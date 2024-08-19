@@ -25,6 +25,7 @@ struct socket_event_subscription {
     event_subscription_event_queue_t * queue;
     socket_event_subscription_handler_t * handler;
     uint32_t type;
+    event_subscription_meta_t * meta;
     uint32_t status;
     socket_t * descriptor;
 };
@@ -37,7 +38,7 @@ struct socket_event_subscription_func {
 
 #define socket_event_subscription_buffer_get(subscription)                  (&((socket_event_subscription_t *)(subscription))->descriptor->buffer)
 
-#define socket_event_subscription_gen(descriptor, handler)                  ((socket_event_subscription_t *) descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler))
+#define socket_event_subscription_gen(descriptor, handler, meta)            ((socket_event_subscription_t *) descriptor_event_subscription_gen((descriptor_t *) descriptor, (descriptor_event_subscription_handler_t *) handler, meta))
 
 #define socket_event_subscription_node_gen(subscription)                    (event_subscription_event_gen((event_subscription_t *) subscription))
 

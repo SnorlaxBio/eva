@@ -53,42 +53,42 @@ extern int32_t snorlax_eva_run(void) {
     return ret;
 }
 
-extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler) {
+extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(command == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->command == nil, false, "critical", "");
 #endif // RELEASE
-    command_event_subscription_t * subscription = command_event_subscription_gen(command, retry, handler);
+    command_event_subscription_t * subscription = command_event_subscription_gen(command, retry, handler, meta);
 
     event_generator_add(engine->set->command, (event_subscription_t *) subscription);
 
     return (event_subscription_t *) subscription;
 }
 
-extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler) {
+extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler);
+    descriptor_event_subscription_t * subscription = descriptor_event_subscription_gen(descriptor, handler, meta);
 
     event_generator_add(engine->set->descriptor, (event_subscription_t *) subscription);
 
     return subscription;
 }
 
-extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler) {
+extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * s, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(s == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    socket_event_subscription_t * subscription = socket_event_subscription_gen(s, handler);
+    socket_event_subscription_t * subscription = socket_event_subscription_gen(s, handler, meta);
 
     if(s->value <= invalid) {
         if(socket_open(s) == fail) {
@@ -105,14 +105,14 @@ extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t 
     return subscription;
 }
 
-extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * s, socket_client_event_subscription_handler_t * handler) {
+extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * s, socket_client_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(s == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(s, handler, nil);
+    socket_client_event_subscription_t * subscription = socket_client_event_subscription_gen(s, handler, nil, meta);
 
     if(s->value <= invalid) {
         if(socket_client_open(s) == fail) {
@@ -129,14 +129,14 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
     return subscription; 
 }
 
-extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn) {
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");
     snorlaxdbg(engine->set->descriptor == nil, false, "critical", "");
 #endif // RELEASE
-    socket_server_event_subscription_t * subscription = socket_server_event_subscription_gen(descriptor, sessionOn, serverOn);
+    socket_server_event_subscription_t * subscription = socket_server_event_subscription_gen(descriptor, sessionOn, serverOn, meta);
 
     if(descriptor->value <= invalid) {
         if(socket_server_open(descriptor) == fail) {

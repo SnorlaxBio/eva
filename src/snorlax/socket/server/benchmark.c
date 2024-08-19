@@ -43,7 +43,7 @@ int main(int argc, char ** argv) {
     };
 
     server = socket_server_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-    subscription = snorlax_eva_socket_server_sub(server, handler, callback);
+    subscription = snorlax_eva_socket_server_sub(server, handler, callback, nil);
     return snorlax_eva_run();
 }
 

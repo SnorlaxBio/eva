@@ -14,6 +14,7 @@
 
 #include "type.h"
 
+#include "../../event/subscription/meta.h"
 #include "../../event/subscription/event/queue.h"
 
 static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(___notnull descriptor_event_subscription_t * subscription);
@@ -24,7 +25,7 @@ static descriptor_event_subscription_func_t func = {
     descriptor_event_subscription_func_notify
 };
 
-extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler) {
+extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -43,6 +44,8 @@ extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___no
         }
     }
 
+    subscription->meta = meta;
+
     return subscription;
 }
 
@@ -59,10 +62,12 @@ static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(
 
     descriptor_event_subscription_notify(subscription, descriptor_event_type_subscription, (event_subscription_event_t *) descriptor_event_subscription_type_rem);
 
-    subscription->sync = sync_rem(subscription->sync);
-
     subscription->handler = memory_rem(subscription->handler);
     subscription->queue = event_subscription_event_queue_rem(subscription->queue);
+
+    if(subscription->meta) subscription->meta = event_subscription_meta_rem(subscription->meta);
+
+    subscription->sync = sync_rem(subscription->sync);
 
     free(subscription);
 
