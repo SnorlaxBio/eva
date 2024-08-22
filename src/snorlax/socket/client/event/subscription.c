@@ -120,3 +120,23 @@ extern void socket_client_event_subscription_func_notify(___notnull socket_clien
 extern descriptor_buffer_t * socket_client_event_subscription_buffer_get(___notnull socket_client_event_subscription_t * subscription) {
     return address_of(subscription->descriptor->buffer);
 }
+
+/**
+ * 디스크립터 WRITE 에 동일하다. 하나로 합쳐서 공통적으로 호출하도록 사용하면 좋을 것 같다.
+ */
+extern int64_t socket_client_event_subscription_write(___notnull socket_client_event_subscription_t * subscription, const uint8_t * data, uint64_t datalen) {
+#ifndef   RELEASE
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+    buffer_t * out = subscription->descriptor->buffer.out;
+
+    buffer_push(subscription->descriptor->buffer.out, data, datalen);
+
+    if(subscription->descriptor->status & descriptor_state_open_out) {
+        // 아래 루틴을 가볍게 바꿀 수 있다. 매크로로 바꾸던, 함수를 만들던, 함수 호출 비용을 생각해보자.
+        event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
+        process((event_subscription_t *) subscription, descriptor_event_type_write, nil);
+    }
+
+    return datalen;
+}

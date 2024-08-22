@@ -109,4 +109,6 @@ extern int64_t descriptor_event_subscription_write(___notnull descriptor_event_s
         event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
         process((event_subscription_t *) subscription, descriptor_event_type_write, nil);
     }
+
+    return datalen;
 }
