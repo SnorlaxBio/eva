@@ -201,7 +201,7 @@ extern socket_event_subscription_t * event_engine_socket_sub(event_engine_t * en
     return subscription;
 }
 
-extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta) {
+extern socket_server_event_subscription_t * event_engine_socket_server_sub(event_engine_t * engine, socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(engine == nil, false, "critical", "");
     snorlaxdbg(engine->set == nil, false, "critical", "");

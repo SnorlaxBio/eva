@@ -17,6 +17,7 @@
 #include <snorlax/socket/client.h>
 #include <snorlax/socket/server.h>
 #include <snorlax/socket/session.h>
+#include <snorlax/socket/server/event/subscription/meta.h>
 
 struct event_subscription;
 struct descriptor_event_subscription;
@@ -47,7 +48,7 @@ extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * com
 extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
 extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * descriptor, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
 extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
-extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta);
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta);
 
 /**
  * @deprecated

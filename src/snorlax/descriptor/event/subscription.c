@@ -16,6 +16,7 @@
 
 #include "../../event/subscription/meta.h"
 #include "../../event/subscription/event/queue.h"
+#include "subscription/process.h"
 
 static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(___notnull descriptor_event_subscription_t * subscription);
 
@@ -92,5 +93,20 @@ extern void descriptor_event_subscription_func_notify(___notnull descriptor_even
 
     if(on) {
         on(subscription, type, node);
+    }
+}
+
+extern int64_t descriptor_event_subscription_write(___notnull descriptor_event_subscription_t * subscription, const uint8_t * data, uint64_t datalen) {
+#ifndef   RELEASE
+    snorlaxdbg(subscription == nil, false, "critical", "");
+#endif // RELEASE
+    buffer_t * out = subscription->descriptor->buffer.out;
+
+    buffer_push(subscription->descriptor->buffer.out, data, datalen);
+
+    if(subscription->descriptor->status & descriptor_state_open_out) {
+        // 아래 루틴을 가볍게 바꿀 수 있다. 매크로로 바꾸던, 함수를 만들던, 함수 호출 비용을 생각해보자.
+        event_subscription_process_t process = descriptor_event_subscription_process_get(descriptor_event_type_write);
+        process((event_subscription_t *) subscription, descriptor_event_type_write, nil);
     }
 }

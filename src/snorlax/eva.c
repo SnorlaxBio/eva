@@ -129,7 +129,7 @@ extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___not
     return subscription; 
 }
 
-extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, event_subscription_meta_t * meta) {
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
     snorlaxdbg(engine == nil, false, "critical", "");
