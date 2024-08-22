@@ -100,6 +100,12 @@ extern int64_t descriptor_event_subscription_write(___notnull descriptor_event_s
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
+
+    if(subscription->descriptor->value == invalid) {
+        snorlaxdbg(subscription->descriptor->value == invalid, false, "implement", "");
+        return fail;
+    }
+
     buffer_t * out = subscription->descriptor->buffer.out;
 
     buffer_push(subscription->descriptor->buffer.out, data, datalen);

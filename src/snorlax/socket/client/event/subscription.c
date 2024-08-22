@@ -128,6 +128,13 @@ extern int64_t socket_client_event_subscription_write(___notnull socket_client_e
 #ifndef   RELEASE
     snorlaxdbg(subscription == nil, false, "critical", "");
 #endif // RELEASE
+
+    snorlaxdbg(false, true, "implement", "descriptor is not open or alive");
+
+    if(subscription->descriptor->value == invalid) {
+        return fail;
+    }
+
     buffer_t * out = subscription->descriptor->buffer.out;
 
     buffer_push(subscription->descriptor->buffer.out, data, datalen);
