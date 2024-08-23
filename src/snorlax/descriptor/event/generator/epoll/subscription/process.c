@@ -218,14 +218,18 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
     buffer_t * buffer = descriptor->buffer.out;
 
     if(descriptor->status & descriptor_state_open_out) {
+        printf("1\n");
         while(buffer && buffer_node_length(buffer_front(buffer)) > 0 && descriptor_exception_get(descriptor) == nil && (descriptor->status & descriptor_state_close) == 0) {
+            printf("2\n");
             int64_t n = descriptor_write(descriptor);
 
             if(n <= 0) break;
 
+            printf("3\n");
             descriptor_event_subscription_notify(subscription, descriptor_event_type_write, event_subscription_event_parameter_set(node, n));
         }
 
+        printf("4\n");
         if(descriptor_exception_get(descriptor)) {
             descriptor_event_subscription_process_exception(subscription, type, node);
         } else if(descriptor->status & descriptor_state_close) {
@@ -239,11 +243,7 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
                 event_subscription_event_rem(node);
             }
 
-#if 0
-            buffer_adjust(descriptor->buffer.in, 0);
-            buffer_adjust(descriptor->buffer.out, 0);
-#endif // 0
-
+            printf("5\n");
             if(descriptor->status & descriptor_state_write) {
                 if(buffer_node_length(buffer_front(descriptor->buffer.out)) > 0) {
                     event_queue_push(engine->queue, event_gen((event_subscription_t *) subscription,
@@ -254,12 +254,15 @@ extern void descriptor_event_subscription_process_write(___notnull descriptor_ev
             } else {
                 descriptor_event_generator_epoll_control(generator, subscription, descriptor_event_generator_epoll_control_type_mod);
             }
+            printf("6\n");
         }
     } else if(node) {
+        printf("6\n");
         if(node->origin) {
             node->origin->node = nil;
             node->origin = nil;
         }
+        printf("7\n");
         event_subscription_event_rem(node);
     }
 }
