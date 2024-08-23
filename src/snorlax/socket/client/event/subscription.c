@@ -1,6 +1,7 @@
 #include "subscription.h"
 
 #include "../../../descriptor/event/subscription/type.h"
+#include "../../../descriptor/event/subscription/process.h"
 #include "../../../descriptor/event/subscription.h"
 #include "../../../descriptor/event/generator.h"
 #include "../../../event/subscription/meta.h"
