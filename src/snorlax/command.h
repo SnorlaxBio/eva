@@ -28,6 +28,7 @@ typedef void (*command_event_subscription_handler_t)(___notnull command_event_su
 struct command {
     command_func_t * func;
     sync_t * sync;
+    event_object_meta_t * meta;
 
     command_execute_t execute;
 };

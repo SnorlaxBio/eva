@@ -28,31 +28,35 @@ struct event_processor;
 struct event_processor_func;
 struct event_processor_pool;
 struct event_processor_pool_func;
+struct event_object_meta;
+struct event_object_meta_func;
 
-typedef struct event event_t;
-typedef struct event_func event_func_t;
-typedef struct event_queue event_queue_t;
-typedef struct event_queue_func event_queue_func_t;
-typedef struct event_subscription event_subscription_t;
-typedef struct event_subscription_meta event_subscription_meta_t;
-typedef struct event_subscription_meta_func event_subscription_meta_func_t;
-typedef struct event_subscription_func event_subscription_func_t;
-typedef struct event_subscription_event event_subscription_event_t;
-typedef struct event_subscription_event_func event_subscription_event_func_t;
-typedef struct event_subscription_event_queue event_subscription_event_queue_t;
-typedef struct event_subscription_event_queue_func event_subscription_event_queue_func_t;
-typedef struct event_engine event_engine_t;
-typedef struct event_engine_func event_engine_func_t;
-typedef struct event_generator event_generator_t;
-typedef struct event_generator_func event_generator_func_t;
-typedef struct event_generator_set event_generator_set_t;
-typedef struct event_generator_set_func event_generator_set_func_t;
-typedef struct event_processor event_processor_t;
-typedef struct event_processor_func event_processor_func_t;
-typedef struct event_processor_pool event_processor_pool_t;
-typedef struct event_processor_pool_func event_processor_pool_func_t;
+typedef struct event                                    event_t;
+typedef struct event_func                               event_func_t;
+typedef struct event_queue                              event_queue_t;
+typedef struct event_queue_func                         event_queue_func_t;
+typedef struct event_subscription                       event_subscription_t;
+typedef struct event_subscription_meta                  event_subscription_meta_t;
+typedef struct event_subscription_meta_func             event_subscription_meta_func_t;
+typedef struct event_subscription_func                  event_subscription_func_t;
+typedef struct event_subscription_event                 event_subscription_event_t;
+typedef struct event_subscription_event_func            event_subscription_event_func_t;
+typedef struct event_subscription_event_queue           event_subscription_event_queue_t;
+typedef struct event_subscription_event_queue_func      event_subscription_event_queue_func_t;
+typedef struct event_engine                             event_engine_t;
+typedef struct event_engine_func                        event_engine_func_t;
+typedef struct event_generator                          event_generator_t;
+typedef struct event_generator_func                     event_generator_func_t;
+typedef struct event_generator_set                      event_generator_set_t;
+typedef struct event_generator_set_func                 event_generator_set_func_t;
+typedef struct event_processor                          event_processor_t;
+typedef struct event_processor_func                     event_processor_func_t;
+typedef struct event_processor_pool                     event_processor_pool_t;
+typedef struct event_processor_pool_func                event_processor_pool_func_t;
+typedef struct event_object_meta                        event_object_meta_t;
+typedef struct event_object_meta_func                   event_object_meta_func_t;
 
-typedef event_subscription_event_t event_subscription_node_t;
+typedef event_subscription_event_t                      event_subscription_node_t;
 
 typedef void (*event_subscription_process_t)(___notnull event_subscription_t *, uint32_t, event_subscription_node_t *);
 typedef void (*event_processor_cancel_t)(___notnull event_processor_t *);
@@ -108,7 +112,20 @@ extern event_t * event_gen(___notnull event_subscription_t * subscription, event
 
 extern void event_func_on(___notnull event_t * event);
 
-#define event_rem(event)        ((event)->func->rem(event))
-#define event_on(event)         ((event)->func->on(event))
+#define event_rem(event)                    ((event)->func->rem(event))
+#define event_on(event)                     ((event)->func->on(event))
+
+struct event_object_meta {
+    event_object_meta_func_t * func;
+    sync_t * sync;
+};
+
+struct event_object_meta_func {
+    event_object_meta_t * (*rem)(event_object_meta_t *);
+};
+
+#define event_object_meta_rem(meta)         ((meta)->func->rem(meta))
+
+#define event_object_func_rem               object_func_rem
 
 #endif // __SNORLAX__EVENT__H__

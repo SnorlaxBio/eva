@@ -36,6 +36,10 @@ static command_t * command_func_rem(___notnull command_t * command) {
     snorlaxdbg(command == nil, false, "critical", "");
 #endif // RELEASE
 
+    if(command->meta) command->meta = event_object_meta_rem(command->meta);
+
+    command->sync = sync_rem(command->sync);
+
     free(command);
 
     return nil;

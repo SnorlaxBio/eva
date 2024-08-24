@@ -23,6 +23,7 @@ typedef struct console_in_func console_in_func_t;
 struct console_in {
     console_in_func_t * func;
     sync_t * sync;
+    event_object_meta_t * meta;
     descriptor_buffer_t buffer;
     descriptor_exception_t exception;
     int32_t value;
