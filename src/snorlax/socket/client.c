@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <snorlax/buffer/mem.h>
 
@@ -27,11 +28,13 @@ static socket_client_func_t func = {
     (socket_client_shutdown_t) socket_func_shutdown
 };
 
-extern socket_client_t * socket_client_tcp4_gen(uint32_t destination, uint16_t port) {
+extern socket_client_t * socket_client_tcp4_gen(uint8_t * destination, uint16_t port) {
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htons(destination);
-    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = destination;
+    addr.sin_port = uint16_of(port);
+
+    snorlaxdbg(false, true, "debug", "%s:%u", inet_ntoa(addr.sin_addr), addr.sin_port);
 
     return socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in));
 }
