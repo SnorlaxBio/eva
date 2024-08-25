@@ -83,7 +83,7 @@ extern socket_t * socket_func_rem(___notnull socket_t * descriptor) {
 
     if(descriptor->buffer.in) descriptor->buffer.in = buffer_rem(descriptor->buffer.in);
     if(descriptor->buffer.out) descriptor->buffer.out = buffer_rem(descriptor->buffer.out);
-    if(descriptor->meta) descriptor->meta = event_object_meta_rem(descriptor->meta);
+
     descriptor->addr.value = memory_rem(descriptor->addr.value);
     descriptor->sync = sync_rem(descriptor->sync);
 

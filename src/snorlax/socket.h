@@ -45,7 +45,7 @@ struct socket_addr {
 struct socket {
     socket_func_t * func;
     sync_t * sync;
-    event_object_meta_t * meta;
+    ___reference event_object_meta_t * meta;
     socket_buffer_t buffer;
     descriptor_exception_t exception;
     int32_t value;

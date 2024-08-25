@@ -73,7 +73,7 @@ extern descriptor_exception_t * descriptor_exception_func_get(___notnull descrip
 struct descriptor {
     descriptor_func_t * func;
     sync_t * sync;
-    event_object_meta_t * meta;
+    ___reference event_object_meta_t * meta;
     descriptor_buffer_t buffer;
     descriptor_exception_t exception;
     int32_t value;
