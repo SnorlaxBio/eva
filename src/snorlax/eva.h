@@ -17,7 +17,6 @@
 #include <snorlax/socket/client.h>
 #include <snorlax/socket/server.h>
 #include <snorlax/socket/session.h>
-#include <snorlax/socket/server/event/subscription/meta.h>
 
 struct event_subscription;
 struct descriptor_event_subscription;

@@ -12,7 +12,6 @@
 
 #include <snorlax/socket/server.h>
 #include <snorlax/socket/server/event/subscription/list.h>
-#include <snorlax/socket/server/event/subscription/meta.h>
 
 struct socket_server_event_subscription_func;
 

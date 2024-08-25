@@ -31,7 +31,7 @@ static socket_client_func_t func = {
 extern socket_client_t * socket_client_tcp4_gen(uint8_t * destination, uint16_t port) {
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = destination;
+    addr.sin_addr.s_addr = uint32_of(destination);
     addr.sin_port = uint16_of(port);
 
     snorlaxdbg(false, true, "debug", "%s:%u", inet_ntoa(addr.sin_addr), addr.sin_port);
