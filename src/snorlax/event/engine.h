@@ -46,6 +46,13 @@ extern event_engine_t * event_engine_gen(void);
 
 #define event_engine_rem(engine)            ((engine)->func->rem(engine))
 #define event_engine_on(engine)             ((engine)->func->on(engine))
+/**
+ * Turn off event engine
+ * 
+ * @param in engine `event_engine_t` event engine object
+ * @param in cancel event_engine_cancel_t event engine cancel callback function
+ * @return int32_t result to call event_engine_off(), always return success
+ */
 #define event_engine_off(engine, cancel)    ((engine)->func->off(engine, cancel))
 #define event_engine_run(engine)            ((engine)->func->run(engine))
 
