@@ -32,7 +32,7 @@ extern socket_client_t * socket_client_tcp4_gen(uint8_t * destination, uint16_t 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = uint32_of(destination);
-    addr.sin_port = uint16_of(port);
+    addr.sin_port = port;
 
     snorlaxdbg(false, true, "debug", "%s:%u", inet_ntoa(addr.sin_addr), addr.sin_port);
 
@@ -43,7 +43,7 @@ extern socket_client_t * socket_client_tcp6_gen(uint8_t * destination, uint16_t 
     struct sockaddr_in6 addr;
     addr.sin6_family = AF_INET6;
     memcpy(addr.sin6_addr.s6_addr, destination, 16);
-    addr.sin6_port = htons(port);
+    addr.sin6_port = port;
 
     return socket_client_gen(AF_INET6, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in6));
 }
