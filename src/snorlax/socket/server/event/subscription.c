@@ -31,7 +31,7 @@ static socket_server_event_subscription_func_t func = {
     socket_server_event_subscription_func_notify
 };
 
-extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta) {
+extern socket_server_event_subscription_t * socket_server_event_subscription_gen(socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn,socket_server_event_subscription_handler_t * serverOn) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -58,8 +58,6 @@ extern socket_server_event_subscription_t * socket_server_event_subscription_gen
         }
     }
 
-    subscription->meta = meta;
-
     return subscription;
 }
 
@@ -82,8 +80,6 @@ extern socket_server_event_subscription_t * socket_server_event_subscription_fun
     subscription->queue = event_subscription_event_queue_rem(subscription->queue);
     subscription->handler = memory_rem(subscription->handler);
 
-    if(subscription->meta) subscription->meta = event_subscription_meta_rem(subscription->meta);
-
     subscription->sync = sync_rem(subscription->sync);
 
     free(subscription);
@@ -105,7 +101,7 @@ extern void socket_server_event_subscription_func_notify(___notnull socket_serve
         int32_t value = *((int32_t *)((buffer_node_front(buffer) + sizeof(socklen_t) + addrlen)));
 
         socket_session_t * descriptor = socket_session_gen(value, server->domain, server->type, server->protocol, addr, addrlen);
-        socket_session_event_subscription_t * session = socket_session_event_subscription_gen(descriptor, subscription->session.handler, socket_server_event_subscription_list_node_gen(subscription->session.list), nil);
+        socket_session_event_subscription_t * session = socket_session_event_subscription_gen(descriptor, subscription->session.handler, socket_server_event_subscription_list_node_gen(subscription->session.list));
 
         socket_session_event_subscription_notify(session, descriptor_event_type_open, nil);
 

@@ -44,11 +44,11 @@ extern int32_t snorlax_eva_on(void);
 extern int32_t snorlax_eva_off(event_engine_cancel_t cancel);
 extern int32_t snorlax_eva_run(void);
 
-extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
-extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
-extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * descriptor, socket_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
-extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler, event_subscription_meta_t * meta);
-extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn, socket_server_event_subscription_meta_t * meta);
+extern event_subscription_t * snorlax_eva_command_sub(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler);
+extern descriptor_event_subscription_t * snorlax_eva_descriptor_sub(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler);
+extern socket_event_subscription_t * snorlax_eva_socket_sub(___notnull socket_t * descriptor, socket_event_subscription_handler_t * handler);
+extern socket_client_event_subscription_t * snorlax_eva_socket_client_sub(___notnull socket_client_t * descriptor, socket_client_event_subscription_handler_t * handler);
+extern socket_server_event_subscription_t * snorlax_eva_socket_server_sub(___notnull socket_server_t * descriptor, socket_session_event_subscription_handler_t * sessionOn, socket_server_event_subscription_handler_t * serverOn);
 
 /**
  * @deprecated

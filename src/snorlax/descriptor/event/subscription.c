@@ -26,7 +26,7 @@ static descriptor_event_subscription_func_t func = {
     descriptor_event_subscription_func_notify
 };
 
-extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
+extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___notnull descriptor_t * descriptor, descriptor_event_subscription_handler_t * handler) {
 #ifndef   RELEASE
     snorlaxdbg(descriptor == nil, false, "critical", "");
 #endif // RELEASE
@@ -44,8 +44,6 @@ extern descriptor_event_subscription_t * descriptor_event_subscription_gen(___no
             subscription->handler[i] = handler[i];
         }
     }
-
-    subscription->meta = meta;
 
     return subscription;
 }
@@ -65,8 +63,6 @@ static descriptor_event_subscription_t * descriptor_event_subscription_func_rem(
 
     subscription->handler = memory_rem(subscription->handler);
     subscription->queue = event_subscription_event_queue_rem(subscription->queue);
-
-    if(subscription->meta) subscription->meta = event_subscription_meta_rem(subscription->meta);
 
     subscription->sync = sync_rem(subscription->sync);
 

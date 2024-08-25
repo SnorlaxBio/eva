@@ -37,8 +37,8 @@ int main(int argc, char ** argv) {
         on
     };
 
-    subscription[0] = (event_subscription_t *) snorlax_eva_descriptor_sub((descriptor_t *) consolein, handler, nil);
-    subscription[1] = (event_subscription_t *) snorlax_eva_descriptor_sub((descriptor_t *) consoleout, handler, nil);
+    subscription[0] = (event_subscription_t *) snorlax_eva_descriptor_sub((descriptor_t *) consolein, handler);
+    subscription[1] = (event_subscription_t *) snorlax_eva_descriptor_sub((descriptor_t *) consoleout, handler);
 
     return snorlax_eva_run();
 }

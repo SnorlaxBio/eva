@@ -45,7 +45,7 @@ int main(int argc, char ** argv) {
 
     socket_server_t * server = socket_server_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in));
 
-    socket_server_event_subscription_t * subscription = event_engine_socket_server_sub(engine, server, sessionOn, serverOn, nil);
+    socket_server_event_subscription_t * subscription = event_engine_socket_server_sub(engine, server, sessionOn, serverOn);
     
     return event_engine_run(engine);
 }

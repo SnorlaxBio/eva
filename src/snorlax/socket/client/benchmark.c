@@ -50,7 +50,7 @@ int main(int argc, char ** argv) {
 
     for(int i = 0; i < total; i++) {
         clients[i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-        subscriptions[i] = snorlax_eva_socket_client_sub(clients[i], handler, nil);
+        subscriptions[i] = snorlax_eva_socket_client_sub(clients[i], handler);
     }
 
 

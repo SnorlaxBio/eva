@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
     addr.sin_port = ntohs(2078);
 
     socket_client_t * client = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, address_of(addr), sizeof(struct sockaddr_in));
-    socket_client_event_subscription_t * subscription = event_engine_socket_client_sub(engine, client, clientOn, nil, nil);
+    socket_client_event_subscription_t * subscription = event_engine_socket_client_sub(engine, client, clientOn, nil);
 
     return event_engine_run(engine);
 }

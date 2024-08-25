@@ -50,7 +50,7 @@ int main(int argc, char ** argv) {
 
     for(int i = 0; i < total; i++) {
         clients[0][i] = socket_client_gen(AF_INET, SOCK_STREAM, IPPROTO_TCP, (struct sockaddr *) &addr, addrlen);
-        subscriptions[0][i] = snorlax_eva_socket_client_sub(clients[0][i], handler, nil);
+        subscriptions[0][i] = snorlax_eva_socket_client_sub(clients[0][i], handler);
     }
 
     // addr.sin_port = htons(6378);

@@ -27,7 +27,7 @@ static command_event_subscription_func_t func = {
     command_event_subscription_func_notify
 };
 
-extern command_event_subscription_t * command_event_subscription_gen(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler, event_subscription_meta_t * meta) {
+extern command_event_subscription_t * command_event_subscription_gen(___notnull command_t * command, int32_t retry, command_event_subscription_handler_t * handler) {
 #ifndef   RELEASE
     snorlaxdbg(command == nil, false, "critical", "");
 #endif // RELEASE
@@ -47,8 +47,6 @@ extern command_event_subscription_t * command_event_subscription_gen(___notnull 
             subscription->handler[i] = handler[i];
         }
     }
-
-    subscription->meta = meta;
 
     return subscription;
 }
