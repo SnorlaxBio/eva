@@ -209,7 +209,10 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 if(flags & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
                     descriptor_exception_set(descriptor, descriptor_exception_type_system, socket_func_error_retrieve((socket_t *) descriptor), epoll_wait);
 
-                    descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
+                    if(descriptor_exception_get(descriptor)) {
+                        descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
+                    }
+
                     continue;
                 }
             }
