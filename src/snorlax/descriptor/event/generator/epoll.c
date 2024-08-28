@@ -306,7 +306,8 @@ static void descriptor_event_generator_epoll_func_dispatch(descriptor_event_subs
                                             descriptor_event_subscription_node_gen((event_subscription_t *) subscription)));
     } else {
         if((subscription->descriptor->status & (descriptor_state_open | descriptor_state_close)) == 0 && subscription->descriptor->value > invalid) {
-            type = descriptor_event_type_open;
+            snorlaxdbg(false, true, "check", "");
+            // type = descriptor_event_type_open;
         }
 
         event_subscription_process_t process = descriptor_event_generator_epoll_subscription_process_get(type);
