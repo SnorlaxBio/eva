@@ -191,10 +191,27 @@ static ___sync int32_t descriptor_event_generator_epoll_func_pub(___notnull desc
                 snorlaxdbg(false, true, "descriptor exception", "%d %d %p", descriptor_exception_type_system, flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
 #endif // RELEASE
 
-                descriptor_exception_set(descriptor, descriptor_exception_type_system, flags & (EPOLLERR | EPOLLPRI | EPOLLHUP | EPOLLRDHUP), epoll_wait);
+                if(flags & EPOLLPRI) {
+                    /**
+                     * EPOLLPRI
+                     * 
+                     * There is an exceptional condition on the file descriptor. Possibilities include:
+                     * 
+                     * - There is out-of-band data on a TCP socket.
+                     * - A pseudoterminal master in packet mode has seen a state chagne on the slave.
+                     * - A cgroup.events file has been modified.
+                     * 
+                     * TODO: DESCRIPTOR TYPE CHECK ... TCP ...
+                     */
+                    snorlaxdbg(flags & EPOLLPRI, false, "implement", "");
+                }
 
-                descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
-                continue;
+                if(flags & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
+                    descriptor_exception_set(descriptor, descriptor_exception_type_system, socket_func_error_retrieve((socket_t *) descriptor), epoll_wait);
+
+                    descriptor_event_generator_epoll_func_dispatch(subscription, descriptor_event_type_exception, queue, engine);
+                    continue;
+                }
             }
             if(flags & EPOLLOUT) {
                 descriptor->status = descriptor->status | descriptor_state_write;

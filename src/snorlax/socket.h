@@ -80,6 +80,8 @@ extern int32_t socket_func_shutdown(___notnull socket_t * descriptor, uint32_t h
 extern int32_t socket_func_check(___notnull socket_t * descriptir, uint32_t state);
 extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, void * addr, uint64_t addrlen);
 
+extern int32_t socket_func_error_retrieve(socket_t * descriptor);
+
 #define socket_rem(descriptor)                  ((descriptor)->func->rem(descriptor))
 #define socket_open(descriptor)                 ((descriptor)->func->open(descriptor))
 #define socket_read(descriptor)                 ((descriptor)->func->read(descriptor))
@@ -87,5 +89,7 @@ extern socket_t * socket_gen(int32_t domain, int32_t type, int32_t protocol, voi
 #define socket_close(descriptor)                ((descriptor)->func->close(descriptor))
 #define socket_check(descriptor, state)         ((descriptor)->func->check(descriptor, state))
 #define socket_shutdown(descriptor, how)        ((descriptor)->func->shutdown(descriptor, how))
+
+#define socket_error_retrieve(descriptor)       (socket_func_error_retrieve(descriptor))
 
 #endif // __SNORLAX__SOCKET__H__

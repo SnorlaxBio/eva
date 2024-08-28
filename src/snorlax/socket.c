@@ -158,3 +158,20 @@ extern int32_t socket_func_check(___notnull socket_t * descriptor, uint32_t stat
 
     return false;
 }
+
+extern int32_t socket_func_error_retrieve(socket_t * descriptor) {
+#ifndef   RELEASE
+    snorlaxdbg(descriptor == nil, false, "critical", "");
+#endif // RELEASE
+
+    int32_t value = 0;
+    socklen_t valuelen = sizeof(int32_t);
+
+    if(getsockopt(descriptor->value, SOL_SOCKET, SO_ERROR, &value, &valuelen) == success) {
+        return value;
+    }
+
+    snorlaxdbg(false, true, "caution", "fail to getsockopt(...) => %d", errno);
+
+    return 0;
+}
