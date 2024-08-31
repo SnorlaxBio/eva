@@ -2,7 +2,7 @@
  * @file        snorlax/socket.c
  * @brief
  * @details
- * @author      snorlax <ceo@snorlax.bio>
+ * @author      snorlax <opuntia@snorlax.bio>
  * @since       June 27, 2024
  */
 
